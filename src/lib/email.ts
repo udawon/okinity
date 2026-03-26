@@ -21,7 +21,7 @@ export async function sendConsultationAlert(data: ConsultationEmailData) {
 
   // Email to admin/consultant
   await getResend().emails.send({
-    from: 'OKINITY <noreply@okinity.com>',
+    from: 'OKINITY <onboarding@resend.dev>',
     to: adminEmail,
     subject: `[新規相談] ${data.customerName} — ${data.tourTitle}`,
     html: `
@@ -55,7 +55,7 @@ export async function sendConsultationAlert(data: ConsultationEmailData) {
   };
 
   await getResend().emails.send({
-    from: 'OKINITY <noreply@okinity.com>',
+    from: 'OKINITY <onboarding@resend.dev>',
     to: data.customerEmail,
     subject: subjects[data.language] || subjects.en,
     html: `
