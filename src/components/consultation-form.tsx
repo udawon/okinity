@@ -61,6 +61,12 @@ export function ConsultationForm() {
           >
             <div className="text-4xl mb-4">✓</div>
             <p className="text-lg text-teal-400">{t('success')}</p>
+            <button
+              onClick={() => setSubmitted(false)}
+              className="mt-6 rounded-full border border-white/20 px-6 py-2 text-sm text-white/60 hover:text-white hover:border-white/40 transition-colors"
+            >
+              {lang === 'ko' ? '새로운 상담 신청' : lang === 'ja' ? '新しいご相談' : 'New Inquiry'}
+            </button>
           </motion.div>
         </div>
       </section>
