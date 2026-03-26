@@ -1,0 +1,75 @@
+{
+  "nav": {
+    "home": "홈",
+    "tours": "투어",
+    "about": "OKINITY",
+    "contact": "문의",
+    "consultation": "상담 신청"
+  },
+  "hero": {
+    "subtitle": "오키나와 프리미엄 요트 경험",
+    "cta": "투어 둘러보기",
+    "ctaConsult": "상담 신청하기"
+  },
+  "tours": {
+    "title": "투어 프로그램",
+    "subtitle": "특별한 순간을 바다 위에서",
+    "charter": "전세",
+    "perPerson": "1인",
+    "minPersons": "명 이상 출항",
+    "duration": "소요시간",
+    "includes": "포함사항",
+    "viewDetails": "자세히 보기",
+    "yen": "엔"
+  },
+  "why": {
+    "title": "왜 OKINITY인가",
+    "premium": {
+      "title": "프리미엄 경험",
+      "desc": "소수인원 전용 프라이빗 요트로 특별한 순간을 만듭니다"
+    },
+    "location": {
+      "title": "최적의 로케이션",
+      "desc": "오키나와 최고의 해상 포인트를 알고 있습니다"
+    },
+    "custom": {
+      "title": "맞춤 서비스",
+      "desc": "프로포즈부터 비즈니스 미팅까지, 당신만의 크루즈를 설계합니다"
+    }
+  },
+  "consultation": {
+    "title": "상담 신청",
+    "subtitle": "전문 상담사가 최적의 투어를 설계해드립니다",
+    "name": "이름",
+    "email": "이메일",
+    "phone": "연락처",
+    "preferredContact": "선호 연락 수단",
+    "kakao": "카카오톡",
+    "line": "LINE",
+    "emailContact": "이메일",
+    "phoneContact": "전화",
+    "contactId": "카카오톡 ID / LINE ID / 전화번호",
+    "tour": "관심 투어",
+    "date": "희망 날짜",
+    "partySize": "인원",
+    "persons": "명",
+    "message": "추가 요청사항",
+    "messagePlaceholder": "특별한 요청이 있으시면 알려주세요",
+    "submit": "상담 신청하기",
+    "success": "상담 신청이 완료되었습니다! 곧 연락드리겠습니다.",
+    "selectTour": "투어를 선택해주세요"
+  },
+  "contact": {
+    "title": "문의하기",
+    "subtitle": "궁금한 점이 있으시면 편하게 연락주세요",
+    "kakao": "카카오톡 문의",
+    "instagram": "인스타그램",
+    "email": "이메일 문의"
+  },
+  "footer": {
+    "slogan": "We guide to the future",
+    "copyright": "© 2026 OKINITY. All rights reserved.",
+    "privacy": "개인정보처리방침",
+    "terms": "이용약관"
+  }
+}

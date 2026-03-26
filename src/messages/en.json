@@ -1,0 +1,75 @@
+{
+  "nav": {
+    "home": "Home",
+    "tours": "Tours",
+    "about": "OKINITY",
+    "contact": "Contact",
+    "consultation": "Inquire"
+  },
+  "hero": {
+    "subtitle": "Okinawa Premium Yacht Experience",
+    "cta": "Explore Tours",
+    "ctaConsult": "Book a Consultation"
+  },
+  "tours": {
+    "title": "Tour Programs",
+    "subtitle": "Unforgettable moments on the sea",
+    "charter": "Charter",
+    "perPerson": "Per Person",
+    "minPersons": "+ guests to sail",
+    "duration": "Duration",
+    "includes": "Includes",
+    "viewDetails": "View Details",
+    "yen": "JPY"
+  },
+  "why": {
+    "title": "Why OKINITY",
+    "premium": {
+      "title": "Premium Experience",
+      "desc": "Private yacht for intimate groups — crafting extraordinary moments"
+    },
+    "location": {
+      "title": "Perfect Location",
+      "desc": "We know Okinawa's finest spots on the water"
+    },
+    "custom": {
+      "title": "Tailored Service",
+      "desc": "From proposals to business meetings — your cruise, your way"
+    }
+  },
+  "consultation": {
+    "title": "Book a Consultation",
+    "subtitle": "Our specialists will design the perfect tour for you",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "preferredContact": "Preferred Contact Method",
+    "kakao": "KakaoTalk",
+    "line": "LINE",
+    "emailContact": "Email",
+    "phoneContact": "Phone",
+    "contactId": "KakaoTalk ID / LINE ID / Phone Number",
+    "tour": "Interested Tour",
+    "date": "Preferred Date",
+    "partySize": "Party Size",
+    "persons": "guests",
+    "message": "Additional Requests",
+    "messagePlaceholder": "Let us know if you have any special requests",
+    "submit": "Submit Inquiry",
+    "success": "Your inquiry has been submitted! We'll be in touch shortly.",
+    "selectTour": "Select a tour"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Feel free to reach out with any questions",
+    "kakao": "KakaoTalk",
+    "instagram": "Instagram",
+    "email": "Email"
+  },
+  "footer": {
+    "slogan": "We guide to the future",
+    "copyright": "© 2026 OKINITY. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  }
+}

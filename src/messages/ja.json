@@ -1,0 +1,75 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "tours": "ツアー",
+    "about": "OKINITY",
+    "contact": "お問い合わせ",
+    "consultation": "ご相談"
+  },
+  "hero": {
+    "subtitle": "沖縄プレミアムヨット体験",
+    "cta": "ツアーを見る",
+    "ctaConsult": "ご相談はこちら"
+  },
+  "tours": {
+    "title": "ツアープログラム",
+    "subtitle": "特別な瞬間を海の上で",
+    "charter": "チャーター",
+    "perPerson": "1名",
+    "minPersons": "名以上で出航",
+    "duration": "所要時間",
+    "includes": "含まれるもの",
+    "viewDetails": "詳しく見る",
+    "yen": "円"
+  },
+  "why": {
+    "title": "OKINITYが選ばれる理由",
+    "premium": {
+      "title": "プレミアム体験",
+      "desc": "少人数専用プライベートヨットで特別な瞬間をお届けします"
+    },
+    "location": {
+      "title": "最高のロケーション",
+      "desc": "沖縄最高の海上ポイントを熟知しています"
+    },
+    "custom": {
+      "title": "オーダーメイド",
+      "desc": "プロポーズからビジネスミーティングまで、あなただけのクルーズを設計します"
+    }
+  },
+  "consultation": {
+    "title": "ご相談",
+    "subtitle": "専門スタッフが最適なツアーをご提案します",
+    "name": "お名前",
+    "email": "メールアドレス",
+    "phone": "電話番号",
+    "preferredContact": "ご希望の連絡方法",
+    "kakao": "カカオトーク",
+    "line": "LINE",
+    "emailContact": "メール",
+    "phoneContact": "電話",
+    "contactId": "カカオトークID / LINE ID / 電話番号",
+    "tour": "ご希望のツアー",
+    "date": "ご希望日",
+    "partySize": "人数",
+    "persons": "名",
+    "message": "その他ご要望",
+    "messagePlaceholder": "特別なご要望がございましたらお知らせください",
+    "submit": "相談を申し込む",
+    "success": "ご相談のお申し込みを受け付けました。まもなくご連絡いたします。",
+    "selectTour": "ツアーを選択してください"
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "subtitle": "ご不明な点がございましたらお気軽にご連絡ください",
+    "kakao": "カカオトーク",
+    "instagram": "インスタグラム",
+    "email": "メール"
+  },
+  "footer": {
+    "slogan": "We guide to the future",
+    "copyright": "© 2026 OKINITY. All rights reserved.",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約"
+  }
+}
