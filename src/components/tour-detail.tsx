@@ -3,26 +3,46 @@
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { Link } from '@/i18n/navigation';
 import type { Tour } from '@/lib/tours';
-
-const categoryIcons: Record<string, string> = {
-  cruise: '⛵',
-  business: '💼',
-  filming: '🎬',
-  festival: '🎆',
-  party: '🎉',
-  proposal: '💍',
-};
+import { getCategoryBySlug } from '@/lib/tours';
 
 export function TourDetail({ tour }: { tour: Tour }) {
   const t = useTranslations('tours');
   const tConsult = useTranslations('consultation');
   const { locale } = useParams();
   const lang = (locale as 'ko' | 'ja' | 'en') || 'ko';
+  const category = getCategoryBySlug(tour.categorySlug);
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-6">
       <div className="mx-auto max-w-4xl">
+        {/* Breadcrumb */}
+        {category && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-6 flex items-center gap-2 text-sm text-white/40"
+          >
+            <Link href="/#tours" className="hover:text-white/60 transition-colors">
+              {t('title')}
+            </Link>
+            <span>/</span>
+            {category.tours.length > 1 ? (
+              <Link
+                href={`/tours/${category.slug}`}
+                className="hover:text-white/60 transition-colors"
+              >
+                {category.title[lang]}
+              </Link>
+            ) : (
+              <span>{category.title[lang]}</span>
+            )}
+            <span>/</span>
+            <span className="text-white/60">{tour.title[lang]}</span>
+          </motion.div>
+        )}
+
         {/* Hero banner */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -31,7 +51,7 @@ export function TourDetail({ tour }: { tour: Tour }) {
         >
           <div className="absolute inset-0 bg-gradient-to-t from-ocean-900/90 to-transparent z-10" />
           <div className="absolute inset-0 flex items-center justify-center text-7xl">
-            {categoryIcons[tour.category]}
+            {category?.icon || '⛵'}
           </div>
           <div className="absolute bottom-6 left-6 z-20">
             <h1 className="text-3xl md:text-4xl font-bold">

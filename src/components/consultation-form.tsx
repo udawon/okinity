@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { tours } from '@/lib/tours';
+import { tourCategories } from '@/lib/tours';
 import { useParams } from 'next/navigation';
 
 export function ConsultationForm() {
@@ -173,14 +173,22 @@ export function ConsultationForm() {
                 <option value="" className="bg-ocean-900">
                   {t('selectTour')}
                 </option>
-                {tours.map((tour) => (
-                  <option
-                    key={tour.id}
-                    value={tour.id}
+                {tourCategories.map((category) => (
+                  <optgroup
+                    key={category.slug}
+                    label={category.title[lang]}
                     className="bg-ocean-900"
                   >
-                    {tour.title[lang]}
-                  </option>
+                    {category.tours.map((tour) => (
+                      <option
+                        key={tour.id}
+                        value={tour.id}
+                        className="bg-ocean-900"
+                      >
+                        {tour.title[lang]}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
             </div>

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { consultations } from '@/lib/db/schema';
 import { sendConsultationAlert } from '@/lib/email';
-import { tours } from '@/lib/tours';
+import { getTourById } from '@/lib/tours';
 
 export async function POST(request: Request) {
   try {
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       .returning();
 
     // Send email notifications
-    const tour = tours.find((t) => t.id === tourId);
+    const tour = getTourById(tourId);
     const tourTitle = tour
       ? tour.title[language as 'ko' | 'ja' | 'en'] || tour.title.en
       : 'Unknown Tour';

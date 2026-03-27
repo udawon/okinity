@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { tours } from '@/lib/tours';
+import { getTourById } from '@/lib/tours';
 
 interface Consultation {
   id: string;
@@ -116,7 +116,7 @@ export default function AdminPage() {
             </div>
           ) : (
             consultations.map((c) => {
-              const tour = tours.find((t) => t.id === c.tourId);
+              const tour = getTourById(c.tourId);
               return (
                 <div key={c.id} className="glass rounded-xl p-6">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

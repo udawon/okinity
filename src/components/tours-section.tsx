@@ -1,8 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { tours } from '@/lib/tours';
-import { TourCard } from './tour-card';
+import { tourCategories } from '@/lib/tours';
+import { CategoryCard } from './category-card';
 
 export function ToursSection() {
   const t = useTranslations('tours');
@@ -15,12 +15,10 @@ export function ToursSection() {
           <p className="mt-4 text-white/50 text-lg">{t('subtitle')}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tours
-            .filter((tour) => tour.available)
-            .map((tour, i) => (
-              <TourCard key={tour.id} tour={tour} index={i} />
-            ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {tourCategories.map((category, i) => (
+            <CategoryCard key={category.slug} category={category} index={i} />
+          ))}
         </div>
       </div>
     </section>
