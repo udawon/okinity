@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { tourCategories } from '@/lib/tours';
 
@@ -35,8 +36,15 @@ export function ToursSection() {
                   <div className="glass group relative overflow-hidden rounded-2xl transition-all duration-300 hover:border-white/20 hover:shadow-lg hover:shadow-teal-500/5">
                     {/* Image area */}
                     <div className="relative h-56 overflow-hidden bg-ocean-700">
-                      <div className="absolute inset-0 bg-gradient-to-t from-ocean-900/80 to-transparent z-10" />
-                      <div className="absolute inset-0 flex items-center justify-center text-6xl">
+                      <Image
+                        src={category.image}
+                        alt={category.title[lang]}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-ocean-900/90 via-ocean-900/30 to-transparent z-10" />
+                      <div className="absolute top-4 left-4 z-20 text-3xl">
                         {category.icon}
                       </div>
                     </div>

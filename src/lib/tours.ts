@@ -39,7 +39,7 @@ export const tourCategories: TourCategory[] = [
       en: 'Enjoy Okinawa\'s emerald waters on an exclusive private yacht',
     },
     icon: '⛵',
-    image: '/images/cruise.jpg',
+    image: '/images/private-cruise/cruise.png',
     tours: [
       {
         id: '1',
@@ -172,7 +172,7 @@ export const tourCategories: TourCategory[] = [
       en: 'Authentic fishing experiences in Okinawa\'s rich waters',
     },
     icon: '🎣',
-    image: '/images/fishing.jpg',
+    image: '/images/fishing-tour/fishing.png',
     tours: [
       {
         id: '5',
@@ -276,7 +276,7 @@ export const tourCategories: TourCategory[] = [
       en: 'Watch Okinawa\'s biggest fireworks festivals from a private VIP seat on the sea',
     },
     icon: '🎆',
-    image: '/images/fireworks.jpg',
+    image: '/images/firework/fireworks.png',
     tours: [
       {
         id: '8',
@@ -351,7 +351,7 @@ export const tourCategories: TourCategory[] = [
       en: 'Premium BBQ party on the waters of Okinawa',
     },
     icon: '🍖',
-    image: '/images/bbq.jpg',
+    image: '/images/BBQ/Concept-bbq.png',
     tours: [
       {
         id: '10',
@@ -378,8 +378,8 @@ export const tourCategories: TourCategory[] = [
           ja: ['BBQセット', '海鮮', 'お肉', 'ドリンク', 'デザート'],
           en: ['BBQ set', 'Seafood', 'Meat', 'Drinks', 'Dessert'],
         },
-        image: '/images/bbq.jpg',
-        images: ['/images/bbq-1.jpg', '/images/bbq-2.jpg', '/images/bbq-3.jpg'],
+        image: '/images/BBQ/Concept-bbq.png',
+        images: ['/images/BBQ/Concept-bbq.png'],
         available: true,
       },
     ],
