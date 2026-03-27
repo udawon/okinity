@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 export function ImageCarousel({ images, alt }: { images: string[]; alt: string }) {
   const [current, setCurrent] = useState(0);
@@ -19,11 +20,15 @@ export function ImageCarousel({ images, alt }: { images: string[]; alt: string }
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="absolute inset-0 flex items-center justify-center text-3xl text-white/20"
+          className="absolute inset-0"
         >
-          {/* Placeholder when image doesn't exist */}
-          <div className="absolute inset-0 bg-gradient-to-br from-ocean-600 to-ocean-800" />
-          <span className="relative z-10">{alt} {current + 1}/{images.length}</span>
+          <Image
+            src={images[current]}
+            alt={`${alt} ${current + 1}`}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 400px"
+          />
         </motion.div>
       </AnimatePresence>
 
