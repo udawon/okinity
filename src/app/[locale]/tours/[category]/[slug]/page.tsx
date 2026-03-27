@@ -1,17 +1,21 @@
 import { notFound } from 'next/navigation';
 import { getTourBySlug, tourCategories } from '@/lib/tours';
 import { TourDetail } from '@/components/tour-detail';
+import { routing } from '@/i18n/routing';
 
 type Props = {
   params: Promise<{ locale: string; category: string; slug: string }>;
 };
 
 export function generateStaticParams() {
-  return tourCategories.flatMap((cat) =>
-    cat.tours.map((tour) => ({
-      category: cat.slug,
-      slug: tour.slug,
-    }))
+  return routing.locales.flatMap((locale) =>
+    tourCategories.flatMap((cat) =>
+      cat.tours.map((tour) => ({
+        locale,
+        category: cat.slug,
+        slug: tour.slug,
+      }))
+    )
   );
 }
 
