@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import type { TourCategory } from '@/lib/tours';
 import { ImageCarousel } from './image-carousel';
@@ -43,10 +44,15 @@ export function CategoryDetail({ category }: { category: TourCategory }) {
           animate={{ opacity: 1, y: 0 }}
           className="relative rounded-2xl overflow-hidden h-48 md:h-64 bg-ocean-700 mb-10"
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-ocean-900/90 to-transparent z-10" />
-          <div className="absolute inset-0 flex items-center justify-center text-7xl">
-            {category.icon}
-          </div>
+          <Image
+            src={category.image}
+            alt={category.title[lang]}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 1024px"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-ocean-900/90 via-ocean-900/40 to-ocean-900/20 z-10" />
           <div className="absolute bottom-6 left-6 z-20">
             <h1 className="text-3xl md:text-4xl font-bold">
               {category.title[lang]}
