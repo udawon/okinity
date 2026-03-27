@@ -12,6 +12,7 @@ export interface Tour {
   durationLabel: { ko: string; ja: string; en: string };
   includes: { ko: string[]; ja: string[]; en: string[] };
   image: string;
+  images: string[];
   available: boolean;
 }
 
@@ -66,6 +67,7 @@ export const tourCategories: TourCategory[] = [
           en: ['Premium drinks', 'Catering', 'Private space', 'Presentation equipment'],
         },
         image: '/images/business.jpg',
+        images: ['/images/business-1.jpg', '/images/business-2.jpg', '/images/business-3.jpg'],
         available: true,
       },
       {
@@ -94,6 +96,7 @@ export const tourCategories: TourCategory[] = [
           en: ['Private yacht', 'Location guide', 'Drinks & meals', 'Equipment loading support'],
         },
         image: '/images/filming.jpg',
+        images: ['/images/filming-1.jpg', '/images/filming-2.jpg', '/images/filming-3.jpg'],
         available: true,
       },
       {
@@ -122,6 +125,7 @@ export const tourCategories: TourCategory[] = [
           en: ['Party setup', 'Catering', 'Drinks', 'DJ equipment (optional)'],
         },
         image: '/images/party.jpg',
+        images: ['/images/party-1.jpg', '/images/party-2.jpg', '/images/party-3.jpg'],
         available: true,
       },
       {
@@ -150,6 +154,7 @@ export const tourCategories: TourCategory[] = [
           en: ['Flower decoration', 'Champagne', 'Photography', 'Custom staging'],
         },
         image: '/images/proposal.jpg',
+        images: ['/images/proposal-1.jpg', '/images/proposal-2.jpg', '/images/proposal-3.jpg'],
         available: true,
       },
     ],
@@ -195,6 +200,7 @@ export const tourCategories: TourCategory[] = [
           en: ['Fishing gear rental', 'Bait', 'Drinks', 'Guide'],
         },
         image: '/images/fishing.jpg',
+        images: ['/images/fishing-3h-1.jpg', '/images/fishing-3h-2.jpg', '/images/fishing-3h-3.jpg'],
         available: true,
       },
       {
@@ -223,6 +229,7 @@ export const tourCategories: TourCategory[] = [
           en: ['Fishing gear rental', 'Bait', 'Lunch box', 'Drinks', 'Guide'],
         },
         image: '/images/fishing.jpg',
+        images: ['/images/fishing-6h-1.jpg', '/images/fishing-6h-2.jpg', '/images/fishing-6h-3.jpg'],
         available: true,
       },
       {
@@ -251,6 +258,7 @@ export const tourCategories: TourCategory[] = [
           en: ['Premium gear', 'Bait', 'Lunch', 'Drinks', 'Expert guide', 'Sashimi service'],
         },
         image: '/images/fishing.jpg',
+        images: ['/images/fishing-pro-1.jpg', '/images/fishing-pro-2.jpg', '/images/fishing-pro-3.jpg'],
         available: true,
       },
     ],
@@ -296,6 +304,7 @@ export const tourCategories: TourCategory[] = [
           en: ['Welcome drink', 'Snacks', 'Finger food', 'Additional drinks available'],
         },
         image: '/images/fireworks.jpg',
+        images: ['/images/fireworks-apr-1.jpg', '/images/fireworks-apr-2.jpg', '/images/fireworks-apr-3.jpg'],
         available: true,
       },
       {
@@ -324,6 +333,7 @@ export const tourCategories: TourCategory[] = [
           en: ['Welcome drink', 'Snacks', 'Finger food', 'Additional drinks available'],
         },
         image: '/images/fireworks.jpg',
+        images: ['/images/fireworks-oct-1.jpg', '/images/fireworks-oct-2.jpg', '/images/fireworks-oct-3.jpg'],
         available: true,
       },
     ],
@@ -369,6 +379,7 @@ export const tourCategories: TourCategory[] = [
           en: ['BBQ set', 'Seafood', 'Meat', 'Drinks', 'Dessert'],
         },
         image: '/images/bbq.jpg',
+        images: ['/images/bbq-1.jpg', '/images/bbq-2.jpg', '/images/bbq-3.jpg'],
         available: true,
       },
     ],
