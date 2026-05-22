@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { type Product, formatPriceKRW } from '@/lib/content';
 
-/** 상품 카드 — 사진 위 카테고리·제목·가격 오버레이. 둥근 + 부드러운 그림자. */
+/** 상품 카드 — Must-Do 스타일: 이미지 위 + 내용(카테고리·제목·설명·가격) 아래 흰 카드. */
 export default async function ProductCard({ product }: { product: Product }) {
   const t = await getTranslations('products');
   const price = formatPriceKRW(product.priceKRW);
@@ -10,25 +10,25 @@ export default async function ProductCard({ product }: { product: Product }) {
   return (
     <Link
       href={`/products/${product.slug}`}
-      className="group block h-full"
+      className="group flex h-full flex-col overflow-hidden rounded-card border border-line bg-surface shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-hover"
     >
-      <div className="relative aspect-[3/4] h-full overflow-hidden rounded-card shadow-card transition-shadow duration-300 group-hover:shadow-hover">
-        <div
-          className="absolute inset-0 bg-brand-light bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-          style={{ backgroundImage: `url(${product.heroImage})` }}
-          role="img"
-          aria-label={product.title}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-          <span className="text-xs font-medium uppercase tracking-[0.15em] text-white/80">
-            {t(`category.${product.category}`)}
-          </span>
-          <h3 className="mt-1 font-serif text-2xl leading-tight">{product.title}</h3>
-          <p className="mt-1 line-clamp-2 text-sm text-white/85">{product.summary}</p>
-          <span className="mt-3 inline-block text-sm font-semibold text-white">
+      <div
+        className="aspect-[4/3] w-full overflow-hidden bg-brand-light bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+        style={{ backgroundImage: `url(${product.heroImage})` }}
+        role="img"
+        aria-label={product.title}
+      />
+      <div className="flex flex-1 flex-col gap-2 p-5">
+        <span className="text-xs font-medium uppercase tracking-[0.12em] text-brand-dark">
+          {t(`category.${product.category}`)}
+        </span>
+        <h3 className="font-serif text-xl leading-tight text-ink">{product.title}</h3>
+        <p className="line-clamp-2 text-sm text-muted">{product.summary}</p>
+        <div className="mt-auto flex items-center justify-between pt-3">
+          <span className="text-sm font-semibold text-ink">
             {price ? t('priceFrom', { price }) : t('priceOnRequest')}
           </span>
+          <span className="text-xs font-medium text-brand-dark">자세히 →</span>
         </div>
       </div>
     </Link>

@@ -1,11 +1,13 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import type { Locale } from '@/i18n/routing';
-import { getGallery, getReviews } from '@/lib/content';
+import { getAllProducts, getGallery, getReviews } from '@/lib/content';
 import Container from '@/components/Container';
 import Hero from '@/components/Hero';
 import CategoryCard from '@/components/CategoryCard';
-import Carousel, { CarouselItem } from '@/components/Carousel';
+import ProductCard from '@/components/ProductCard';
+import CarouselSection from '@/components/CarouselSection';
+import { CarouselItem } from '@/components/Carousel';
 import KakaoBand from '@/components/KakaoBand';
 import ReviewList from '@/components/ReviewList';
 
@@ -19,7 +21,10 @@ export default async function HomePage({
 
   const tHome = await getTranslations('home');
   const tNav = await getTranslations('nav');
+  const tProducts = await getTranslations('products');
   const tGallery = await getTranslations('gallery');
+
+  const products = getAllProducts(locale as Locale);
   const reviews = getReviews(locale as Locale);
   const galleryPreview = getGallery().slice(0, 6);
 
@@ -34,34 +39,40 @@ export default async function HomePage({
     <>
       <Hero />
 
-      {/* 프로그램 안내 — 중앙 정렬 제목 + 가로 카루셀 */}
-      <section className="py-20">
-        <Container>
-          <h2 className="text-center font-serif text-3xl text-ink sm:text-4xl">
-            {tHome('categoriesTitle')}
-          </h2>
-          <div className="mt-10">
-            <Carousel>
-              {categories.map((c) => (
-                <CarouselItem key={c.href}>
-                  <CategoryCard
-                    href={c.href}
-                    title={c.title}
-                    description={c.description}
-                  />
-                </CarouselItem>
-              ))}
-            </Carousel>
-          </div>
-        </Container>
-      </section>
+      {/* 투어 프로그램 — Must-Do 스타일 카루셀 (이미지 위 + 내용 아래) + 화살표 */}
+      {products.length > 0 && (
+        <CarouselSection
+          title={tProducts('sectionTitle')}
+          intro={tProducts('sectionSubtitle')}
+        >
+          {products.map((p) => (
+            <CarouselItem key={p.slug}>
+              <ProductCard product={p} />
+            </CarouselItem>
+          ))}
+        </CarouselSection>
+      )}
+
+      {/* 시그니처 경험 — Signature 스타일 카루셀 (키 큰 다크 오버레이) + 화살표 */}
+      <div className="bg-surface">
+        <CarouselSection
+          title={tHome('signatureTitle')}
+          intro={tHome('signatureIntro')}
+        >
+          {categories.map((c) => (
+            <CarouselItem key={c.href}>
+              <CategoryCard href={c.href} title={c.title} description={c.description} />
+            </CarouselItem>
+          ))}
+        </CarouselSection>
+      </div>
 
       {/* 카카오톡 실시간 문의 밴드 */}
       <KakaoBand />
 
       {/* 갤러리 미리보기 */}
       {galleryPreview.length > 0 && (
-        <section className="py-20">
+        <section className="py-16 sm:py-20">
           <Container>
             <h2 className="text-center font-serif text-3xl text-ink sm:text-4xl">
               {tGallery('title')}
