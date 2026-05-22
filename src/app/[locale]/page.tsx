@@ -5,6 +5,7 @@ import { getGallery, getReviews } from '@/lib/content';
 import Container from '@/components/Container';
 import Hero from '@/components/Hero';
 import CategoryCard from '@/components/CategoryCard';
+import Carousel, { CarouselItem } from '@/components/Carousel';
 import KakaoBand from '@/components/KakaoBand';
 import ReviewList from '@/components/ReviewList';
 
@@ -33,21 +34,24 @@ export default async function HomePage({
     <>
       <Hero />
 
-      {/* 카테고리 카드 — 주요 섹션 진입 */}
-      <section className="py-16">
+      {/* 프로그램 안내 — 중앙 정렬 제목 + 가로 카루셀 */}
+      <section className="py-20">
         <Container>
-          <h2 className="font-serif text-2xl text-ink sm:text-3xl">
+          <h2 className="text-center font-serif text-3xl text-ink sm:text-4xl">
             {tHome('categoriesTitle')}
           </h2>
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {categories.map((c) => (
-              <CategoryCard
-                key={c.href}
-                href={c.href}
-                title={c.title}
-                description={c.description}
-              />
-            ))}
+          <div className="mt-10">
+            <Carousel>
+              {categories.map((c) => (
+                <CarouselItem key={c.href}>
+                  <CategoryCard
+                    href={c.href}
+                    title={c.title}
+                    description={c.description}
+                  />
+                </CarouselItem>
+              ))}
+            </Carousel>
           </div>
         </Container>
       </section>
@@ -57,29 +61,32 @@ export default async function HomePage({
 
       {/* 갤러리 미리보기 */}
       {galleryPreview.length > 0 && (
-        <section className="py-16">
+        <section className="py-20">
           <Container>
-            <div className="flex items-end justify-between">
-              <h2 className="font-serif text-2xl text-ink sm:text-3xl">
-                {tGallery('title')}
-              </h2>
-              <Link
-                href="/gallery"
-                className="font-mono text-xs uppercase tracking-[0.08em] text-brand-dark hover:text-ink"
-              >
-                {tGallery('viewMore')} →
-              </Link>
-            </div>
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+            <h2 className="text-center font-serif text-3xl text-ink sm:text-4xl">
+              {tGallery('title')}
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-center text-muted">
+              {tGallery('subtitle')}
+            </p>
+            <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-3">
               {galleryPreview.map((it, i) => (
                 <div
                   key={i}
-                  className="aspect-square w-full border border-line bg-brand-light bg-cover bg-center"
+                  className="aspect-square w-full overflow-hidden rounded-card bg-brand-light bg-cover bg-center shadow-card"
                   style={{ backgroundImage: `url(${it.image})` }}
                   role="img"
                   aria-label={it.caption ?? `gallery ${i + 1}`}
                 />
               ))}
+            </div>
+            <div className="mt-8 text-center">
+              <Link
+                href="/gallery"
+                className="rounded-button border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink shadow-card transition-colors hover:border-brand hover:text-brand-dark"
+              >
+                {tGallery('viewMore')}
+              </Link>
             </div>
           </Container>
         </section>

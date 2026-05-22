@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200" preserveAspectRatio="xMidYMid slice" role="img" aria-label="배경 이미지 준비 중">
+  <defs>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1aa6b0"/>
+      <stop offset="0.55" stop-color="#0f8b96"/>
+      <stop offset="1" stop-color="#0b6f78"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1200" fill="url(#sea)"/>
+  <g fill="#ffffff" opacity="0.06">
+    <circle cx="300" cy="280" r="220"/>
+    <circle cx="1300" cy="900" r="320"/>
+  </g>
+</svg>

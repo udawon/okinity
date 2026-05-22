@@ -30,7 +30,7 @@ export default function LocaleSwitcher({ current }: { current: Locale }) {
           onClick={() => onSelect(loc)}
           disabled={isPending}
           aria-current={loc === current ? 'true' : undefined}
-          className={`px-2 py-1 font-mono text-xs uppercase tracking-[0.08em] transition-colors disabled:opacity-50 ${
+          className={`rounded-button px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
             loc === current
               ? 'bg-brand text-brand-contrast'
               : 'text-muted hover:text-ink'

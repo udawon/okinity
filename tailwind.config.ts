@@ -26,10 +26,10 @@ export default {
         container: design.container.max
       },
       fontFamily: {
-        // 제목=세리프, 본문/UI=모노. sans는 모노로 별칭(잔여 font-sans 사용처 대비).
         serif: ['var(--font-serif)', 'Georgia', 'serif'],
-        mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
-        sans: ['var(--font-mono)', 'ui-monospace', 'monospace']
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        // 이전 테마의 font-mono 사용처가 산세리프로 렌더되도록 별칭
+        mono: ['var(--font-sans)', 'system-ui', 'sans-serif']
       }
     }
   },

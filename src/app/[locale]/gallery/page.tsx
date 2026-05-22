@@ -39,7 +39,10 @@ export default async function GalleryPage({
         ) : (
           <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
             {items.map((it, i) => (
-              <figure key={i} className="border border-line">
+              <figure
+                key={i}
+                className="overflow-hidden rounded-card bg-surface shadow-card"
+              >
                 <div
                   className="aspect-square w-full bg-brand-light bg-cover bg-center"
                   style={{ backgroundImage: `url(${it.image})` }}
@@ -47,7 +50,7 @@ export default async function GalleryPage({
                   aria-label={it.caption ?? `gallery ${i + 1}`}
                 />
                 {it.caption && (
-                  <figcaption className="px-3 py-2 font-mono text-xs tracking-[0.02em] text-muted">
+                  <figcaption className="px-3 py-2 text-xs text-muted">
                     {it.caption}
                   </figcaption>
                 )}

@@ -1,44 +1,45 @@
 /**
  * 디자인 토큰 — 시각 스타일의 단일 출처(Single Source of Truth).
- * 테마: "Miti Navi — Nautical parchment & polished brass" (DESIGN.md 반영).
- *   양피지 배경 + 딥 차콜 텍스트, 세리프 제목 + 모노 본문, 라운드 0·플랫(그림자/그라데이션 없음).
+ * 테마: "Siyam-inspired" — 밝은 트로피컬 리조트 톤. 모래빛 배경 + 오션 틸,
+ *   둥근 모서리·부드러운 그림자, 세리프 제목 + 산세리프 본문, 사진 중심.
+ *   (Sun Siyam의 디자인 언어를 참고한 원본 구현 — 자산 복제 아님)
  *
- * 컴포넌트 호환을 위해 기존 토큰 키 이름(brand/accent/...)을 유지하되 값을 새 팔레트로 매핑.
- * 접근성: Linen(#999999)은 양피지 배경에서 본문 대비 미달이라, 본문/보조 텍스트는 Ebony로 매핑.
+ * "디자인을 config로 교체"한다는 요구는 이 파일 수정으로 충족된다. tailwind.config.ts가 import.
+ * 색 토큰 변경 시 명암 대비(WCAG AA: 본문 4.5:1)를 확인할 것.
  */
 export const design = {
   colors: {
-    // 'brand' = 1차 액션/버튼 = Deep Charcoal
+    // 1차 액션 = 오션 틸 (트로피컬 바다)
     brand: {
-      DEFAULT: '#000e13', // Deep Charcoal — 버튼 배경, 강한 보더
-      dark: '#232323', // Ebony — hover
-      light: '#d9cfb9', // muted parchment — 이미지 placeholder 배경
-      contrast: '#e6dece' // Parchment — 차콜 위 텍스트
+      DEFAULT: '#0f9aa3',
+      dark: '#0b767d',
+      light: '#e4f4f5',
+      contrast: '#ffffff'
     },
-    // 유일한 색 강조 = Amber Glaze (외곽선·미세 하이라이트에만)
+    // 따뜻한 모래/골드 보조 강조 (희소하게)
     accent: {
-      DEFAULT: '#ffdead', // Amber Glaze
-      dark: '#8a6d1f', // 읽을 수 있는 다크 앰버(큰 텍스트용)
-      light: '#fff6e6'
+      DEFAULT: '#cf9a55',
+      dark: '#9a6f33',
+      light: '#f7ecdb'
     },
-    ink: '#000e13', // Deep Charcoal — 본문/제목
-    muted: '#232323', // Ebony — 보조 텍스트(AA 안전)
-    line: '#c2b69c', // 양피지 톤 보더(가시성 확보)
-    surface: '#efe9dc', // 카드: 배경보다 살짝 밝게(그림자 없이 평면 구분)
-    bg: '#e6dece' // Parchment — 페이지 배경
+    ink: '#2b2a26', // 본문/제목 (따뜻한 진회색)
+    muted: '#6b6760', // 보조 텍스트
+    line: '#e7e0d3', // 모래빛 보더
+    surface: '#ffffff', // 카드 (흰색, 그림자로 부양)
+    bg: '#f5efe4' // 페이지 배경 (모래/크림)
   },
-  // DESIGN.md: 모든 요소 0px 라운드 (각진 구조적 미감)
+  // 둥근 모서리 (리조트 톤). 버튼은 알약형.
   radius: {
-    card: '0px',
-    button: '0px'
+    card: '1rem',
+    button: '9999px'
   },
-  // DESIGN.md: 그림자/엘리베이션 없음 — 평면 유지
+  // 부드러운 그림자 (카드 부양감)
   shadow: {
-    card: 'none',
-    hover: 'none'
+    card: '0 1px 3px rgba(43,42,38,0.05), 0 12px 32px rgba(43,42,38,0.08)',
+    hover: '0 8px 20px rgba(43,42,38,0.10), 0 24px 56px rgba(15,154,163,0.16)'
   },
   container: {
-    max: '82.5rem' // 1320px
+    max: '78rem' // 1248px
   }
 } as const;
 

@@ -18,19 +18,16 @@ export default async function Header({ locale }: { locale: Locale }) {
   const t = await getTranslations('nav');
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg">
+    <header className="sticky top-0 z-40 border-b border-line bg-bg/95 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-4">
-        <Link
-          href="/"
-          className="font-mono text-base font-bold uppercase tracking-[0.12em] text-ink"
-        >
+        <Link href="/" className="font-serif text-xl tracking-wide text-ink">
           {site.name}
         </Link>
 
         {/* 데스크탑 내비 */}
-        <nav className="hidden items-center gap-6 font-mono text-xs uppercase tracking-[0.1em] text-muted lg:flex">
+        <nav className="hidden items-center gap-7 text-sm font-medium text-muted lg:flex">
           {NAV.map((it) => (
-            <Link key={it.key} href={it.href} className="hover:text-ink">
+            <Link key={it.key} href={it.href} className="transition-colors hover:text-brand-dark">
               {t(it.key)}
             </Link>
           ))}
@@ -42,7 +39,7 @@ export default async function Header({ locale }: { locale: Locale }) {
           </div>
           <Link
             href="/contact"
-            className="hidden bg-brand px-4 py-2 font-mono text-xs uppercase tracking-[0.08em] text-brand-contrast transition-colors hover:bg-brand-dark sm:inline-block"
+            className="hidden rounded-button bg-brand px-5 py-2.5 text-sm font-semibold text-brand-contrast transition-colors hover:bg-brand-dark sm:inline-block"
           >
             {t('contact')}
           </Link>

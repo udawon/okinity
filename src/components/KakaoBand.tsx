@@ -14,20 +14,18 @@ export default async function KakaoBand() {
   const external = href.startsWith('http');
 
   const button = (
-    <span className="inline-block border border-accent px-6 py-3 font-mono text-sm uppercase tracking-[0.08em] text-brand-contrast transition-colors hover:bg-accent hover:text-ink">
+    <span className="inline-block rounded-button border border-brand-contrast/80 px-7 py-3 text-sm font-semibold text-brand-contrast transition-colors hover:bg-brand-contrast hover:text-brand-dark">
       {t('button')}
     </span>
   );
 
   return (
     <section className="bg-brand">
-      <Container className="flex flex-col items-center gap-4 py-14 text-center">
-        <h2 className="font-serif text-2xl text-brand-contrast sm:text-3xl">
+      <Container className="flex flex-col items-center gap-4 py-16 text-center">
+        <h2 className="font-serif text-3xl text-brand-contrast">
           {t('title')}
         </h2>
-        <p className="font-mono text-xs uppercase tracking-[0.06em] text-brand-contrast/80">
-          {t('subtitle')}
-        </p>
+        <p className="text-sm text-brand-contrast/85">{t('subtitle')}</p>
         <div className="mt-2">
           {external ? (
             <a href={href} target="_blank" rel="noopener noreferrer">
