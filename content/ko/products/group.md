@@ -9,7 +9,7 @@ includes:
   - 스노클링 + 체험 다이빙 혼합 가능
   - 비다이버 동반자 프로그램
   - 단체 사진·영상
-heroImage: /images/placeholder.svg
+heroImage: /images/ph-4.svg
 order: 4
 ---
 

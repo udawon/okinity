@@ -29,10 +29,10 @@ export default async function HomePage({
   const galleryPreview = getGallery().slice(0, 6);
 
   const categories = [
-    { href: '/diving', title: tNav('diving'), description: tHome('cardDiving') },
-    { href: '/padi', title: tNav('padi'), description: tHome('cardPadi') },
-    { href: '/schedule', title: tNav('schedule'), description: tHome('cardSchedule') },
-    { href: '/gallery', title: tNav('gallery'), description: tHome('cardGallery') }
+    { href: '/diving', title: tNav('diving'), description: tHome('cardDiving'), image: '/images/ph-1.svg' },
+    { href: '/padi', title: tNav('padi'), description: tHome('cardPadi'), image: '/images/ph-3.svg' },
+    { href: '/schedule', title: tNav('schedule'), description: tHome('cardSchedule'), image: '/images/ph-4.svg' },
+    { href: '/gallery', title: tNav('gallery'), description: tHome('cardGallery'), image: '/images/ph-2.svg' }
   ];
 
   return (
@@ -61,7 +61,12 @@ export default async function HomePage({
         >
           {categories.map((c) => (
             <CarouselItem key={c.href}>
-              <CategoryCard href={c.href} title={c.title} description={c.description} />
+              <CategoryCard
+                href={c.href}
+                title={c.title}
+                description={c.description}
+                image={c.image}
+              />
             </CarouselItem>
           ))}
         </CarouselSection>

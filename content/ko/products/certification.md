@@ -9,7 +9,7 @@ includes:
   - 국제 자격증 발급 (PADI/SSI 등)
   - 교재·장비 일체
   - 수료까지 강사 밀착 지도
-heroImage: /images/placeholder.svg
+heroImage: /images/ph-3.svg
 order: 3
 ---
 

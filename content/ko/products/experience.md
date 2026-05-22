@@ -10,7 +10,7 @@ includes:
   - 장비 일체 대여 (슈트·핀·마스크·호흡기)
   - 수중 사진 촬영
   - 픽업 안내 (지역 협의)
-heroImage: /images/placeholder.svg
+heroImage: /images/ph-1.svg
 order: 1
 ---
 

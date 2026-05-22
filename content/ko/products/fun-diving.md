@@ -9,7 +9,7 @@ includes:
   - 보트/비치 다이빙 (포인트별 협의)
   - 공기탱크·웨이트
   - 다이빙 로그 작성 지원
-heroImage: /images/placeholder.svg
+heroImage: /images/ph-2.svg
 order: 2
 ---
 

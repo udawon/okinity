@@ -13,9 +13,9 @@ export default function Carousel({ children }: { children: ReactNode }) {
   );
 }
 
-/** 카루셀 아이템 래퍼 — 모바일 1.2장, 태블릿 2.5장, 데스크탑 3.5장 노출. */
+/** 카루셀 아이템 래퍼 — 큰 카드. 모바일 1.1장, 태블릿 1.7장, 데스크탑 2.4장 노출. */
 export function CarouselItem({ children }: { children: ReactNode }) {
   return (
-    <div className="w-[80%] shrink-0 snap-start sm:w-[42%] lg:w-[28%]">{children}</div>
+    <div className="w-[86%] shrink-0 snap-start sm:w-[58%] lg:w-[40%]">{children}</div>
   );
 }
