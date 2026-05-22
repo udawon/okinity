@@ -1,9 +1,44 @@
 {
   "nav": {
     "home": "Home",
-    "products": "Tours",
-    "instructor": "Instructor",
-    "contact": "Book a Tour"
+    "about": "About",
+    "diving": "Diving",
+    "padi": "PADI Courses",
+    "schedule": "Schedule",
+    "gallery": "Gallery",
+    "contact": "Book"
+  },
+  "home": {
+    "categoriesTitle": "Programs",
+    "cardDiving": "Discover Okinawa's sea — discovery, fun & group diving.",
+    "cardPadi": "Earn an international diving certification in Okinawa.",
+    "cardSchedule": "Check available dates.",
+    "cardGallery": "Browse moments from the dive site."
+  },
+  "kakao": {
+    "title": "Chat with us on KakaoTalk",
+    "subtitle": "Click to connect via KakaoTalk",
+    "button": "Open KakaoTalk chat"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "subtitle": "Available dates. Tell us your preferred date via booking.",
+    "colDate": "Date",
+    "colProgram": "Program",
+    "colStatus": "Status",
+    "statusAvailable": "Available",
+    "statusFull": "Full",
+    "statusClosed": "Closed",
+    "empty": "Schedule coming soon."
+  },
+  "gallery": {
+    "title": "Gallery",
+    "subtitle": "Moments from diving in Okinawa.",
+    "empty": "Photos coming soon.",
+    "viewMore": "View more"
+  },
+  "about": {
+    "title": "About"
   },
   "hero": {
     "eyebrow": "Local Diving in Okinawa",

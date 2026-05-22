@@ -1,0 +1,7 @@
+[
+  { "date": "2026-06-07", "program": "체험 다이빙", "status": "available" },
+  { "date": "2026-06-08", "program": "펀다이빙", "status": "available" },
+  { "date": "2026-06-14", "program": "PADI 오픈워터 교육", "status": "full" },
+  { "date": "2026-06-15", "program": "가족·그룹 패키지", "status": "available" },
+  { "date": "2026-06-21", "program": "휴무", "status": "closed" }
+]

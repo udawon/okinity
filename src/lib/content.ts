@@ -63,6 +63,14 @@ export function getProduct(locale: Locale, slug: string): Product | null {
   return null;
 }
 
+/** 특정 카테고리들에 속한 상품만. (다이빙=experience·fun·group, PADI=certification 분리용) */
+export function getProductsByCategories(
+  locale: Locale,
+  categories: Product['category'][]
+): Product[] {
+  return getAllProducts(locale).filter((p) => categories.includes(p.category));
+}
+
 /** 상품 목록. 기본 로케일에 존재하는 모든 상품을 기준으로, 요청 로케일 폴백 적용. */
 export function getAllProducts(locale: Locale): Product[] {
   const baseDir = path.join(CONTENT_ROOT, routing.defaultLocale, 'products');
@@ -151,6 +159,46 @@ export function getReviews(locale: Locale): Review[] {
   try {
     const parsed = z.array(ReviewSchema).parse(JSON.parse(raw));
     return parsed;
+  } catch {
+    return [];
+  }
+}
+
+// ── 갤러리 (사진) ─────────────────────────────────────────────────────
+// content/gallery.json (로케일 공유). 사진은 public/ 경로.
+
+const GalleryItemSchema = z.object({
+  image: z.string(),
+  caption: z.string().optional()
+});
+export type GalleryItem = z.infer<typeof GalleryItemSchema>;
+
+export function getGallery(): GalleryItem[] {
+  const file = path.join(CONTENT_ROOT, 'gallery.json');
+  if (!fs.existsSync(file)) return [];
+  try {
+    return z.array(GalleryItemSchema).parse(JSON.parse(fs.readFileSync(file, 'utf8')));
+  } catch {
+    return [];
+  }
+}
+
+// ── 일정표 (예약 가능 일정) ───────────────────────────────────────────
+// content/schedule.json (로케일 공유). status로 상태 표시.
+
+const ScheduleItemSchema = z.object({
+  date: z.string(), // ISO 또는 표시용 문자열
+  program: z.string(),
+  status: z.enum(['available', 'full', 'closed']).default('available')
+});
+export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
+
+export function getSchedule(): ScheduleItem[] {
+  const file = path.join(CONTENT_ROOT, 'schedule.json');
+  if (!fs.existsSync(file)) return [];
+  try {
+    const items = z.array(ScheduleItemSchema).parse(JSON.parse(fs.readFileSync(file, 'utf8')));
+    return items.sort((a, b) => a.date.localeCompare(b.date));
   } catch {
     return [];
   }

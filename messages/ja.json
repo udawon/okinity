@@ -1,9 +1,44 @@
 {
   "nav": {
     "home": "ホーム",
-    "products": "ツアー",
-    "instructor": "インストラクター",
-    "contact": "予約・お問い合わせ"
+    "about": "紹介",
+    "diving": "ダイビング",
+    "padi": "PADI講習",
+    "schedule": "スケジュール",
+    "gallery": "ギャラリー",
+    "contact": "予約"
+  },
+  "home": {
+    "categoriesTitle": "プログラム案内",
+    "cardDiving": "体験・ファン・グループダイビングで沖縄の海へ。",
+    "cardPadi": "沖縄で国際ダイビングライセンスを取得。",
+    "cardSchedule": "予約可能なスケジュールをご確認ください。",
+    "cardGallery": "現場の生き生きとした瞬間をご覧ください。"
+  },
+  "kakao": {
+    "title": "カカオトークでお問い合わせ",
+    "subtitle": "クリックするとカカオトークに接続されます",
+    "button": "カカオトークでチャット"
+  },
+  "schedule": {
+    "title": "スケジュール",
+    "subtitle": "予約可能な日程です。ご希望の日付を予約フォームでお知らせください。",
+    "colDate": "日付",
+    "colProgram": "プログラム",
+    "colStatus": "状態",
+    "statusAvailable": "予約可能",
+    "statusFull": "満員",
+    "statusClosed": "休業",
+    "empty": "スケジュールは近日公開します。"
+  },
+  "gallery": {
+    "title": "ギャラリー",
+    "subtitle": "沖縄ダイビングの瞬間。",
+    "empty": "写真は近日公開します。",
+    "viewMore": "もっと見る"
+  },
+  "about": {
+    "title": "紹介"
   },
   "hero": {
     "eyebrow": "沖縄の地元ダイビング",

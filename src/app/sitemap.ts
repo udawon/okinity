@@ -5,7 +5,15 @@ import { site } from '@/config/site.config';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const slugs = getAllProductSlugs();
-  const staticPaths = ['', '/products', '/instructor', '/contact'];
+  const staticPaths = [
+    '',
+    '/about',
+    '/diving',
+    '/padi',
+    '/schedule',
+    '/gallery',
+    '/contact'
+  ];
 
   const entries: MetadataRoute.Sitemap = [];
 

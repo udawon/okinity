@@ -4,6 +4,15 @@ import type { Locale } from '@/i18n/routing';
 import { site } from '@/config/site.config';
 import Container from './Container';
 import LocaleSwitcher from './LocaleSwitcher';
+import MobileNav from './MobileNav';
+
+const NAV = [
+  { href: '/about', key: 'about' },
+  { href: '/diving', key: 'diving' },
+  { href: '/padi', key: 'padi' },
+  { href: '/schedule', key: 'schedule' },
+  { href: '/gallery', key: 'gallery' }
+] as const;
 
 export default async function Header({ locale }: { locale: Locale }) {
   const t = await getTranslations('nav');
@@ -18,23 +27,26 @@ export default async function Header({ locale }: { locale: Locale }) {
           {site.name}
         </Link>
 
-        <nav className="hidden items-center gap-7 font-mono text-xs uppercase tracking-[0.1em] text-muted md:flex">
-          <Link href="/products" className="hover:text-ink">
-            {t('products')}
-          </Link>
-          <Link href="/instructor" className="hover:text-ink">
-            {t('instructor')}
-          </Link>
+        {/* 데스크탑 내비 */}
+        <nav className="hidden items-center gap-6 font-mono text-xs uppercase tracking-[0.1em] text-muted lg:flex">
+          {NAV.map((it) => (
+            <Link key={it.key} href={it.href} className="hover:text-ink">
+              {t(it.key)}
+            </Link>
+          ))}
         </nav>
 
         <div className="flex items-center gap-3">
-          <LocaleSwitcher current={locale} />
+          <div className="hidden lg:block">
+            <LocaleSwitcher current={locale} />
+          </div>
           <Link
             href="/contact"
-            className="bg-brand px-4 py-2 font-mono text-xs uppercase tracking-[0.08em] text-brand-contrast transition-colors hover:bg-brand-dark"
+            className="hidden bg-brand px-4 py-2 font-mono text-xs uppercase tracking-[0.08em] text-brand-contrast transition-colors hover:bg-brand-dark sm:inline-block"
           >
             {t('contact')}
           </Link>
+          <MobileNav current={locale} />
         </div>
       </Container>
     </header>

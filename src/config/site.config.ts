@@ -11,9 +11,13 @@ export const site = {
   // 연락 채널 — 폼 외 직접 연락 경로
   contact: {
     email: 'hello@ponyokinawa.com',
-    kakaoOpenChat: '', // 예: https://open.kakao.com/o/xxxx
+    kakaoOpenChat: '', // 예: https://open.kakao.com/o/xxxx (비우면 카카오 밴드가 예약 폼으로 연결)
     instagram: '' // 예: https://instagram.com/ponyokinawa
-  }
+  },
+  // 푸터·소개에 노출할 주소 (실제 주소로 교체)
+  address: '오키나와 (주소 입력 예정)',
+  // PADI 제휴 표기 여부
+  padiAffiliated: true
 } as const;
 
 export type Site = typeof site;

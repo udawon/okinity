@@ -1,9 +1,44 @@
 {
   "nav": {
     "home": "홈",
-    "products": "투어 상품",
-    "instructor": "강사 소개",
-    "contact": "예약 문의"
+    "about": "소개",
+    "diving": "다이빙",
+    "padi": "PADI 교육",
+    "schedule": "일정표",
+    "gallery": "갤러리",
+    "contact": "예약"
+  },
+  "home": {
+    "categoriesTitle": "프로그램 안내",
+    "cardDiving": "체험·펀·그룹 다이빙으로 오키나와 바다를 만나보세요.",
+    "cardPadi": "오키나와에서 국제 다이빙 자격증을 취득하세요.",
+    "cardSchedule": "예약 가능한 일정을 확인하세요.",
+    "cardGallery": "현장의 생생한 순간들을 둘러보세요."
+  },
+  "kakao": {
+    "title": "카카오톡 실시간 문의",
+    "subtitle": "클릭하시면 카카오톡으로 연결됩니다",
+    "button": "카카오톡 채팅하기"
+  },
+  "schedule": {
+    "title": "일정표",
+    "subtitle": "예약 가능한 일정입니다. 원하는 날짜를 예약 문의로 알려주세요.",
+    "colDate": "날짜",
+    "colProgram": "프로그램",
+    "colStatus": "상태",
+    "statusAvailable": "예약 가능",
+    "statusFull": "마감",
+    "statusClosed": "휴무",
+    "empty": "곧 일정이 등록됩니다."
+  },
+  "gallery": {
+    "title": "갤러리",
+    "subtitle": "오키나와 다이빙 현장의 순간들.",
+    "empty": "사진이 곧 등록됩니다.",
+    "viewMore": "갤러리 더 보기"
+  },
+  "about": {
+    "title": "소개"
   },
   "hero": {
     "eyebrow": "오키나와 현지 다이빙",
