@@ -1,0 +1,157 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import matter from 'gray-matter';
+import { z } from 'zod';
+import { routing, type Locale } from '@/i18n/routing';
+
+/**
+ * 콘텐츠 레이어 — 상품 정보를 코드가 아닌 마크다운 파일에서 읽는다.
+ *
+ * content/{locale}/products/{slug}.md 구조.
+ * 프론트매터(frontmatter)는 zod로 검증해 오타·누락을 빌드/요청 시 잡는다.
+ * 마크다운 본문(긴 설명)은 페이지에서 react-markdown으로 렌더.
+ *
+ * "콘텐츠를 md로 교체"라는 요구를 이 파일이 실현한다. 비개발자는 .md만 편집하면 되고,
+ * 게시는 git push → 재배포로 반영된다(노코드 CMS 아님 — 설계 검토에서 명확히 한 부분).
+ */
+
+const CONTENT_ROOT = path.join(process.cwd(), 'content');
+
+// 가격 공개 여부는 운영 결정(Open Question #1). price를 비워두면 "문의 시 안내"로 표기.
+const ProductFrontmatter = z.object({
+  slug: z.string(),
+  title: z.string(),
+  summary: z.string(),
+  category: z.enum(['experience', 'fun', 'certification', 'group']),
+  durationHours: z.number().optional(),
+  priceKRW: z.number().optional(), // 비우면 "문의 시 안내"
+  includes: z.array(z.string()).default([]),
+  heroImage: z.string().default('/images/placeholder.svg'),
+  order: z.number().default(99)
+});
+
+export type Product = z.infer<typeof ProductFrontmatter> & {
+  body: string;
+  /** 요청 로케일에 콘텐츠가 없어 기본 로케일로 폴백했는지 여부 */
+  fellBackToDefault: boolean;
+};
+
+function readProductFile(locale: Locale, slug: string): { raw: string } | null {
+  const file = path.join(CONTENT_ROOT, locale, 'products', `${slug}.md`);
+  if (!fs.existsSync(file)) return null;
+  return { raw: fs.readFileSync(file, 'utf8') };
+}
+
+function parse(raw: string, fellBack: boolean): Product {
+  const { data, content } = matter(raw);
+  const fm = ProductFrontmatter.parse(data);
+  return { ...fm, body: content.trim(), fellBackToDefault: fellBack };
+}
+
+/**
+ * 단일 상품 조회. 요청 로케일에 파일이 없으면 기본 로케일(ko)로 폴백하고
+ * fellBackToDefault=true 를 표시한다(페이지에서 noindex 처리에 사용).
+ */
+export function getProduct(locale: Locale, slug: string): Product | null {
+  const direct = readProductFile(locale, slug);
+  if (direct) return parse(direct.raw, false);
+
+  if (locale !== routing.defaultLocale) {
+    const fallback = readProductFile(routing.defaultLocale, slug);
+    if (fallback) return parse(fallback.raw, true);
+  }
+  return null;
+}
+
+/** 상품 목록. 기본 로케일에 존재하는 모든 상품을 기준으로, 요청 로케일 폴백 적용. */
+export function getAllProducts(locale: Locale): Product[] {
+  const baseDir = path.join(CONTENT_ROOT, routing.defaultLocale, 'products');
+  if (!fs.existsSync(baseDir)) return [];
+
+  const slugs = fs
+    .readdirSync(baseDir)
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => f.replace(/\.md$/, ''));
+
+  return slugs
+    .map((slug) => getProduct(locale, slug))
+    .filter((p): p is Product => p !== null)
+    .sort((a, b) => a.order - b.order);
+}
+
+export function getAllProductSlugs(): string[] {
+  const baseDir = path.join(CONTENT_ROOT, routing.defaultLocale, 'products');
+  if (!fs.existsSync(baseDir)) return [];
+  return fs
+    .readdirSync(baseDir)
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => f.replace(/\.md$/, ''));
+}
+
+/** 가격 표기 헬퍼 — 가격이 없으면 "문의 시 안내"(번역 키로 처리하도록 null 반환). */
+export function formatPriceKRW(priceKRW?: number): string | null {
+  if (priceKRW == null) return null;
+  return new Intl.NumberFormat('ko-KR').format(priceKRW);
+}
+
+// ── 강사 소개 (신뢰 앵커 콘텐츠) ─────────────────────────────────────
+
+const InstructorFrontmatter = z.object({
+  name: z.string(),
+  headline: z.string(),
+  certifications: z.array(z.string()).default([]),
+  yearsExperience: z.number().optional(),
+  photo: z.string().default('/images/placeholder.svg')
+});
+
+export type Instructor = z.infer<typeof InstructorFrontmatter> & {
+  body: string;
+  fellBackToDefault: boolean;
+};
+
+export function getInstructor(locale: Locale): Instructor | null {
+  const read = (l: Locale) => {
+    const file = path.join(CONTENT_ROOT, l, 'instructor.md');
+    return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
+  };
+
+  let raw = read(locale);
+  let fellBack = false;
+  if (!raw && locale !== routing.defaultLocale) {
+    raw = read(routing.defaultLocale);
+    fellBack = true;
+  }
+  if (!raw) return null;
+
+  const { data, content } = matter(raw);
+  const fm = InstructorFrontmatter.parse(data);
+  return { ...fm, body: content.trim(), fellBackToDefault: fellBack };
+}
+
+// ── 후기 ─────────────────────────────────────────────────────────────
+
+const ReviewSchema = z.object({
+  author: z.string(),
+  product: z.string().optional(),
+  rating: z.number().min(1).max(5).default(5),
+  text: z.string()
+});
+
+export type Review = z.infer<typeof ReviewSchema>;
+
+export function getReviews(locale: Locale): Review[] {
+  const read = (l: Locale) => {
+    const file = path.join(CONTENT_ROOT, l, 'reviews.json');
+    return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
+  };
+
+  const raw = read(locale) ?? read(routing.defaultLocale);
+  if (!raw) return [];
+
+  try {
+    const parsed = z.array(ReviewSchema).parse(JSON.parse(raw));
+    return parsed;
+  } catch {
+    return [];
+  }
+}

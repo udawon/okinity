@@ -1,0 +1,38 @@
+/* DESIGN.md 폰트:
+   - 제목(세리프): Playfair Display (라틴) + Noto Serif KR (한글)
+   - 본문/UI(모노): Space Mono (라틴) + Noto Sans KR (한글, 모노 한글 부재로 깔끔한 산세리프)
+   네트워크 미가용 시 시스템 폰트로 폴백. */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Space+Mono:wght@400;700&family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-serif: 'Playfair Display', 'Noto Serif KR', Georgia, 'Times New Roman',
+    serif;
+  --font-mono: 'Space Mono', 'Noto Sans KR', ui-monospace, SFMono-Regular, Menlo,
+    monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  /* 본문/UI = 모노 (DESIGN.md), 약간의 트래킹 */
+  body {
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* 제목 = 세리프, weight 400 (Voyage/GTSectraDisplay 역할) */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    letter-spacing: normal;
+  }
+}

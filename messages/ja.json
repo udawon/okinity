@@ -1,0 +1,72 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "products": "ツアー",
+    "instructor": "インストラクター",
+    "contact": "予約・お問い合わせ"
+  },
+  "hero": {
+    "eyebrow": "沖縄の地元ダイビング",
+    "title": "地元インストラクターが案内する\n沖縄スキューバダイビング",
+    "subtitle": "再販パッケージではありません。沖縄在住のインストラクターが最初から最後まで案内します。",
+    "cta": "予約を問い合わせる",
+    "ctaSecondary": "ツアーを見る",
+    "trust1": "地元在住インストラクターが案内",
+    "trust2": "安全第一 · 初心者歓迎",
+    "trust3": "水中写真をご提供"
+  },
+  "products": {
+    "sectionTitle": "ツアー一覧",
+    "sectionSubtitle": "初めての方も、ライセンス保持者も。あなたに合うコースがあります。",
+    "viewDetail": "詳細を見る",
+    "priceOnRequest": "料金はお問い合わせください",
+    "priceFrom": "{price}ウォン〜",
+    "priceLabel": "料金",
+    "durationLabel": "所要時間",
+    "durationHours": "約{hours}時間",
+    "includesTitle": "含まれるもの",
+    "empty": "準備中のツアーです。近日公開します。",
+    "category": {
+      "experience": "体験ダイビング",
+      "fun": "ファンダイビング",
+      "certification": "ライセンス講習",
+      "group": "ファミリー・グループ"
+    }
+  },
+  "instructor": {
+    "sectionTitle": "インストラクター紹介",
+    "certifications": "保有資格",
+    "experience": "経験{years}年",
+    "readMore": "インストラクターについて詳しく"
+  },
+  "reviews": {
+    "sectionTitle": "お客様の声",
+    "empty": "レビューは近日公開します。"
+  },
+  "contact": {
+    "title": "予約・お問い合わせ",
+    "subtitle": "内容をご記入いただければ、インストラクターが直接確認のうえご連絡します。",
+    "form": {
+      "product": "ご希望のツアー",
+      "productPlaceholder": "ツアーを選択",
+      "date": "ご希望の日付",
+      "people": "人数",
+      "name": "お名前",
+      "contact": "連絡先（メールまたは電話）",
+      "message": "メッセージ",
+      "messagePlaceholder": "ダイビング経験やライセンスの有無などをお書きください。",
+      "submit": "問い合わせを送信",
+      "submitting": "送信中...",
+      "success": "お問い合わせを受け付けました。まもなくご連絡します！",
+      "error": "送信に失敗しました。後ほど再試行いただくか、メールでご連絡ください。",
+      "required": "この項目は必須です。"
+    }
+  },
+  "footer": {
+    "contactUs": "お問い合わせ",
+    "rights": "© {year} PONYOKINAWA. All rights reserved."
+  },
+  "common": {
+    "translationPending": "このページは翻訳準備中のため韓国語で表示されます。"
+  }
+}

@@ -1,0 +1,19 @@
+import { getTranslations } from 'next-intl/server';
+import { Link } from '@/i18n/routing';
+import Container from '@/components/Container';
+
+export default async function NotFound() {
+  const t = await getTranslations('nav');
+  return (
+    <Container className="py-24 text-center">
+      <h1 className="text-5xl font-extrabold text-ink">404</h1>
+      <p className="mt-4 text-muted">페이지를 찾을 수 없습니다 / Page not found / ページが見つかりません</p>
+      <Link
+        href="/"
+        className="mt-8 inline-block rounded-button bg-brand px-6 py-3 font-semibold text-white hover:bg-brand-dark"
+      >
+        {t('home')}
+      </Link>
+    </Container>
+  );
+}
