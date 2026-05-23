@@ -2,33 +2,40 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { type Product, formatPriceKRW } from '@/lib/content';
 
-/** 상품 카드 — 크고 대담한 이미지 오버레이. 사진 위 카테고리·제목·가격. */
+/**
+ * 상품 카드 — Must-Do 스타일: 사진 위 거대한 세리프 제목 오버레이 + 이미지 아래 설명.
+ */
 export default async function ProductCard({ product }: { product: Product }) {
   const t = await getTranslations('products');
   const price = formatPriceKRW(product.priceKRW);
 
   return (
     <Link href={`/products/${product.slug}`} className="group block h-full">
-      <div className="relative aspect-[4/5] h-full overflow-hidden rounded-card shadow-card transition-shadow duration-300 group-hover:shadow-hover">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-card shadow-card">
         <div
           className="absolute inset-0 bg-brand-light bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
           style={{ backgroundImage: `url(${product.heroImage})` }}
           role="img"
           aria-label={product.title}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-          <span className="text-xs font-medium uppercase tracking-[0.15em] text-white/80">
-            {t(`category.${product.category}`)}
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/45 via-ink/15 to-ink/35" />
+        {/* 거대한 세리프 제목 (상단) */}
+        <div className="absolute inset-x-0 top-0 flex items-start justify-center p-7">
+          <h3 className="text-center font-serif text-4xl leading-[1.1] text-white drop-shadow-md sm:text-5xl">
+            {product.title}
+          </h3>
+        </div>
+      </div>
+      {/* 설명·가격 (이미지 아래, 배경 위) */}
+      <div className="px-1 pt-4">
+        <p className="line-clamp-2 text-sm leading-relaxed text-muted">
+          {product.summary}
+        </p>
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-sm font-semibold text-ink">
+            {price ? t('priceFrom', { price }) : t('priceOnRequest')}
           </span>
-          <h3 className="mt-2 font-serif text-3xl leading-tight">{product.title}</h3>
-          <p className="mt-2 line-clamp-2 text-sm text-white/85">{product.summary}</p>
-          <div className="mt-4 flex items-center justify-between">
-            <span className="text-base font-semibold">
-              {price ? t('priceFrom', { price }) : t('priceOnRequest')}
-            </span>
-            <span className="text-sm font-medium text-white/90">자세히 →</span>
-          </div>
+          <span className="text-sm font-medium text-brand-dark">자세히 →</span>
         </div>
       </div>
     </Link>
