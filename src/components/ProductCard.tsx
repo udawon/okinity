@@ -27,12 +27,12 @@ export default async function ProductCard({ product }: { product: Product }) {
         </div>
       </div>
       {/* 설명·가격 (이미지 아래, 배경 위) */}
-      <div className="px-1 pt-4">
-        <p className="line-clamp-2 text-sm leading-relaxed text-muted">
+      <div className="px-1 pt-5">
+        <p className="line-clamp-2 text-base leading-relaxed text-ink/80">
           {product.summary}
         </p>
         <div className="mt-3 flex items-center justify-between">
-          <span className="text-sm font-semibold text-ink">
+          <span className="text-base font-semibold text-ink">
             {price ? t('priceFrom', { price }) : t('priceOnRequest')}
           </span>
           <span className="text-sm font-medium text-brand-dark">자세히 →</span>

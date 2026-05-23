@@ -31,9 +31,11 @@ export default function CarouselSection({
   return (
     <section className="py-16 sm:py-20">
       <Container>
-        <h2 className="text-center font-serif text-3xl text-ink sm:text-4xl">{title}</h2>
+        <h2 className="text-center font-serif text-4xl text-ink sm:text-5xl">{title}</h2>
         {intro && (
-          <p className="mx-auto mt-3 max-w-xl text-center text-muted">{intro}</p>
+          <p className="mx-auto mt-4 max-w-xl text-center text-base leading-relaxed text-muted">
+            {intro}
+          </p>
         )}
       </Container>
 
@@ -48,7 +50,7 @@ export default function CarouselSection({
         {/* 전체 폭 스크롤러 — 카드가 가장자리까지 흐름 */}
         <div
           ref={ref}
-          className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:gap-6 sm:px-6 lg:px-8"
+          className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:px-6 lg:px-8"
         >
           {children}
         </div>
