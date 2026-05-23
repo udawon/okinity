@@ -13,9 +13,10 @@ export default function Carousel({ children }: { children: ReactNode }) {
   );
 }
 
-/** 카루셀 아이템 래퍼 — 화면 비율 기반(전체 폭 캐러셀). 데스크탑 2.5장 노출, 가장자리 bleed. */
+/** 카루셀 아이템 래퍼 — 화면 비율 기반(전체 폭 캐러셀).
+ *  데스크탑 ~3.5장 노출(가운데 3 + 양옆 잘림), 태블릿 ~2.3장, 모바일 ~1.4장. */
 export function CarouselItem({ children }: { children: ReactNode }) {
   return (
-    <div className="w-[80vw] shrink-0 snap-start sm:w-[52vw] lg:w-[36vw]">{children}</div>
+    <div className="w-[68vw] shrink-0 snap-start sm:w-[40vw] lg:w-[26vw]">{children}</div>
   );
 }

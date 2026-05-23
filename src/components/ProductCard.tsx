@@ -21,7 +21,7 @@ export default async function ProductCard({ product }: { product: Product }) {
         <div className="absolute inset-0 bg-gradient-to-b from-ink/45 via-ink/15 to-ink/35" />
         {/* 거대한 세리프 제목 (상단) */}
         <div className="absolute inset-x-0 top-0 flex items-start justify-center p-7">
-          <h3 className="text-center font-serif text-4xl leading-[1.1] text-white drop-shadow-md sm:text-5xl">
+          <h3 className="text-center font-serif text-3xl leading-[1.1] text-white drop-shadow-md sm:text-4xl">
             {product.title}
           </h3>
         </div>
