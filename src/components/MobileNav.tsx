@@ -31,7 +31,7 @@ export default function MobileNav({ current }: { current: Locale }) {
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 top-16 border-b border-line bg-bg">
+        <div className="absolute left-0 right-0 top-16 border-b border-line bg-bg sm:top-[111px]">
           <nav className="flex flex-col px-5 py-4 font-mono text-sm uppercase tracking-[0.1em] text-ink">
             {ITEMS.map((it) => (
               <Link

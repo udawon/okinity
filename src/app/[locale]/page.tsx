@@ -58,9 +58,10 @@ export default async function HomePage({
         <CarouselSection
           title={tHome('signatureTitle')}
           intro={tHome('signatureIntro')}
+          align="left"
         >
           {categories.map((c) => (
-            <CarouselItem key={c.href}>
+            <CarouselItem key={c.href} fixed>
               <CategoryCard
                 href={c.href}
                 title={c.title}

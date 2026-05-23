@@ -6,6 +6,7 @@ import { routing, type Locale } from '@/i18n/routing';
 import { site } from '@/config/site.config';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BookButton from '@/components/BookButton';
 import '../globals.css';
 
 export function generateStaticParams() {
@@ -58,6 +59,7 @@ export default async function LocaleLayout({
           <Header locale={locale as Locale} />
           <main>{children}</main>
           <Footer />
+          <BookButton />
         </NextIntlClientProvider>
       </body>
     </html>

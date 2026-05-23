@@ -13,10 +13,18 @@ export default function Carousel({ children }: { children: ReactNode }) {
   );
 }
 
-/** 카루셀 아이템 래퍼 — 화면 비율 기반(전체 폭 캐러셀).
- *  데스크탑 ~3.5장 노출(가운데 3 + 양옆 잘림), 태블릿 ~2.3장, 모바일 ~1.4장. */
-export function CarouselItem({ children }: { children: ReactNode }) {
-  return (
-    <div className="w-[68vw] shrink-0 snap-start sm:w-[40vw] lg:w-[26vw]">{children}</div>
-  );
+/**
+ * 카루셀 아이템 래퍼.
+ * 기본(투어 상품): 화면 비율 ~28vw — 레퍼런스 Must-Do처럼 화면 따라 커짐.
+ * fixed(시그니처): 고정 340px — 레퍼런스 Signature는 폭 고정이라 넓은 화면에선 더 많이 노출.
+ */
+export function CarouselItem({
+  children,
+  fixed = false
+}: {
+  children: ReactNode;
+  fixed?: boolean;
+}) {
+  const w = fixed ? 'w-[78vw] sm:w-[340px]' : 'w-[78vw] sm:w-[46vw] lg:w-[28vw]';
+  return <div className={`${w} shrink-0 snap-start`}>{children}</div>;
 }

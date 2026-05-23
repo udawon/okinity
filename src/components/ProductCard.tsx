@@ -11,16 +11,16 @@ export default async function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link href={`/products/${product.slug}`} className="group block h-full">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-card shadow-card">
+      <div className="relative aspect-[4/5] overflow-hidden">
         <div
           className="absolute inset-0 bg-brand-light bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
           style={{ backgroundImage: `url(${product.heroImage})` }}
           role="img"
           aria-label={product.title}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink/45 via-ink/15 to-ink/35" />
-        {/* 거대한 세리프 제목 (상단) */}
-        <div className="absolute inset-x-0 top-0 flex items-start justify-center p-7">
+        <div className="absolute inset-0 bg-ink/30" />
+        {/* 거대한 세리프 제목 (세로 중앙) */}
+        <div className="absolute inset-0 flex items-center justify-center p-7">
           <h3 className="text-center font-serif text-3xl leading-[1.1] text-white drop-shadow-md sm:text-4xl">
             {product.title}
           </h3>

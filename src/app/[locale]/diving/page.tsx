@@ -26,7 +26,7 @@ export default async function DivingPage({
   const tNav = await getTranslations('nav');
   const tProducts = await getTranslations('products');
   // 다이빙 = 체험·펀·그룹 (자격증은 PADI 교육으로 분리)
-  const products = getProductsByCategories(locale as Locale, ['experience', 'fun', 'group']);
+  const products = getProductsByCategories(locale as Locale, ['experience', 'fun', 'freediving', 'group']);
 
   return (
     <section className="py-12 sm:py-16">

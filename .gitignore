@@ -32,3 +32,8 @@ next-env.d.ts
 .vercel
 .gstack/
 /.playwright-mcp
+
+# 로컬 QA/디자인리뷰 산출물
+.playwright-mcp/
+/*.jpeg
+/*.png

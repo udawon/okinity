@@ -22,7 +22,7 @@ const ProductFrontmatter = z.object({
   slug: z.string(),
   title: z.string(),
   summary: z.string(),
-  category: z.enum(['experience', 'fun', 'certification', 'group']),
+  category: z.enum(['experience', 'fun', 'freediving', 'certification', 'group']),
   durationHours: z.number().optional(),
   priceKRW: z.number().optional(), // 비우면 "문의 시 안내"
   includes: z.array(z.string()).default([]),

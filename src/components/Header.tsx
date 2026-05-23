@@ -19,7 +19,7 @@ export default async function Header({ locale }: { locale: Locale }) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/95 backdrop-blur">
-      <Container className="flex h-16 items-center justify-between gap-4">
+      <Container className="flex h-16 items-center justify-between gap-4 sm:h-[111px]">
         <Link href="/" className="font-serif text-xl tracking-wide text-ink">
           {site.name}
         </Link>
