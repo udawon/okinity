@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import Container from './Container';
 
 /**
- * 캐러셀 섹션 — 전체 폭 가로 스크롤. 좌우 peek(양옆 카드 일부 노출),
- * 화살표 클릭 시 카드 1장씩 이동(snap).
+ * 캐러셀 섹션 — 전체 폭 가로 스크롤. 첫 카드는 왼쪽 정렬(온전 노출),
+ * 오른쪽 끝에서 다음 카드가 잘려 peek가 생긴다. 화살표 클릭 시 카드 1장씩 이동(snap).
  * align: 'center' = 제목·설명 중앙(투어 상품), 'left' = 제목 좌 + 설명 우 2단(시그니처).
  */
 export default function CarouselSection({
@@ -20,15 +20,6 @@ export default function CarouselSection({
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-
-  // 초기 위치를 한 칸 밀어 첫 카드를 왼쪽 잘림(peek)으로 → 가운데 3개 + 양옆 잘림
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const first = el.firstElementChild as HTMLElement | null;
-    if (!first) return;
-    el.scrollLeft = first.getBoundingClientRect().width + 12;
-  }, []);
 
   // 화살표: 카드 1장(+gap)씩 정확히 이동
   const scroll = (dir: 1 | -1) => {
