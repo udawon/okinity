@@ -35,7 +35,7 @@ export default function CarouselSection({
     'absolute top-[40%] z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-2xl text-ink shadow-card backdrop-blur transition-colors hover:bg-white sm:flex';
 
   return (
-    <section className="pt-24 pb-10 sm:pt-[155px] sm:pb-[30px]">
+    <section className="py-16 sm:py-24">
       <Container>
         {align === 'left' ? (
           <div className="grid gap-5 lg:grid-cols-2 lg:items-center lg:gap-12">
@@ -58,7 +58,7 @@ export default function CarouselSection({
         )}
       </Container>
 
-      <div className="relative mt-16 sm:mt-[140px]">
+      <div className="relative mt-10 sm:mt-12">
         <button type="button" aria-label="이전" onClick={() => scroll(-1)} className={`${arrow} left-3`}>
           ‹
         </button>
