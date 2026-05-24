@@ -1,5 +1,6 @@
 import { getInquiryStore, type InquiryStatus } from '@/lib/inquiries';
 import StatusControl from '@/components/admin/StatusControl';
+import AdminNav from '@/components/admin/AdminNav';
 import { logout } from './actions';
 
 // 항상 최신 데이터를 보여줘야 하므로 동적 렌더링.
@@ -41,6 +42,10 @@ export default async function AdminDashboard() {
             로그아웃
           </button>
         </form>
+      </div>
+
+      <div className="mt-4">
+        <AdminNav />
       </div>
 
       {inquiries.length === 0 ? (
