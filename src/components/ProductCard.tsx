@@ -28,7 +28,7 @@ export default async function ProductCard({ product }: { product: Product }) {
       </div>
       {/* 설명·가격 (이미지 아래, 배경 위) */}
       <div className="px-1 pt-5">
-        <p className="line-clamp-2 text-base leading-relaxed text-ink/80">
+        <p className="line-clamp-2 min-h-[3.25rem] text-base leading-relaxed text-ink/80">
           {product.summary}
         </p>
         <div className="mt-3 flex items-center justify-between">
