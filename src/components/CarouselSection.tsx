@@ -58,7 +58,7 @@ export default function CarouselSection({
         )}
       </Container>
 
-      <div className="relative mt-10 sm:mt-12">
+      <div className={`relative mt-10 ${align === 'left' ? 'sm:mt-[150px]' : 'sm:mt-12'}`}>
         <button type="button" aria-label="이전" onClick={() => scroll(-1)} className={`${arrow} left-3`}>
           ‹
         </button>
