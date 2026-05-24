@@ -1,15 +1,20 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import type { Locale } from '@/i18n/routing';
-import { getAllProducts, getGallery, getReviews } from '@/lib/content';
+import { getAllProducts, getGallery, getReviews, type GalleryItem } from '@/lib/content';
+import { getSiteContentMap, CONTENT_KEYS, mergeOverride } from '@/lib/site-content';
 import Container from '@/components/Container';
-import Hero from '@/components/Hero';
+import Hero, { type HeroOverride } from '@/components/Hero';
 import CategoryCard from '@/components/CategoryCard';
 import ProductCard from '@/components/ProductCard';
 import CarouselSection from '@/components/CarouselSection';
 import { CarouselItem } from '@/components/Carousel';
 import KakaoBand from '@/components/KakaoBand';
 import ReviewList from '@/components/ReviewList';
+
+// 어드민 콘텐츠 편집을 즉시 반영하기 위해 동적 렌더링.
+// (Supabase 미설정 시에도 오버라이드 조회는 빈 객체라 비용 거의 없음)
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage({
   params
@@ -24,20 +29,45 @@ export default async function HomePage({
   const tProducts = await getTranslations('products');
   const tGallery = await getTranslations('gallery');
 
-  const products = getAllProducts(locale as Locale);
-  const reviews = getReviews(locale as Locale);
-  const galleryPreview = getGallery().slice(0, 6);
+  // 어드민 오버라이드 일괄 조회 (Supabase 미설정 시 빈 객체 → md 기본값만 사용)
+  const overrides = await getSiteContentMap();
+  const heroOverride = overrides[CONTENT_KEYS.hero] as HeroOverride | undefined;
 
-  const categories = [
+  // 투어 상품: md 기본값 + product:{slug} 오버라이드
+  const products = getAllProducts(locale as Locale).map((p) =>
+    mergeOverride(p, overrides[CONTENT_KEYS.product(p.slug)])
+  );
+  const reviews = getReviews(locale as Locale);
+
+  // 갤러리: gallery 오버라이드의 items 배열 우선, 없으면 json
+  const galleryOverrideItems = overrides[CONTENT_KEYS.gallery]?.items;
+  const galleryItems: GalleryItem[] = Array.isArray(galleryOverrideItems)
+    ? (galleryOverrideItems as GalleryItem[])
+    : getGallery();
+  const galleryPreview = galleryItems.slice(0, 6);
+
+  // 시그니처 경험: 기본값 + signature:{href} 오버라이드(이미지/동영상/제목/설명)
+  const baseCategories = [
     { href: '/diving', title: tNav('diving'), description: tHome('cardDiving'), image: '/images/ph-1.svg' },
     { href: '/padi', title: tNav('padi'), description: tHome('cardPadi'), image: '/images/ph-3.svg' },
     { href: '/schedule', title: tNav('schedule'), description: tHome('cardSchedule'), image: '/images/ph-4.svg' },
     { href: '/gallery', title: tNav('gallery'), description: tHome('cardGallery'), image: '/images/ph-2.svg' }
   ];
+  const categories = baseCategories.map((c) => {
+    const o = overrides[CONTENT_KEYS.signature(c.href)] ?? {};
+    const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : undefined);
+    return {
+      href: c.href,
+      title: str(o.title) ?? c.title,
+      description: str(o.description) ?? c.description,
+      image: str(o.image) ?? c.image,
+      video: str(o.video)
+    };
+  });
 
   return (
     <>
-      <Hero />
+      <Hero override={heroOverride} />
 
       {/* 투어 프로그램 — Must-Do 스타일 카루셀 (이미지 위 + 내용 아래) + 화살표 */}
       {products.length > 0 && (
@@ -67,6 +97,7 @@ export default async function HomePage({
               title={c.title}
               description={c.description}
               image={c.image}
+              video={c.video}
             />
           </CarouselItem>
         ))}
