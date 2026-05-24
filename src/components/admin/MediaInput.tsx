@@ -14,17 +14,25 @@ export default function MediaInput({
   prefix,
   defaultUrl = '',
   accept = 'image/*,video/*',
-  disabled = false
+  disabled = false,
+  onChange
 }: {
-  name: string;
+  name?: string;
   prefix: string;
   defaultUrl?: string;
   accept?: string;
   disabled?: boolean;
+  /** 동적 배열(갤러리) 등 form 밖에서 값을 받을 때 사용. */
+  onChange?: (url: string) => void;
 }) {
-  const [url, setUrl] = useState(defaultUrl);
+  const [url, setUrlState] = useState(defaultUrl);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+
+  const setUrl = (u: string) => {
+    setUrlState(u);
+    onChange?.(u);
+  };
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -45,7 +53,7 @@ export default function MediaInput({
 
   return (
     <div className="space-y-2">
-      <input type="hidden" name={name} value={url} />
+      {name && <input type="hidden" name={name} value={url} />}
 
       {url && (
         <div className="overflow-hidden rounded-card border border-line bg-surface">

@@ -1,7 +1,11 @@
-import { getSiteContent } from '@/lib/site-content';
+import { getAllProducts, getGallery, type GalleryItem } from '@/lib/content';
+import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import AdminNav from '@/components/admin/AdminNav';
 import HeroForm from '@/components/admin/HeroForm';
+import ProductForm from '@/components/admin/ProductForm';
+import SignatureForm from '@/components/admin/SignatureForm';
+import GalleryForm from '@/components/admin/GalleryForm';
 import { logout } from '../actions';
 
 export const dynamic = 'force-dynamic';
@@ -9,9 +13,23 @@ export const dynamic = 'force-dynamic';
 const sectionCls = 'rounded-card border border-line bg-surface p-5 sm:p-6';
 const sectionTitleCls = 'text-lg font-bold text-ink';
 
+// 시그니처 카드(메인과 동일한 href). 라벨은 어드민 식별용 기본 한국어.
+const SIGNATURE_ITEMS = [
+  { href: '/diving', label: '다이빙' },
+  { href: '/padi', label: 'PADI 교육' },
+  { href: '/schedule', label: '일정표' },
+  { href: '/gallery', label: '갤러리' }
+];
+
 export default async function AdminContentPage() {
   const enabled = isSupabaseEnabled();
-  const hero = enabled ? ((await getSiteContent('hero')) ?? {}) : {};
+  const overrides = enabled ? await getSiteContentMap() : {};
+  const hero = overrides[CONTENT_KEYS.hero] ?? {};
+  const products = getAllProducts('ko');
+  const galleryOverrideItems = overrides[CONTENT_KEYS.gallery]?.items;
+  const galleryDefaults: GalleryItem[] = Array.isArray(galleryOverrideItems)
+    ? (galleryOverrideItems as GalleryItem[])
+    : getGallery();
 
   return (
     <main className="mx-auto w-full max-w-container px-5 py-8 sm:px-6">
@@ -52,12 +70,48 @@ export default async function AdminContentPage() {
           <HeroForm defaults={hero} disabled={!enabled} />
         </section>
 
-        {/* 다음 단계: 투어 상품 / 시그니처 경험 / 갤러리 편집 폼 */}
-        <section className={`${sectionCls} opacity-60`}>
-          <h2 className={sectionTitleCls}>투어 상품 · 시그니처 · 갤러리</h2>
-          <p className="mt-1 text-sm text-muted">
-            (준비 중 — Hero 동작 확인 후 동일 패턴으로 추가됩니다)
+        <section className={sectionCls}>
+          <h2 className={sectionTitleCls}>투어 상품</h2>
+          <p className="mb-4 mt-1 text-sm text-muted">
+            각 상품의 이미지·제목·설명·가격. 비운 항목은 기본값(content/*.md)을 사용합니다.
           </p>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {products.map((p) => (
+              <ProductForm
+                key={p.slug}
+                slug={p.slug}
+                baseTitle={p.title}
+                defaults={overrides[CONTENT_KEYS.product(p.slug)] ?? {}}
+                disabled={!enabled}
+              />
+            ))}
+          </div>
+        </section>
+
+        <section className={sectionCls}>
+          <h2 className={sectionTitleCls}>시그니처 경험</h2>
+          <p className="mb-4 mt-1 text-sm text-muted">
+            각 카드의 이미지/동영상·제목·설명. 동영상이 있으면 자동재생됩니다.
+          </p>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {SIGNATURE_ITEMS.map((s) => (
+              <SignatureForm
+                key={s.href}
+                href={s.href}
+                label={s.label}
+                defaults={overrides[CONTENT_KEYS.signature(s.href)] ?? {}}
+                disabled={!enabled}
+              />
+            ))}
+          </div>
+        </section>
+
+        <section className={sectionCls}>
+          <h2 className={sectionTitleCls}>갤러리</h2>
+          <p className="mb-4 mt-1 text-sm text-muted">
+            메인 갤러리 미리보기에 노출됩니다(앞 6장). 이미지를 추가/삭제하세요.
+          </p>
+          <GalleryForm defaults={galleryDefaults} disabled={!enabled} />
         </section>
       </div>
     </main>
