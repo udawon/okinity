@@ -12,7 +12,8 @@ export default {
         muted: design.colors.muted,
         line: design.colors.line,
         surface: design.colors.surface,
-        bg: design.colors.bg
+        bg: design.colors.bg,
+        panel: design.colors.panel
       },
       borderRadius: {
         card: design.radius.card,

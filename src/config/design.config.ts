@@ -26,7 +26,8 @@ export const design = {
     muted: '#6b6760', // 보조 텍스트
     line: '#e7e0d3', // 모래빛 보더
     surface: '#ffffff', // 카드 (흰색, 그림자로 부양)
-    bg: '#f5efe4' // 페이지 배경 (모래/크림)
+    bg: '#f5efe4', // 페이지 배경 (모래/크림)
+    panel: '#eeded2' // 카드 텍스트 영역 (핑크베이지, 배경과 구분 — 레퍼런스 Must-Do 톤)
   },
   // 둥근 모서리 (리조트 톤). 버튼은 알약형.
   radius: {
