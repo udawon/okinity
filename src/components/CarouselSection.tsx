@@ -35,7 +35,13 @@ export default function CarouselSection({
     'absolute top-[40%] z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-2xl text-ink shadow-card backdrop-blur transition-colors hover:bg-white sm:flex';
 
   return (
-    <section className={align === 'left' ? 'py-20 sm:py-[195px]' : 'py-16 sm:py-24'}>
+    <section
+      className={
+        align === 'left'
+          ? 'py-20 sm:py-[195px]' // 시그니처: sunsiyam Signature 상하 195px 대칭
+          : 'pt-16 pb-20 sm:pt-[155px] sm:pb-[183px]' // 투어: sunsiyam Must-Do 상단 155 / 하단 183
+      }
+    >
       <Container>
         {align === 'left' ? (
           <div className="grid gap-5 lg:grid-cols-2 lg:items-center lg:gap-12">
@@ -58,7 +64,7 @@ export default function CarouselSection({
         )}
       </Container>
 
-      <div className={`relative mt-10 ${align === 'left' ? 'sm:mt-[150px]' : 'sm:mt-12'}`}>
+      <div className={`relative mt-10 ${align === 'left' ? 'sm:mt-[150px]' : 'sm:mt-[110px]'}`}>
         <button type="button" aria-label="이전" onClick={() => scroll(-1)} className={`${arrow} left-3`}>
           ‹
         </button>
