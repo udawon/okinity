@@ -53,25 +53,24 @@ export default async function HomePage({
         </CarouselSection>
       )}
 
-      {/* 시그니처 경험 — Signature 스타일 카루셀 (키 큰 다크 오버레이) + 화살표 */}
-      <div className="bg-surface">
-        <CarouselSection
-          title={tHome('signatureTitle')}
-          intro={tHome('signatureIntro')}
-          align="left"
-        >
-          {categories.map((c) => (
-            <CarouselItem key={c.href} fixed>
-              <CategoryCard
-                href={c.href}
-                title={c.title}
-                description={c.description}
-                image={c.image}
-              />
-            </CarouselItem>
-          ))}
-        </CarouselSection>
-      </div>
+      {/* 시그니처 경험 — Signature 스타일 카루셀 (키 큰 다크 오버레이) + 화살표.
+          배경은 투어 상품과 동일(페이지 베이지) — 레퍼런스처럼 섹션 간 여백 연속. */}
+      <CarouselSection
+        title={tHome('signatureTitle')}
+        intro={tHome('signatureIntro')}
+        align="left"
+      >
+        {categories.map((c) => (
+          <CarouselItem key={c.href} fixed>
+            <CategoryCard
+              href={c.href}
+              title={c.title}
+              description={c.description}
+              image={c.image}
+            />
+          </CarouselItem>
+        ))}
+      </CarouselSection>
 
       {/* 카카오톡 실시간 문의 밴드 */}
       <KakaoBand />
