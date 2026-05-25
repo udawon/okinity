@@ -8,6 +8,7 @@ import { site } from '@/config/site.config';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookButton from '@/components/BookButton';
+import OceanBackground from '@/components/OceanBackground';
 import '../globals.css';
 
 // next/font — self-host + subset + preload. CDN @import(render-blocking) 대체.
@@ -77,7 +78,8 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={fontVars}>
-      <body className="min-h-dvh bg-bg font-sans text-ink antialiased">
+      <body className="min-h-dvh font-sans text-white antialiased">
+        <OceanBackground />
         <NextIntlClientProvider messages={messages}>
           <Header locale={locale as Locale} />
           <main>{children}</main>
