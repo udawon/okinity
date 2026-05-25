@@ -69,18 +69,18 @@ export default function CarouselSection({
       <Container>
         {align === 'left' ? (
           <div className="grid gap-5 lg:grid-cols-2 lg:items-center lg:gap-12">
-            <h2 className="font-serif text-4xl leading-tight text-ink sm:text-5xl">
+            <h2 className="font-serif text-4xl leading-tight text-white sm:text-5xl">
               {title}
             </h2>
             {intro && (
-              <p className="text-base leading-relaxed text-muted lg:text-lg">{intro}</p>
+              <p className="text-base leading-relaxed text-white/60 lg:text-lg">{intro}</p>
             )}
           </div>
         ) : (
           <>
-            <h2 className="text-center font-serif text-4xl text-ink sm:text-5xl">{title}</h2>
+            <h2 className="text-center font-serif text-4xl text-white sm:text-5xl">{title}</h2>
             {intro && (
-              <p className="mx-auto mt-4 max-w-xl text-center text-base leading-relaxed text-muted">
+              <p className="mx-auto mt-4 max-w-xl text-center text-base leading-relaxed text-white/60">
                 {intro}
               </p>
             )}

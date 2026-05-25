@@ -23,19 +23,19 @@ export default async function ProductCard({ product }: { product: Product }) {
             aria-label={product.title}
           />
         </div>
-        {/* 패널 — 제목 + 설명 + 가격/CTA */}
-        <div className="flex flex-1 flex-col bg-panel px-7 py-8">
-          <h3 className="font-serif text-2xl leading-snug text-ink sm:text-[28px]">
+        {/* 패널 — 제목 + 설명 + 가격/CTA (다크 글래스) */}
+        <div className="flex flex-1 flex-col bg-white/[0.07] px-7 py-8 backdrop-blur-sm">
+          <h3 className="font-serif text-2xl leading-snug text-white sm:text-[28px]">
             {product.title}
           </h3>
-          <p className="mt-4 text-base leading-relaxed text-ink/70">
+          <p className="mt-4 text-base leading-relaxed text-white/65">
             {product.summary}
           </p>
-          <div className="mt-auto flex items-center justify-between border-t border-ink/10 pt-5">
-            <span className="text-base font-semibold text-ink">
+          <div className="mt-auto flex items-center justify-between border-t border-white/15 pt-5">
+            <span className="text-base font-semibold text-white">
               {price ? t('priceFrom', { price }) : t('priceOnRequest')}
             </span>
-            <span className="text-sm font-medium text-brand-dark">자세히 →</span>
+            <span className="text-sm font-medium text-[#5fd6e2]">자세히 →</span>
           </div>
         </div>
       </div>

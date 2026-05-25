@@ -18,16 +18,16 @@ export default async function Header({ locale }: { locale: Locale }) {
   const t = await getTranslations('nav');
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#06151d]/50 backdrop-blur-md">
       <Container className="flex h-16 items-center justify-between gap-4 sm:h-[111px]">
-        <Link href="/" className="font-serif text-xl tracking-wide text-ink">
+        <Link href="/" className="font-serif text-xl tracking-wide text-white">
           {site.name}
         </Link>
 
         {/* 데스크탑 내비 */}
-        <nav className="hidden items-center gap-7 text-sm font-medium text-muted lg:flex">
+        <nav className="hidden items-center gap-7 text-sm font-medium text-white/70 lg:flex">
           {NAV.map((it) => (
-            <Link key={it.key} href={it.href} className="transition-colors hover:text-brand-dark">
+            <Link key={it.key} href={it.href} className="transition-colors hover:text-white">
               {t(it.key)}
             </Link>
           ))}

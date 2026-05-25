@@ -6,26 +6,26 @@ export default async function ReviewList({ reviews }: { reviews: Review[] }) {
   const t = await getTranslations('reviews');
 
   return (
-    <section className="bg-surface py-20">
+    <section className="py-20">
       <Container>
-        <h2 className="text-center font-serif text-3xl text-ink sm:text-4xl">
+        <h2 className="text-center font-serif text-3xl text-white sm:text-4xl">
           {t('sectionTitle')}
         </h2>
         {reviews.length === 0 ? (
-          <p className="mt-6 text-center text-muted">{t('empty')}</p>
+          <p className="mt-6 text-center text-white/50">{t('empty')}</p>
         ) : (
           <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {reviews.map((r, i) => (
               <li
                 key={i}
-                className="rounded-card border border-line bg-bg p-6 shadow-card"
+                className="rounded-card border border-white/10 bg-white/[0.06] p-6 backdrop-blur-sm"
               >
-                <div className="text-accent" aria-label={`${r.rating} / 5`}>
+                <div className="text-[#f2c879]" aria-label={`${r.rating} / 5`}>
                   {'★'.repeat(r.rating)}
-                  <span className="text-line">{'★'.repeat(5 - r.rating)}</span>
+                  <span className="text-white/20">{'★'.repeat(5 - r.rating)}</span>
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-ink">{r.text}</p>
-                <p className="mt-4 text-sm font-semibold text-muted">— {r.author}</p>
+                <p className="mt-3 text-sm leading-relaxed text-white/85">{r.text}</p>
+                <p className="mt-4 text-sm font-semibold text-white/55">— {r.author}</p>
               </li>
             ))}
           </ul>

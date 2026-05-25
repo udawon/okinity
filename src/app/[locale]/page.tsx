@@ -110,17 +110,17 @@ export default async function HomePage({
       {galleryPreview.length > 0 && (
         <section className="py-16 sm:py-20">
           <Container>
-            <h2 className="text-center font-serif text-3xl text-ink sm:text-4xl">
+            <h2 className="text-center font-serif text-3xl text-white sm:text-4xl">
               {tGallery('title')}
             </h2>
-            <p className="mx-auto mt-3 max-w-xl text-center text-muted">
+            <p className="mx-auto mt-3 max-w-xl text-center text-white/60">
               {tGallery('subtitle')}
             </p>
             <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-3">
               {galleryPreview.map((it, i) => (
                 <div
                   key={i}
-                  className="aspect-square w-full overflow-hidden rounded-card bg-brand-light bg-cover bg-center shadow-card"
+                  className="aspect-square w-full overflow-hidden rounded-card border border-white/10 bg-white/5 bg-cover bg-center"
                   style={{ backgroundImage: `url(${it.image})` }}
                   role="img"
                   aria-label={it.caption ?? `gallery ${i + 1}`}
@@ -130,7 +130,7 @@ export default async function HomePage({
             <div className="mt-8 text-center">
               <Link
                 href="/gallery"
-                className="rounded-button border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink shadow-card transition-colors hover:border-brand hover:text-brand-dark"
+                className="rounded-button border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-white/50 hover:bg-white/10"
               >
                 {tGallery('viewMore')}
               </Link>
