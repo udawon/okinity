@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import type { Metadata } from 'next';
 import { Playfair_Display, Noto_Serif_KR, Noto_Sans_KR } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
@@ -32,6 +34,18 @@ const notoSansKR = Noto_Sans_KR({
   preload: false
 });
 const fontVars = `${playfair.variable} ${notoSerifKR.variable} ${notoSansKR.variable}`;
+
+// 바다 배경 영상 — public/videos/ 에 파일이 있으면 영상 레이어 활성, 없으면 색 배경.
+function resolveOceanVideos() {
+  const dir = path.join(process.cwd(), 'public', 'videos');
+  const pick = (name: string) =>
+    fs.existsSync(path.join(dir, name)) ? `/videos/${name}` : null;
+  return {
+    surface: pick('surface.mp4'),
+    mid: pick('mid.mp4'),
+    deep: pick('deep.mp4')
+  };
+}
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -79,7 +93,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={fontVars}>
       <body className="min-h-dvh font-sans text-white antialiased">
-        <OceanBackground />
+        <OceanBackground videos={resolveOceanVideos()} />
         <NextIntlClientProvider messages={messages}>
           <Header locale={locale as Locale} />
           <main>{children}</main>
