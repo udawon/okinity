@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import Container from '@/components/Container';
+import ScheduleCalendar from '@/components/ScheduleCalendar';
 
 export async function generateMetadata({
   params
@@ -13,12 +14,6 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'schedule' });
   return { title: t('title'), description: t('subtitle') };
 }
-
-const STATUS_STYLE: Record<ScheduleItem['status'], string> = {
-  available: 'text-brand',
-  full: 'text-muted',
-  closed: 'text-muted line-through'
-};
 
 export default async function SchedulePage({
   params
@@ -39,51 +34,26 @@ export default async function SchedulePage({
   };
 
   return (
-    <section className="py-12 sm:py-16">
+    <section className="py-16 sm:py-24">
       <Container className="max-w-3xl">
-        <h1 className="font-serif text-3xl font-normal text-ink sm:text-4xl">
-          {t('title')}
-        </h1>
-        <p className="mt-3 font-mono text-sm tracking-[0.02em] text-muted">
-          {t('subtitle')}
-        </p>
+        <h1 className="font-serif text-3xl font-normal text-white sm:text-4xl">{t('title')}</h1>
+        <p className="mt-3 text-sm leading-relaxed text-white/60">{t('subtitle')}</p>
 
-        {items.length === 0 ? (
-          <p className="mt-8 text-muted">{t('empty')}</p>
-        ) : (
-          <table className="mt-8 w-full border border-line text-left font-mono text-sm">
-            <thead className="border-b border-line text-muted">
-              <tr>
-                <th className="px-4 py-3 font-medium uppercase tracking-[0.06em]">
-                  {t('colDate')}
-                </th>
-                <th className="px-4 py-3 font-medium uppercase tracking-[0.06em]">
-                  {t('colProgram')}
-                </th>
-                <th className="px-4 py-3 font-medium uppercase tracking-[0.06em]">
-                  {t('colStatus')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it, i) => (
-                <tr key={i} className="border-b border-line last:border-0">
-                  <td className="whitespace-nowrap px-4 py-3 text-ink">{it.date}</td>
-                  <td className="px-4 py-3 text-ink">{it.program}</td>
-                  <td className={`px-4 py-3 font-semibold ${STATUS_STYLE[it.status]}`}>
-                    {statusLabel[it.status]}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <div className="mt-10 rounded-card border border-white/10 bg-[#081a24]/85 p-5 shadow-card backdrop-blur-md sm:p-7">
+          <ScheduleCalendar
+            items={items}
+            locale={locale}
+            statusLabel={statusLabel}
+            emptyLabel={t('empty')}
+          />
+        </div>
 
         <Link
           href="/contact"
-          className="mt-8 inline-block bg-brand px-6 py-3 font-mono text-sm uppercase tracking-[0.08em] text-brand-contrast transition-colors hover:bg-brand-dark"
+          className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[#06151d] transition hover:bg-white/90"
         >
           {tNav('contact')}
+          <span aria-hidden>→</span>
         </Link>
       </Container>
     </section>
