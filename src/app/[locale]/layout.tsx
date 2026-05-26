@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import type { Metadata } from 'next';
 import { Playfair_Display, Noto_Serif_KR, Noto_Sans_KR } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
@@ -35,17 +33,15 @@ const notoSansKR = Noto_Sans_KR({
 });
 const fontVars = `${playfair.variable} ${notoSerifKR.variable} ${notoSansKR.variable}`;
 
-// 바다 배경 영상 — public/videos/ 에 파일이 있으면 영상 레이어 활성, 없으면 색 배경.
-function resolveOceanVideos() {
-  const dir = path.join(process.cwd(), 'public', 'videos');
-  const pick = (name: string) =>
-    fs.existsSync(path.join(dir, name)) ? `/videos/${name}` : null;
-  return {
-    surface: pick('surface.mp4'),
-    mid: pick('mid.mp4'),
-    deep: pick('deep.mp4')
-  };
-}
+// 바다 배경 영상 — public/videos/ 의 정적 에셋(리포에 커밋됨)을 URL로 직접 참조.
+// 주의: Vercel 서버리스에선 public/ 을 fs로 읽을 수 없다(에셋은 CDN 서빙). 따라서
+// 런타임 fs.existsSync 대신 정적 경로를 그대로 사용한다. 파일이 없으면 <video>가
+// 조용히 로드 실패할 뿐 크래시는 없다(OceanBackground가 graceful 처리).
+const OCEAN_VIDEOS = {
+  surface: '/videos/surface.mp4',
+  mid: '/videos/mid.mp4',
+  deep: '/videos/deep.mp4'
+} as const;
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -93,7 +89,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={fontVars}>
       <body className="min-h-dvh font-sans text-white antialiased">
-        <OceanBackground videos={resolveOceanVideos()} />
+        <OceanBackground videos={OCEAN_VIDEOS} />
         <NextIntlClientProvider messages={messages}>
           <Header locale={locale as Locale} />
           <main>{children}</main>
