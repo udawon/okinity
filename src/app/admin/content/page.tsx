@@ -1,4 +1,4 @@
-import { getAllProducts, getGallery, type GalleryItem } from '@/lib/content';
+import { getAllProducts, getGallery, getSchedule, type GalleryItem, type ScheduleItem } from '@/lib/content';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import AdminNav from '@/components/admin/AdminNav';
@@ -6,6 +6,7 @@ import HeroForm from '@/components/admin/HeroForm';
 import ProductForm from '@/components/admin/ProductForm';
 import SignatureForm from '@/components/admin/SignatureForm';
 import GalleryForm from '@/components/admin/GalleryForm';
+import ScheduleForm from '@/components/admin/ScheduleForm';
 import { logout } from '../actions';
 
 export const dynamic = 'force-dynamic';
@@ -30,6 +31,10 @@ export default async function AdminContentPage() {
   const galleryDefaults: GalleryItem[] = Array.isArray(galleryOverrideItems)
     ? (galleryOverrideItems as GalleryItem[])
     : getGallery();
+  const scheduleOverrideItems = overrides[CONTENT_KEYS.schedule]?.items;
+  const scheduleDefaults: ScheduleItem[] = Array.isArray(scheduleOverrideItems)
+    ? (scheduleOverrideItems as ScheduleItem[])
+    : getSchedule();
 
   return (
     <main className="mx-auto w-full max-w-container px-5 py-8 sm:px-6">
@@ -112,6 +117,14 @@ export default async function AdminContentPage() {
             메인 갤러리 미리보기에 노출됩니다(앞 6장). 이미지를 추가/삭제하세요.
           </p>
           <GalleryForm defaults={galleryDefaults} disabled={!enabled} />
+        </section>
+
+        <section className={sectionCls}>
+          <h2 className={sectionTitleCls}>일정표</h2>
+          <p className="mb-4 mt-1 text-sm text-muted">
+            /일정표 달력에 표시됩니다. 날짜·프로그램·상태를 추가/삭제하세요.
+          </p>
+          <ScheduleForm defaults={scheduleDefaults} disabled={!enabled} />
         </section>
       </div>
     </main>

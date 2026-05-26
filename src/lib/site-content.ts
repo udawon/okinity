@@ -14,6 +14,7 @@ export type Json = Record<string, unknown>;
 export const CONTENT_KEYS = {
   hero: 'hero',
   gallery: 'gallery',
+  schedule: 'schedule',
   product: (slug: string) => `product:${slug}`,
   signature: (href: string) => `signature:${href}`
 } as const;

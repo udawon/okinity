@@ -2,8 +2,12 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
+import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import Container from '@/components/Container';
 import ScheduleCalendar from '@/components/ScheduleCalendar';
+
+// 어드민 일정 편집을 즉시 반영하기 위해 동적 렌더링.
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params
@@ -25,7 +29,13 @@ export default async function SchedulePage({
 
   const t = await getTranslations('schedule');
   const tNav = await getTranslations('nav');
-  const items = getSchedule();
+
+  // 어드민 오버라이드(schedule:{ items }) 우선, 없으면 content/schedule.json 기본값.
+  const override = await getSiteContent(CONTENT_KEYS.schedule);
+  const overrideItems = override?.items;
+  const items: ScheduleItem[] = Array.isArray(overrideItems)
+    ? (overrideItems as ScheduleItem[]).slice().sort((a, b) => a.date.localeCompare(b.date))
+    : getSchedule();
 
   const statusLabel: Record<ScheduleItem['status'], string> = {
     available: t('statusAvailable'),
