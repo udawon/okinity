@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from 'react';
 import Container from './Container';
+import Reveal from './Reveal';
 
 const GAP = 12; // gap-3
 
@@ -68,27 +69,30 @@ export default function CarouselSection({
     >
       <Container>
         {align === 'left' ? (
-          <div className="grid gap-5 lg:grid-cols-2 lg:items-center lg:gap-12">
+          <Reveal className="grid gap-5 lg:grid-cols-2 lg:items-center lg:gap-12">
             <h2 className="font-serif text-4xl leading-tight text-white sm:text-5xl">
               {title}
             </h2>
             {intro && (
               <p className="text-base leading-relaxed text-white/60 lg:text-lg">{intro}</p>
             )}
-          </div>
+          </Reveal>
         ) : (
-          <>
+          <Reveal>
             <h2 className="text-center font-serif text-4xl text-white sm:text-5xl">{title}</h2>
             {intro && (
               <p className="mx-auto mt-4 max-w-xl text-center text-base leading-relaxed text-white/60">
                 {intro}
               </p>
             )}
-          </>
+          </Reveal>
         )}
       </Container>
 
-      <div className={`relative mt-10 ${align === 'left' ? 'sm:mt-[150px]' : 'sm:mt-[110px]'}`}>
+      <Reveal
+        delay={0.12}
+        className={`relative mt-10 ${align === 'left' ? 'sm:mt-[150px]' : 'sm:mt-[110px]'}`}
+      >
         <button type="button" aria-label="이전" onClick={() => scroll(-1)} className={`${arrow} left-3`}>
           ‹
         </button>
@@ -107,7 +111,7 @@ export default function CarouselSection({
         >
           {children}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

@@ -11,6 +11,7 @@ import CarouselSection from '@/components/CarouselSection';
 import { CarouselItem } from '@/components/Carousel';
 import KakaoBand from '@/components/KakaoBand';
 import ReviewList from '@/components/ReviewList';
+import Reveal from '@/components/Reveal';
 
 // 어드민 콘텐츠 편집을 즉시 반영하기 위해 동적 렌더링.
 // (Supabase 미설정 시에도 오버라이드 조회는 빈 객체라 비용 거의 없음)
@@ -110,31 +111,34 @@ export default async function HomePage({
       {galleryPreview.length > 0 && (
         <section className="py-16 sm:py-20">
           <Container>
-            <h2 className="text-center font-serif text-3xl text-white sm:text-4xl">
-              {tGallery('title')}
-            </h2>
-            <p className="mx-auto mt-3 max-w-xl text-center text-white/60">
-              {tGallery('subtitle')}
-            </p>
+            <Reveal>
+              <h2 className="text-center font-serif text-3xl text-white sm:text-4xl">
+                {tGallery('title')}
+              </h2>
+              <p className="mx-auto mt-3 max-w-xl text-center text-white/60">
+                {tGallery('subtitle')}
+              </p>
+            </Reveal>
             <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-3">
               {galleryPreview.map((it, i) => (
-                <div
-                  key={i}
-                  className="aspect-square w-full overflow-hidden rounded-card border border-white/10 bg-white/5 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${it.image})` }}
-                  role="img"
-                  aria-label={it.caption ?? `gallery ${i + 1}`}
-                />
+                <Reveal key={i} delay={i * 0.07}>
+                  <div
+                    className="aspect-square w-full overflow-hidden rounded-card border border-white/10 bg-white/5 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${it.image})` }}
+                    role="img"
+                    aria-label={it.caption ?? `gallery ${i + 1}`}
+                  />
+                </Reveal>
               ))}
             </div>
-            <div className="mt-8 text-center">
+            <Reveal delay={0.1} className="mt-8 text-center">
               <Link
                 href="/gallery"
                 className="rounded-button border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-white/50 hover:bg-white/10"
               >
                 {tGallery('viewMore')}
               </Link>
-            </div>
+            </Reveal>
           </Container>
         </section>
       )}

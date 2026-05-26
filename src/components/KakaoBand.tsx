@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { site } from '@/config/site.config';
 import Container from './Container';
+import Reveal from './Reveal';
 
 /**
  * 카카오톡 실시간 문의 밴드 (hongstardive의 노란 띠와 같은 역할).
@@ -21,20 +22,22 @@ export default async function KakaoBand() {
 
   return (
     <section className="bg-brand">
-      <Container className="flex flex-col items-center gap-4 py-16 text-center">
-        <h2 className="font-serif text-3xl text-brand-contrast">
-          {t('title')}
-        </h2>
-        <p className="text-sm text-brand-contrast/85">{t('subtitle')}</p>
-        <div className="mt-2">
-          {external ? (
-            <a href={href} target="_blank" rel="noopener noreferrer">
-              {button}
-            </a>
-          ) : (
-            <Link href={href}>{button}</Link>
-          )}
-        </div>
+      <Container className="py-16 text-center">
+        <Reveal className="flex flex-col items-center gap-4">
+          <h2 className="font-serif text-3xl text-brand-contrast">
+            {t('title')}
+          </h2>
+          <p className="text-sm text-brand-contrast/85">{t('subtitle')}</p>
+          <div className="mt-2">
+            {external ? (
+              <a href={href} target="_blank" rel="noopener noreferrer">
+                {button}
+              </a>
+            ) : (
+              <Link href={href}>{button}</Link>
+            )}
+          </div>
+        </Reveal>
       </Container>
     </section>
   );
