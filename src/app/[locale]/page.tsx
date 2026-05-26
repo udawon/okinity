@@ -9,7 +9,6 @@ import CategoryCard from '@/components/CategoryCard';
 import ProductCard from '@/components/ProductCard';
 import CarouselSection from '@/components/CarouselSection';
 import { CarouselItem } from '@/components/Carousel';
-import KakaoBand from '@/components/KakaoBand';
 import ReviewList from '@/components/ReviewList';
 import Reveal from '@/components/Reveal';
 import RevealWords from '@/components/RevealWords';
@@ -106,9 +105,6 @@ export default async function HomePage({
           </CarouselItem>
         ))}
       </CarouselSection>
-
-      {/* 카카오톡 실시간 문의 밴드 */}
-      <KakaoBand />
 
       {/* 갤러리 미리보기 */}
       {galleryPreview.length > 0 && (
