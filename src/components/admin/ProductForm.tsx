@@ -90,7 +90,9 @@ export default function ProductForm({
       </div>
 
       <div>
-        <label className={labelCls} htmlFor={`${slug}-price`}>가격 (원, 숫자만 · 비우면 "문의 시 안내")</label>
+        <label className={labelCls} htmlFor={`${slug}-price`}>
+          {'가격 (원, 숫자만 · 비우면 "문의 시 안내")'}
+        </label>
         <input
           id={`${slug}-price`}
           name="priceKRW"
