@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 export type OceanVideos = {
   surface?: string | null;
   mid?: string | null;
+  under?: string | null;
   deep?: string | null;
 };
 
@@ -16,15 +17,17 @@ export type OceanVideos = {
  * 오래 섞여 보였다. 스냅이 섹션 단위로 안착하므로, 각 섹션에 머무는 동안엔 항상 한
  * 영상만 보이게 하고(블렌드 정체 없음), 다음 섹션으로 넘어갈 때만 CSS로 부드럽게 전환.
  *
- * 섹션 인덱스 → 깊이 매핑(홈 기준): Hero·투어=해수면, 시그니처=바다, 갤러리·후기=깊은바다.
+ * 섹션 인덱스 → 깊이 매핑(홈 기준):
+ *   Hero=해수면(surface), 투어=바다(mid), 시그니처=수중(under), 갤러리·후기=깊은바다(deep).
  * 영상이 없으면 색 틴트만으로 동일한 깊이감을 보여준다(graceful).
  */
-const DEPTH_BY_SECTION = [0, 0, 1, 2, 2]; // 0=surface, 1=mid, 2=deep
+const DEPTH_BY_SECTION = [0, 1, 2, 3, 3]; // 0=surface, 1=mid, 2=under, 3=deep
 
 const TINT = [
-  'rgba(28,120,140,0.40)', // 해수면
-  'rgba(12,78,98,0.52)', // 바다
-  'rgba(5,28,42,0.66)' // 깊은 바다
+  'rgba(28,120,140,0.40)', // 해수면 surface
+  'rgba(14,92,112,0.48)', // 바다 mid
+  'rgba(9,58,80,0.56)', // 수중 under
+  'rgba(5,28,42,0.66)' // 깊은 바다 deep
 ];
 
 export default function OceanBackground({ videos }: { videos?: OceanVideos }) {
@@ -63,7 +66,7 @@ export default function OceanBackground({ videos }: { videos?: OceanVideos }) {
     };
   }, []);
 
-  const layers = [videos?.surface, videos?.mid, videos?.deep];
+  const layers = [videos?.surface, videos?.mid, videos?.under, videos?.deep];
 
   return (
     <div className="fixed inset-0 -z-10 bg-[#06151d]" aria-hidden>

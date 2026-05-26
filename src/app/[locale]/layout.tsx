@@ -40,6 +40,7 @@ const fontVars = `${playfair.variable} ${notoSerifKR.variable} ${notoSansKR.vari
 const OCEAN_VIDEOS = {
   surface: '/videos/surface.mp4',
   mid: '/videos/mid.mp4',
+  under: '/videos/under.mp4',
   deep: '/videos/deep.mp4'
 } as const;
 
