@@ -4,7 +4,7 @@
   "private": true,
   "description": "PONYOKINAWA — 오키나와 스쿠버다이빙 투어 홈페이지",
   "engines": {
-    "node": ">=20.0.0"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "next dev",
