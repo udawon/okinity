@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import type { Locale } from '@/i18n/routing';
@@ -21,8 +22,15 @@ export default async function Header({ locale }: { locale: Locale }) {
   return (
     <HeaderShell>
       <Container className="flex h-16 items-center justify-between gap-4 sm:h-[111px]">
-        <Link href="/" className="font-serif text-xl tracking-wide text-white">
-          {site.name}
+        <Link href="/" aria-label={site.name} className="inline-flex items-center">
+          <Image
+            src="/brand/logo-white.png"
+            alt={site.name}
+            width={819}
+            height={235}
+            priority
+            className="h-8 w-auto sm:h-11"
+          />
         </Link>
 
         {/* 데스크탑 내비 */}

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import '../globals.css';
 
 export const metadata: Metadata = {
-  title: 'Admin · PONYOKINAWA',
+  title: 'Admin · OKINITY',
   robots: { index: false, follow: false } // 어드민은 검색 비색인
 };
 

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { site } from '@/config/site.config';
 import Container from './Container';
@@ -9,7 +10,13 @@ export default async function Footer() {
     <footer className="mt-20 border-t border-white/10 bg-black/25 backdrop-blur-sm">
       <Container className="flex flex-col gap-6 py-10 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="font-serif text-xl tracking-wide text-white">{site.name}</p>
+          <Image
+            src="/brand/logo-white.png"
+            alt={site.name}
+            width={819}
+            height={235}
+            className="h-9 w-auto"
+          />
           <p className="mt-2 text-sm text-white/55">{site.address}</p>
           <p className="mt-1 text-xs text-white/45">
             {t('rights', { year: new Date().getFullYear() })}

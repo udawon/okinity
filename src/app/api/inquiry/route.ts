@@ -48,7 +48,7 @@ async function sendEmail(text: string, name: string, replyTo?: string) {
     body: JSON.stringify({
       from: fromEmail,
       to: [toEmail],
-      subject: `[PONYOKINAWA] 새 예약 문의 — ${name}`,
+      subject: `[OKINITY] 새 예약 문의 — ${name}`,
       text,
       reply_to: replyTo
     })

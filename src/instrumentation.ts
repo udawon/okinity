@@ -34,7 +34,7 @@ export async function register() {
   console.warn(
     '\n' +
       line +
-      '\n⚠  PONYOKINAWA 프로덕션 설정 경고 — 배포 전 확인 필요\n' +
+      '\n⚠  OKINITY 프로덕션 설정 경고 — 배포 전 확인 필요\n' +
       line +
       '\n' +
       problems.map((p, i) => `  ${i + 1}. ${p}`).join('\n\n') +
