@@ -13,7 +13,7 @@ import KakaoBand from '@/components/KakaoBand';
 import ReviewList from '@/components/ReviewList';
 import Reveal from '@/components/Reveal';
 import RevealWords from '@/components/RevealWords';
-import HeroSnap from '@/components/HeroSnap';
+import ScrollSnap from '@/components/ScrollSnap';
 
 // 어드민 콘텐츠 편집을 즉시 반영하기 위해 동적 렌더링.
 // (Supabase 미설정 시에도 오버라이드 조회는 빈 객체라 비용 거의 없음)
@@ -70,7 +70,7 @@ export default async function HomePage({
 
   return (
     <>
-      <HeroSnap />
+      <ScrollSnap />
       <Hero override={heroOverride} />
 
       {/* 투어 프로그램 — Must-Do 스타일 카루셀 (이미지 위 + 내용 아래) + 화살표 */}
