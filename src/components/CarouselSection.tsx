@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import Container from './Container';
 import Reveal from './Reveal';
+import RevealWords from './RevealWords';
 
 const GAP = 12; // gap-3
 
@@ -69,23 +70,33 @@ export default function CarouselSection({
     >
       <Container>
         {align === 'left' ? (
-          <Reveal className="grid gap-5 lg:grid-cols-2 lg:items-center lg:gap-12">
-            <h2 className="font-serif text-4xl leading-tight text-white sm:text-5xl">
-              {title}
-            </h2>
+          <div className="grid gap-5 lg:grid-cols-2 lg:items-center lg:gap-12">
+            <RevealWords
+              as="h2"
+              text={title}
+              className="font-serif text-4xl leading-tight text-white sm:text-5xl"
+            />
             {intro && (
-              <p className="text-base leading-relaxed text-white/60 lg:text-lg">{intro}</p>
+              <Reveal delay={0.1}>
+                <p className="text-base leading-relaxed text-white/60 lg:text-lg">{intro}</p>
+              </Reveal>
             )}
-          </Reveal>
+          </div>
         ) : (
-          <Reveal>
-            <h2 className="text-center font-serif text-4xl text-white sm:text-5xl">{title}</h2>
+          <>
+            <RevealWords
+              as="h2"
+              text={title}
+              className="text-center font-serif text-4xl text-white sm:text-5xl"
+            />
             {intro && (
-              <p className="mx-auto mt-4 max-w-xl text-center text-base leading-relaxed text-white/60">
-                {intro}
-              </p>
+              <Reveal delay={0.1}>
+                <p className="mx-auto mt-4 max-w-xl text-center text-base leading-relaxed text-white/60">
+                  {intro}
+                </p>
+              </Reveal>
             )}
-          </Reveal>
+          </>
         )}
       </Container>
 

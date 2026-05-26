@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
+import RevealWords from './RevealWords';
 
 /** Hero 어드민 오버라이드 — 비어있는 필드는 번역 기본값을 사용. */
 export type HeroOverride = {
@@ -59,9 +60,11 @@ export default async function Hero({ override }: { override?: HeroOverride } = {
         <span className="block text-[0.72rem] font-medium uppercase tracking-[0.4em] text-white/80">
           {eyebrow}
         </span>
-        <h1 className="mx-auto mt-6 max-w-[20ch] break-keep font-sans text-[2.5rem] font-semibold leading-[1.08] drop-shadow-[0_2px_24px_rgba(0,0,0,0.4)] sm:text-6xl lg:text-7xl">
-          {title}
-        </h1>
+        <RevealWords
+          as="h1"
+          text={title}
+          className="mx-auto mt-6 max-w-[20ch] break-keep font-sans text-[2.5rem] font-semibold leading-[1.08] drop-shadow-[0_2px_24px_rgba(0,0,0,0.4)] sm:text-6xl lg:text-7xl"
+        />
         <p className="mx-auto mt-6 max-w-xl break-keep text-base leading-relaxed text-white/80 sm:text-lg">
           {subtitle}
         </p>

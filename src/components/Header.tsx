@@ -5,6 +5,7 @@ import { site } from '@/config/site.config';
 import Container from './Container';
 import LocaleSwitcher from './LocaleSwitcher';
 import MobileNav from './MobileNav';
+import HeaderShell from './HeaderShell';
 
 const NAV = [
   { href: '/about', key: 'about' },
@@ -18,7 +19,7 @@ export default async function Header({ locale }: { locale: Locale }) {
   const t = await getTranslations('nav');
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#06151d]/50 backdrop-blur-md">
+    <HeaderShell>
       <Container className="flex h-16 items-center justify-between gap-4 sm:h-[111px]">
         <Link href="/" className="font-serif text-xl tracking-wide text-white">
           {site.name}
@@ -46,6 +47,6 @@ export default async function Header({ locale }: { locale: Locale }) {
           <MobileNav current={locale} />
         </div>
       </Container>
-    </header>
+    </HeaderShell>
   );
 }

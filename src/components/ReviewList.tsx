@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { type Review } from '@/lib/content';
 import Container from './Container';
 import Reveal from './Reveal';
+import RevealWords from './RevealWords';
 
 export default async function ReviewList({ reviews }: { reviews: Review[] }) {
   const t = await getTranslations('reviews');
@@ -9,11 +10,11 @@ export default async function ReviewList({ reviews }: { reviews: Review[] }) {
   return (
     <section className="py-20">
       <Container>
-        <Reveal>
-          <h2 className="text-center font-serif text-3xl text-white sm:text-4xl">
-            {t('sectionTitle')}
-          </h2>
-        </Reveal>
+        <RevealWords
+          as="h2"
+          text={t('sectionTitle')}
+          className="text-center font-serif text-3xl text-white sm:text-4xl"
+        />
         {reviews.length === 0 ? (
           <p className="mt-6 text-center text-white/50">{t('empty')}</p>
         ) : (

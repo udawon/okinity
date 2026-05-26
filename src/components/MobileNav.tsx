@@ -25,20 +25,20 @@ export default function MobileNav({ current }: { current: Locale }) {
         aria-label="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex h-9 w-9 items-center justify-center text-ink"
+        className="flex h-9 w-9 items-center justify-center text-white"
       >
-        <span className="font-mono text-lg">{open ? '✕' : '≡'}</span>
+        <span className="text-lg">{open ? '✕' : '≡'}</span>
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 top-16 border-b border-line bg-bg sm:top-[111px]">
-          <nav className="flex flex-col px-5 py-4 font-mono text-sm uppercase tracking-[0.1em] text-ink">
+        <div className="absolute left-0 right-0 top-16 border-b border-white/10 bg-[#06151d]/95 backdrop-blur-md sm:top-[111px]">
+          <nav className="flex flex-col px-5 py-4 text-sm font-medium text-white/80">
             {ITEMS.map((it) => (
               <Link
                 key={it.key}
                 href={it.href}
                 onClick={() => setOpen(false)}
-                className="border-b border-line py-3 last:border-0 hover:text-brand-dark"
+                className="border-b border-white/10 py-3 transition-colors last:border-0 hover:text-white"
               >
                 {t(it.key)}
               </Link>

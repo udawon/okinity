@@ -12,6 +12,8 @@ import { CarouselItem } from '@/components/Carousel';
 import KakaoBand from '@/components/KakaoBand';
 import ReviewList from '@/components/ReviewList';
 import Reveal from '@/components/Reveal';
+import RevealWords from '@/components/RevealWords';
+import HeroSnap from '@/components/HeroSnap';
 
 // 어드민 콘텐츠 편집을 즉시 반영하기 위해 동적 렌더링.
 // (Supabase 미설정 시에도 오버라이드 조회는 빈 객체라 비용 거의 없음)
@@ -68,6 +70,7 @@ export default async function HomePage({
 
   return (
     <>
+      <HeroSnap />
       <Hero override={heroOverride} />
 
       {/* 투어 프로그램 — Must-Do 스타일 카루셀 (이미지 위 + 내용 아래) + 화살표 */}
@@ -111,10 +114,12 @@ export default async function HomePage({
       {galleryPreview.length > 0 && (
         <section className="py-16 sm:py-20">
           <Container>
-            <Reveal>
-              <h2 className="text-center font-serif text-3xl text-white sm:text-4xl">
-                {tGallery('title')}
-              </h2>
+            <RevealWords
+              as="h2"
+              text={tGallery('title')}
+              className="text-center font-serif text-3xl text-white sm:text-4xl"
+            />
+            <Reveal delay={0.1}>
               <p className="mx-auto mt-3 max-w-xl text-center text-white/60">
                 {tGallery('subtitle')}
               </p>

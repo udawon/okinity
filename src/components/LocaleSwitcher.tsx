@@ -33,7 +33,7 @@ export default function LocaleSwitcher({ current }: { current: Locale }) {
           className={`rounded-button px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
             loc === current
               ? 'bg-brand text-brand-contrast'
-              : 'text-muted hover:text-ink'
+              : 'text-white/55 hover:text-white'
           }`}
         >
           {LABELS[loc]}
