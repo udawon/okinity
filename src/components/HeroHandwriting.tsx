@@ -28,38 +28,48 @@ export default function HeroHandwriting({
   className?: string;
   emphasisClassName?: string;
 }) {
-  const words = text.split(' ');
-  let gi = 0; // 전역 글자 인덱스
+  const lines = text.split('\n'); // \n = 강제 줄바꿈
+  let gi = 0; // 전역 글자 인덱스(줄을 넘어도 연속)
+
+  const renderWord = (word: string, key: number, isLast: boolean) => {
+    const isEmph = !!emphasis && word === emphasis;
+    // background-clip:text는 텍스트를 "직접" 가진 요소에만 먹으므로 강조 클래스는 글자 span에 적용.
+    return (
+      <Fragment key={key}>
+        <span className="inline-block whitespace-nowrap">
+          {[...word].map((ch, ci) => {
+            const delay = START + gi * STEP;
+            gi += 1;
+            return (
+              <motion.span
+                key={ci}
+                aria-hidden
+                className={`inline-block ${isEmph ? emphasisClassName : ''}`}
+                initial={{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }}
+                animate={{ opacity: 1, clipPath: 'inset(0 0% 0 0)' }}
+                transition={{ duration: DRAW, ease: EASE, delay }}
+              >
+                {ch}
+              </motion.span>
+            );
+          })}
+        </span>
+        {!isLast ? ' ' : ''}
+      </Fragment>
+    );
+  };
 
   return (
     <motion.h1
       className={`font-[family-name:var(--font-nanum-pen)] ${className}`}
-      aria-label={text}
+      aria-label={text.replace(/\n/g, ' ')}
     >
-      {words.map((word, wi) => {
-        const isEmph = !!emphasis && word === emphasis;
+      {lines.map((line, li) => {
+        const words = line.split(' ');
         return (
-          <Fragment key={wi}>
-            <span className={`inline-block whitespace-nowrap ${isEmph ? emphasisClassName : ''}`}>
-              {[...word].map((ch, ci) => {
-                const delay = START + gi * STEP;
-                gi += 1;
-                return (
-                  <motion.span
-                    key={ci}
-                    aria-hidden
-                    className="inline-block"
-                    initial={{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }}
-                    animate={{ opacity: 1, clipPath: 'inset(0 0% 0 0)' }}
-                    transition={{ duration: DRAW, ease: EASE, delay }}
-                  >
-                    {ch}
-                  </motion.span>
-                );
-              })}
-            </span>
-            {wi < words.length - 1 ? ' ' : ''}
-          </Fragment>
+          <span key={li} className="block">
+            {words.map((word, wi) => renderWord(word, wi, wi === words.length - 1))}
+          </span>
         );
       })}
     </motion.h1>

@@ -49,8 +49,8 @@ export default async function Hero({ override }: { override?: HeroOverride } = {
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center text-white">
         <HeroHandwriting
           text={title}
-          emphasis="마린라이프"
-          emphasisClassName="text-[#5fd6e2]"
+          emphasis="오션라이프"
+          emphasisClassName="text-ocean"
           className="mx-auto max-w-[14ch] break-keep text-5xl leading-[1.15] drop-shadow-[0_2px_28px_rgba(0,0,0,0.5)] sm:text-7xl lg:text-[5.5rem]"
         />
       </div>
