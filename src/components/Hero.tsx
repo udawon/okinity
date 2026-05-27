@@ -50,6 +50,8 @@ export default async function Hero({ override }: { override?: HeroOverride } = {
         <RevealWords
           as="h1"
           text={title}
+          emphasis="마린라이프"
+          emphasisClassName="italic text-[1.08em] text-[#5fd6e2] [text-shadow:0_2px_28px_rgba(0,0,0,0.45)]"
           className="mx-auto max-w-[16ch] break-keep font-serif text-[2.6rem] font-medium leading-[1.25] tracking-[-0.01em] drop-shadow-[0_2px_28px_rgba(0,0,0,0.5)] sm:text-6xl lg:text-7xl"
         />
       </div>

@@ -23,11 +23,16 @@ const wordVariant = {
 export default function RevealWords({
   text,
   as = 'h2',
-  className
+  className,
+  emphasis,
+  emphasisClassName = ''
 }: {
   text: string;
   as?: 'h1' | 'h2' | 'h3';
   className?: string;
+  /** 이 단어와 정확히 일치하면 emphasisClassName을 추가로 적용(포인트 강조). */
+  emphasis?: string;
+  emphasisClassName?: string;
 }) {
   const Tag = motion[as] as typeof motion.h2;
   const words = text.split(' ');
@@ -43,7 +48,11 @@ export default function RevealWords({
     >
       {words.map((w, i) => (
         <Fragment key={i}>
-          <motion.span variants={wordVariant} className="inline-block" aria-hidden>
+          <motion.span
+            variants={wordVariant}
+            className={`inline-block ${emphasis && w === emphasis ? emphasisClassName : ''}`}
+            aria-hidden
+          >
             {w}
           </motion.span>
           {i < words.length - 1 ? ' ' : ''}
