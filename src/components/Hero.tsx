@@ -49,12 +49,6 @@ export default async function Hero({ override }: { override?: HeroOverride } = {
           />
         ))}
 
-      {/* 가독성 오버레이 */}
-      <div
-        className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/35"
-        aria-hidden
-      />
-
       {/* 중앙 콘텐츠 */}
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center text-white">
         <span className="block text-[0.72rem] font-medium uppercase tracking-[0.4em] text-white/80">

@@ -24,7 +24,7 @@ export type OceanVideos = {
 const DEPTH_BY_SECTION = [0, 1, 2, 3, 3]; // 0=surface, 1=mid, 2=under, 3=deep
 
 const TINT = [
-  'rgba(22,100,120,0.55)', // 해수면 surface (Hero — 밝은 영상 톤다운)
+  'transparent', // 해수면 surface (Hero — 필터 없이 원본 영상 그대로)
   'rgba(14,92,112,0.48)', // 바다 mid
   'rgba(9,58,80,0.56)', // 수중 under
   'rgba(5,28,42,0.66)' // 깊은 바다 deep
@@ -93,8 +93,10 @@ export default function OceanBackground({ videos }: { videos?: OceanVideos }) {
         className="absolute inset-0 transition-colors duration-[1200ms] ease-in-out"
         style={{ backgroundColor: TINT[depth] }}
       />
-      {/* 상단 빛 + 하단 어둠 */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40" />
+      {/* 하단 어둠 — 해수면(Hero)에선 미적용(원본 영상 그대로), 그 아래 깊이에서만 */}
+      {depth > 0 && (
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40" />
+      )}
     </div>
   );
 }
