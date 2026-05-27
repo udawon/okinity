@@ -1,5 +1,10 @@
 import type { Metadata } from 'next';
-import { Playfair_Display, Noto_Serif_KR, Noto_Sans_KR } from 'next/font/google';
+import {
+  Playfair_Display,
+  Noto_Serif_KR,
+  Noto_Sans_KR,
+  Nanum_Pen_Script
+} from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -31,7 +36,14 @@ const notoSansKR = Noto_Sans_KR({
   display: 'swap',
   preload: false
 });
-const fontVars = `${playfair.variable} ${notoSerifKR.variable} ${notoSansKR.variable}`;
+// 손글씨(Hero "써지는" 타이포) — Nanum Pen Script
+const nanumPen = Nanum_Pen_Script({
+  weight: '400',
+  variable: '--font-nanum-pen',
+  display: 'swap',
+  preload: false
+});
+const fontVars = `${playfair.variable} ${notoSerifKR.variable} ${notoSansKR.variable} ${nanumPen.variable}`;
 
 // 바다 배경 영상 — public/videos/ 의 정적 에셋(리포에 커밋됨)을 URL로 직접 참조.
 // 주의: Vercel 서버리스에선 public/ 을 fs로 읽을 수 없다(에셋은 CDN 서빙). 따라서

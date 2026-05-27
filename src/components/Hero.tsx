@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import RevealWords from './RevealWords';
+import HeroHandwriting from './HeroHandwriting';
 
 /** Hero 어드민 오버라이드 — 비어있는 필드는 번역 기본값을 사용. */
 export type HeroOverride = {
@@ -47,12 +47,11 @@ export default async function Hero({ override }: { override?: HeroOverride } = {
 
       {/* 중앙 콘텐츠 — 텍스트만 */}
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center text-white">
-        <RevealWords
-          as="h1"
+        <HeroHandwriting
           text={title}
           emphasis="마린라이프"
-          emphasisClassName="italic text-[1.08em] text-[#5fd6e2] [text-shadow:0_2px_28px_rgba(0,0,0,0.45)]"
-          className="mx-auto max-w-[16ch] break-keep font-serif text-[2.6rem] font-medium leading-[1.25] tracking-[-0.01em] drop-shadow-[0_2px_28px_rgba(0,0,0,0.5)] sm:text-6xl lg:text-7xl"
+          emphasisClassName="text-[#5fd6e2]"
+          className="mx-auto max-w-[14ch] break-keep text-5xl leading-[1.15] drop-shadow-[0_2px_28px_rgba(0,0,0,0.5)] sm:text-7xl lg:text-[5.5rem]"
         />
       </div>
 
