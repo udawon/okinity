@@ -12,8 +12,9 @@ import { Fragment } from 'react';
  * - prefers-reduced-motion이면 framer가 자동으로 모션 최소화.
  */
 const EASE = [0.22, 1, 0.36, 1] as const;
-const STEP = 0.07; // 글자 간 간격(초)
-const START = 0.25; // 시작 지연(초)
+const STEP = 0.14; // 글자 간 간격(초) — 절반 속도
+const START = 1.0; // 시작 지연(초)
+const DRAW = 0.52; // 글자 1개 그리는 시간(초) — 절반 속도
 
 export default function HeroHandwriting({
   text,
@@ -50,7 +51,7 @@ export default function HeroHandwriting({
                     className="inline-block"
                     initial={{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }}
                     animate={{ opacity: 1, clipPath: 'inset(0 0% 0 0)' }}
-                    transition={{ duration: 0.26, ease: EASE, delay }}
+                    transition={{ duration: DRAW, ease: EASE, delay }}
                   >
                     {ch}
                   </motion.span>
