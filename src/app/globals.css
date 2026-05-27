@@ -40,3 +40,22 @@ html {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Hero 스크롤 인디케이터 — 아래 화살표가 위아래로 둥둥 (trickyknot 톤) */
+@keyframes float-down {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+.animate-float-down {
+  animation: float-down 2.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-down {
+    animation: none;
+  }
+}

@@ -54,12 +54,23 @@ export default async function Hero({ override }: { override?: HeroOverride } = {
         />
       </div>
 
-      {/* DIVE DEEPER 인디케이터 — 하단 중앙 (라벨 + 아래로 가는 세로선) */}
-      <div className="absolute bottom-10 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center">
+      {/* DIVE DEEPER 인디케이터 — 하단 중앙 (라벨 + 둥둥 뜨는 아래 화살표) */}
+      <div className="absolute bottom-10 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-3">
         <span className="text-[0.65rem] font-medium uppercase tracking-[0.32em] text-white/75 drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
           Dive Deeper
         </span>
-        <span className="mt-3 block h-12 w-px animate-pulse bg-white/45" aria-hidden />
+        <svg
+          className="animate-float-down h-3.5 w-7 text-white/80 drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]"
+          viewBox="0 0 28 14"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M3 3 L14 11 L25 3" />
+        </svg>
       </div>
     </section>
   );
