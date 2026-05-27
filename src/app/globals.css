@@ -41,6 +41,34 @@ html {
   scrollbar-width: none;
 }
 
+/* 모바일/터치(홈): 각 섹션을 "한 화면 높이"로 만들고 mandatory 스냅 →
+   스와이프 한 번에 한 섹션씩 묵직하게 전환(표준 풀페이지 스냅 패턴).
+   섹션이 한 화면이어야 mandatory가 확실히 걸린다. 데스크탑은 JS 휠이 처리. */
+@media (hover: none) and (pointer: coarse) {
+  html.snap-page {
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 64px; /* 모바일 헤더 h-16 */
+  }
+  html.snap-page main > section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always; /* 한 번에 한 섹션 — 건너뛰기 방지 */
+    min-height: calc(100svh - 64px); /* 헤더 제외 한 화면 */
+  }
+}
+@media (hover: none) and (pointer: coarse) and (min-width: 640px) {
+  html.snap-page {
+    scroll-padding-top: 111px;
+  }
+  html.snap-page main > section {
+    min-height: calc(100svh - 111px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.snap-page {
+    scroll-snap-type: none;
+  }
+}
+
 /* 글자 안에 흐르는 바다·파도 패턴 (background-clip:text). Hero "오션라이프" 강조용. */
 @keyframes ocean-flow {
   0% {
