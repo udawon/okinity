@@ -106,5 +106,11 @@
   },
   "common": {
     "translationPending": "このページは翻訳準備中のため韓国語で表示されます。"
+  },
+  "blog": {
+    "sectionTitle": "今日のオキニティ",
+    "sectionIntro": "沖縄の現地から届けるダイビングの物語とニュース。",
+    "more": "すべての記事",
+    "empty": "まだ記事がありません。"
   }
 }

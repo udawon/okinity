@@ -3,10 +3,11 @@ import { Link } from '@/i18n/routing';
 import type { Locale } from '@/i18n/routing';
 import { getAllProducts, getGallery, getReviews, type GalleryItem } from '@/lib/content';
 import { getSiteContentMap, CONTENT_KEYS, mergeOverride } from '@/lib/site-content';
+import { parseBlogItems, publishedSorted, BLOG_CAROUSEL_LIMIT } from '@/lib/blog';
 import Container from '@/components/Container';
 import Hero, { type HeroOverride } from '@/components/Hero';
-import CategoryCard from '@/components/CategoryCard';
 import ProductCard from '@/components/ProductCard';
+import BlogCard from '@/components/BlogCard';
 import CarouselSection from '@/components/CarouselSection';
 import { CarouselItem } from '@/components/Carousel';
 import ReviewList from '@/components/ReviewList';
@@ -26,10 +27,9 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const tHome = await getTranslations('home');
-  const tNav = await getTranslations('nav');
   const tProducts = await getTranslations('products');
   const tGallery = await getTranslations('gallery');
+  const tBlog = await getTranslations('blog');
 
   // 어드민 오버라이드 일괄 조회 (Supabase 미설정 시 빈 객체 → md 기본값만 사용)
   const overrides = await getSiteContentMap();
@@ -48,24 +48,11 @@ export default async function HomePage({
     : getGallery();
   const galleryPreview = galleryItems.slice(0, 6);
 
-  // 시그니처 경험: 기본값 + signature:{href} 오버라이드(이미지/동영상/제목/설명)
-  const baseCategories = [
-    { href: '/diving', title: tNav('diving'), description: tHome('cardDiving'), image: '/images/ph-1.svg' },
-    { href: '/padi', title: tNav('padi'), description: tHome('cardPadi'), image: '/images/ph-3.svg' },
-    { href: '/schedule', title: tNav('schedule'), description: tHome('cardSchedule'), image: '/images/ph-4.svg' },
-    { href: '/gallery', title: tNav('gallery'), description: tHome('cardGallery'), image: '/images/ph-2.svg' }
-  ];
-  const categories = baseCategories.map((c) => {
-    const o = overrides[CONTENT_KEYS.signature(c.href)] ?? {};
-    const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : undefined);
-    return {
-      href: c.href,
-      title: str(o.title) ?? c.title,
-      description: str(o.description) ?? c.description,
-      image: str(o.image) ?? c.image,
-      video: str(o.video)
-    };
-  });
+  // 오늘의 오키니티(블로그): 공개글 최신 8개를 캐러셀에
+  const blogPosts = publishedSorted(parseBlogItems(overrides[CONTENT_KEYS.blog]?.items)).slice(
+    0,
+    BLOG_CAROUSEL_LIMIT
+  );
 
   return (
     <>
@@ -86,25 +73,38 @@ export default async function HomePage({
         </CarouselSection>
       )}
 
-      {/* 시그니처 경험 — Signature 스타일 카루셀 (키 큰 다크 오버레이) + 화살표.
-          배경은 투어 상품과 동일(페이지 베이지) — 레퍼런스처럼 섹션 간 여백 연속. */}
-      <CarouselSection
-        title={tHome('signatureTitle')}
-        intro={tHome('signatureIntro')}
-        align="left"
-      >
-        {categories.map((c) => (
-          <CarouselItem key={c.href} fixed>
-            <CategoryCard
-              href={c.href}
-              title={c.title}
-              description={c.description}
-              image={c.image}
-              video={c.video}
+      {/* 오늘의 오키니티 — 블로그 글 캐러셀(공개글 최신 8개) + 전체보기.
+          글이 없으면 같은 자리에 빈 상태 섹션을 렌더해 섹션 순서(바다 깊이 매핑)를 유지. */}
+      {blogPosts.length > 0 ? (
+        <CarouselSection
+          title={tBlog('sectionTitle')}
+          intro={tBlog('sectionIntro')}
+          align="left"
+          moreHref="/blog"
+          moreLabel={tBlog('more')}
+        >
+          {blogPosts.map((p) => (
+            <CarouselItem key={p.id} fixed>
+              <BlogCard post={p} locale={locale as Locale} />
+            </CarouselItem>
+          ))}
+        </CarouselSection>
+      ) : (
+        <section className="py-20 sm:py-[195px]">
+          <Container>
+            <RevealWords
+              as="h2"
+              text={tBlog('sectionTitle')}
+              className="font-serif text-4xl leading-tight text-white sm:text-5xl"
             />
-          </CarouselItem>
-        ))}
-      </CarouselSection>
+            <Reveal delay={0.1}>
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-white/60">
+                {tBlog('empty')}
+              </p>
+            </Reveal>
+          </Container>
+        </section>
+      )}
 
       {/* 갤러리 미리보기 */}
       {galleryPreview.length > 0 && (

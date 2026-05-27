@@ -15,8 +15,8 @@ export const CONTENT_KEYS = {
   hero: 'hero',
   gallery: 'gallery',
   schedule: 'schedule',
-  product: (slug: string) => `product:${slug}`,
-  signature: (href: string) => `signature:${href}`
+  blog: 'blog',
+  product: (slug: string) => `product:${slug}`
 } as const;
 
 /** 여러 키를 한 번에 조회(메인 페이지용). 키 생략 시 전체. */

@@ -106,5 +106,11 @@
   },
   "common": {
     "translationPending": "이 페이지는 번역 준비 중이라 한국어로 표시됩니다."
+  },
+  "blog": {
+    "sectionTitle": "오늘의 오키니티",
+    "sectionIntro": "오키나와 현지에서 전하는 다이빙 이야기와 소식.",
+    "more": "전체 글 보기",
+    "empty": "아직 등록된 글이 없습니다."
   }
 }

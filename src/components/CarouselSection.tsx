@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, type ReactNode } from 'react';
+import { Link } from '@/i18n/routing';
 import Container from './Container';
 import Reveal from './Reveal';
 import RevealWords from './RevealWords';
@@ -16,11 +17,16 @@ export default function CarouselSection({
   title,
   intro,
   align = 'center',
+  moreHref,
+  moreLabel,
   children
 }: {
   title: string;
   intro?: string;
   align?: 'center' | 'left';
+  /** 있으면 캐러셀 아래에 "더보기" 링크 노출. */
+  moreHref?: string;
+  moreLabel?: string;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -123,6 +129,19 @@ export default function CarouselSection({
           {children}
         </div>
       </Reveal>
+
+      {moreHref && moreLabel && (
+        <Container>
+          <div className="mt-10 text-center">
+            <Link
+              href={moreHref}
+              className="rounded-button border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-white/50 hover:bg-white/10"
+            >
+              {moreLabel}
+            </Link>
+          </div>
+        </Container>
+      )}
     </section>
   );
 }

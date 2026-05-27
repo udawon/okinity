@@ -106,5 +106,11 @@
   },
   "common": {
     "translationPending": "This page is shown in Korean while translation is in progress."
+  },
+  "blog": {
+    "sectionTitle": "Today's OKINITY",
+    "sectionIntro": "Diving stories and updates from the heart of Okinawa.",
+    "more": "View all posts",
+    "empty": "No posts yet."
   }
 }

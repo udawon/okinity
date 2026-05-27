@@ -4,7 +4,6 @@ import { isSupabaseEnabled } from '@/lib/supabase/server';
 import AdminNav from '@/components/admin/AdminNav';
 import HeroForm from '@/components/admin/HeroForm';
 import ProductForm from '@/components/admin/ProductForm';
-import SignatureForm from '@/components/admin/SignatureForm';
 import GalleryForm from '@/components/admin/GalleryForm';
 import ScheduleForm from '@/components/admin/ScheduleForm';
 import { logout } from '../actions';
@@ -13,14 +12,6 @@ export const dynamic = 'force-dynamic';
 
 const sectionCls = 'rounded-card border border-line bg-surface p-5 sm:p-6';
 const sectionTitleCls = 'text-lg font-bold text-ink';
-
-// 시그니처 카드(메인과 동일한 href). 라벨은 어드민 식별용 기본 한국어.
-const SIGNATURE_ITEMS = [
-  { href: '/diving', label: '다이빙' },
-  { href: '/padi', label: 'PADI 교육' },
-  { href: '/schedule', label: '일정표' },
-  { href: '/gallery', label: '갤러리' }
-];
 
 export default async function AdminContentPage() {
   const enabled = isSupabaseEnabled();
@@ -87,24 +78,6 @@ export default async function AdminContentPage() {
                 slug={p.slug}
                 baseTitle={p.title}
                 defaults={overrides[CONTENT_KEYS.product(p.slug)] ?? {}}
-                disabled={!enabled}
-              />
-            ))}
-          </div>
-        </section>
-
-        <section className={sectionCls}>
-          <h2 className={sectionTitleCls}>시그니처 경험</h2>
-          <p className="mb-4 mt-1 text-sm text-muted">
-            각 카드의 이미지/동영상·제목·설명. 동영상이 있으면 자동재생됩니다.
-          </p>
-          <div className="grid gap-4 lg:grid-cols-2">
-            {SIGNATURE_ITEMS.map((s) => (
-              <SignatureForm
-                key={s.href}
-                href={s.href}
-                label={s.label}
-                defaults={overrides[CONTENT_KEYS.signature(s.href)] ?? {}}
                 disabled={!enabled}
               />
             ))}
