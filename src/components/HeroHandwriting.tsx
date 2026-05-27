@@ -12,9 +12,9 @@ import { Fragment } from 'react';
  * - prefers-reduced-motion이면 framer가 자동으로 모션 최소화.
  */
 const EASE = [0.22, 1, 0.36, 1] as const;
-const STEP = 0.14; // 글자 간 간격(초) — 절반 속도
+const STEP = 0.2; // 글자 간 간격(초)
 const START = 1.0; // 시작 지연(초)
-const DRAW = 0.52; // 글자 1개 그리는 시간(초) — 절반 속도
+const DRAW = 0.7; // 글자 1개 그리는 시간(초)
 
 export default function HeroHandwriting({
   text,
