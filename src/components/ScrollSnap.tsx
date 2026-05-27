@@ -3,27 +3,36 @@
 import { useEffect } from 'react';
 
 /**
- * 페이지 전체 방향성 섹션 스냅 — trickyknot의 "한 번 내리면 다음 섹션" 느낌을 재현.
+ * 데스크탑 휠 섹션 스냅 — "한 번 내리면 다음 섹션" 느낌(trickyknot).
  *
- * 휠/스와이프를 가로채(preventDefault) 진행 방향의 다음 섹션 경계로 직접 활강시킨다.
- * 스크롤-이벤트 기반이 아니라 입력(제스처) 기반이라 피드백 루프가 없고, 타이머 대신
- * performance.now() 타임스탬프 쿨다운을 써서 백그라운드 throttling에도 견고하다.
+ * 휠을 가로채(preventDefault) 진행 방향의 다음 섹션 경계로 직접 활강시킨다.
+ * 입력(휠) 기반이라 피드백 루프가 없고, performance.now() 타임스탬프 쿨다운으로
+ * 트랙패드 관성을 흡수한다.
+ *
+ * 터치(모바일)는 여기서 처리하지 않는다 — 네이티브 터치 스크롤은 JS로 가로채면
+ * 브라우저 개입/관성 때문에 불안정해서, 모바일은 CSS scroll-snap(globals.css의
+ * pointer:coarse 미디어쿼리)으로 OS가 매끄럽게 스냅하도록 맡긴다.
  *
  * - 스냅 목표 = 각 섹션 top − 헤더 높이(sticky 헤더에 헤딩이 가리지 않게).
- * - 한 제스처 = 한 섹션. 관성(트랙패드) 연속 이벤트는 animating/cooldown으로 흡수.
  * - 위/아래 끝에서는 가로채지 않음(네이티브 스크롤 허용).
  * - prefers-reduced-motion이면 비활성. 홈에서만 마운트.
  */
 export default function ScrollSnap() {
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // 홈에서만 마운트 → html.snap-page 로 모바일 CSS scroll-snap 범위를 홈으로 한정.
+    const html = document.documentElement;
+    html.classList.add('snap-page');
+    const removeClass = () => html.classList.remove('snap-page');
+
+    // 데스크탑 휠 스냅(모바일은 CSS가 처리). reduced-motion이면 휠 스냅 비활성.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return removeClass;
 
     const main = document.querySelector('main');
     const header = document.querySelector('header');
-    if (!main) return;
+    if (!main) return removeClass;
     const sectionList = () =>
       Array.from(main.querySelectorAll(':scope > section')) as HTMLElement[];
-    if (sectionList().length < 2) return;
+    if (sectionList().length < 2) return removeClass;
 
     let animating = false;
     let cooldownUntil = 0;
@@ -89,24 +98,11 @@ export default function ScrollSnap() {
       handle(e.deltaY > 0 ? 1 : -1, e);
     };
 
-    let touchStartY = 0;
-    const onTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-    };
-    const onTouchMove = (e: TouchEvent) => {
-      const dy = touchStartY - e.touches[0].clientY; // 위로 스와이프(콘텐츠 하강)=양수
-      if (Math.abs(dy) < 28) return;
-      handle(dy > 0 ? 1 : -1, e);
-    };
-
     window.addEventListener('wheel', onWheel, { passive: false });
-    window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchmove', onTouchMove, { passive: false });
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('wheel', onWheel);
-      window.removeEventListener('touchstart', onTouchStart);
-      window.removeEventListener('touchmove', onTouchMove);
+      removeClass();
     };
   }, []);
 
