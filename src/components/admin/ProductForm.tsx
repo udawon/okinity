@@ -85,7 +85,7 @@ export default function ProductForm({
           placeholder="비우면 기본값"
           rows={2}
           disabled={disabled}
-          className={inputCls}
+          className={`${inputCls} !rounded-card`}
         />
       </div>
 

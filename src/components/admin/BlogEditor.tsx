@@ -145,7 +145,7 @@ export default function BlogEditor({
                 placeholder="본문 텍스트 (줄바꿈 가능)"
                 rows={5}
                 disabled={disabled}
-                className={`${inputCls} resize-y`}
+                className={`${inputCls} resize-y !rounded-card`}
               />
             ) : (
               <div className="space-y-2">

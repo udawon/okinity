@@ -109,7 +109,7 @@ export default function InquiryForm({ products }: { products: ProductOption[] })
           name="message"
           rows={4}
           placeholder={t('messagePlaceholder')}
-          className={inputCls}
+          className={`${inputCls} !rounded-card`}
         />
       </div>
 

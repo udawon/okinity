@@ -105,7 +105,7 @@ export default function HeroForm({
           placeholder="비우면 기본 문구"
           disabled={disabled}
           rows={2}
-          className={inputCls}
+          className={`${inputCls} !rounded-card`}
         />
       </div>
 
