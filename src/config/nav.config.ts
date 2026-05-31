@@ -19,10 +19,12 @@ export type NavItem = {
   /** 드롭다운 "전체 보기" 대상(카테고리 허브 페이지). 없으면 미표시 */
   hub?: string;
   children?: NavLeaf[];
+  /** 이 항목 뒤에 그룹 구분선을 그린다(헤더 시각 그룹핑). */
+  groupEnd?: boolean;
 };
 
 export const NAV: NavItem[] = [
-  { key: 'about', href: '/about' },
+  { key: 'about', href: '/about', groupEnd: true },
   {
     key: 'snorkeling',
     href: '/contact',
@@ -56,6 +58,7 @@ export const NAV: NavItem[] = [
   {
     key: 'fishing',
     href: '/contact',
+    groupEnd: true,
     children: [
       { tKey: 'tours.fishing.trial4', href: '/contact' },
       { tKey: 'tours.fishing.five6', href: '/contact' },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useId, type KeyboardEvent } from 'react';
+import { Fragment, useRef, useState, useId, type KeyboardEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { NAV, type NavItem } from '@/config/nav.config';
@@ -117,17 +117,22 @@ export default function DesktopNav() {
   return (
     <nav className="hidden xl:block" aria-label="주요 메뉴">
       <ul className="flex items-center gap-6 text-sm font-medium text-white/70">
-        {NAV.map((item) =>
-          item.children ? (
-            <NavDropdown key={item.key} item={item} />
-          ) : (
-            <li key={item.key}>
-              <Link href={item.href} className="py-2 transition-colors hover:text-white">
-                {t(item.key)}
-              </Link>
-            </li>
-          )
-        )}
+        {NAV.map((item) => (
+          <Fragment key={item.key}>
+            {item.children ? (
+              <NavDropdown item={item} />
+            ) : (
+              <li>
+                <Link href={item.href} className="py-2 transition-colors hover:text-white">
+                  {t(item.key)}
+                </Link>
+              </li>
+            )}
+            {item.groupEnd && (
+              <li aria-hidden className="h-4 w-px self-center bg-white/20" />
+            )}
+          </Fragment>
+        ))}
       </ul>
     </nav>
   );
