@@ -16,6 +16,8 @@ export const CONTENT_KEYS = {
   gallery: 'gallery',
   schedule: 'schedule',
   blog: 'blog',
+  /** 홈 투어 카테고리 카드 이미지(다이빙·PADI·낚시·스노클링). value: { images: { [id]: url } } */
+  homeTours: 'home_tours',
   product: (slug: string) => `product:${slug}`
 } as const;
 

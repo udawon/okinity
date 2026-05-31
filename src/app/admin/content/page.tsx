@@ -6,6 +6,7 @@ import HeroForm from '@/components/admin/HeroForm';
 import ProductForm from '@/components/admin/ProductForm';
 import GalleryForm from '@/components/admin/GalleryForm';
 import ScheduleForm from '@/components/admin/ScheduleForm';
+import TourImagesForm from '@/components/admin/TourImagesForm';
 import { logout } from '../actions';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +27,7 @@ export default async function AdminContentPage() {
   const scheduleDefaults: ScheduleItem[] = Array.isArray(scheduleOverrideItems)
     ? (scheduleOverrideItems as ScheduleItem[])
     : getSchedule();
+  const tourImages = (overrides[CONTENT_KEYS.homeTours]?.images as Record<string, string>) ?? {};
 
   return (
     <main className="mx-auto w-full max-w-container px-5 py-8 sm:px-6">
@@ -59,15 +61,25 @@ export default async function AdminContentPage() {
 
       <div className="mt-6 space-y-6">
         <section className={sectionCls}>
-          <h2 className={sectionTitleCls}>Hero (메인 상단)</h2>
+          <h2 className={sectionTitleCls}>Hero 배경 (홈 첫 화면)</h2>
           <p className="mb-4 mt-1 text-sm text-muted">
-            첫 화면의 배경 이미지/동영상과 문구. 비운 항목은 기본값을 사용합니다.
+            홈 첫 화면의 <strong>배경 영상/이미지</strong>를 교체합니다. 비우면 기본 노을 영상.
+            동영상은 자동재생(무음 루프)됩니다. (제목·부제 문구는 현재 코드 고정 — 배경만 반영)
           </p>
           <HeroForm defaults={hero} disabled={!enabled} />
         </section>
 
         <section className={sectionCls}>
-          <h2 className={sectionTitleCls}>투어 상품</h2>
+          <h2 className={sectionTitleCls}>투어 카테고리 이미지 (홈 캐러셀)</h2>
+          <p className="mb-4 mt-1 text-sm text-muted">
+            홈 투어 카테고리 카드(다이빙·PADI·낚시·스노클링)의 이미지. 비운 항목은 기본 이미지를
+            사용합니다.
+          </p>
+          <TourImagesForm defaults={tourImages} disabled={!enabled} />
+        </section>
+
+        <section className={sectionCls}>
+          <h2 className={sectionTitleCls}>투어 상품 (상품 상세 페이지)</h2>
           <p className="mb-4 mt-1 text-sm text-muted">
             각 상품의 이미지·제목·설명·가격. 비운 항목은 기본값(content/*.md)을 사용합니다.
           </p>
@@ -87,7 +99,7 @@ export default async function AdminContentPage() {
         <section className={sectionCls}>
           <h2 className={sectionTitleCls}>갤러리</h2>
           <p className="mb-4 mt-1 text-sm text-muted">
-            메인 갤러리 미리보기에 노출됩니다(앞 6장). 이미지를 추가/삭제하세요.
+            홈 갤러리(가로로 흐르는 띠)와 /갤러리 페이지에 노출됩니다. 이미지를 추가/삭제하세요.
           </p>
           <GalleryForm defaults={galleryDefaults} disabled={!enabled} />
         </section>

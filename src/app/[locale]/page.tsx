@@ -46,5 +46,25 @@ export default async function HomePage({
     emptyLabel: tSchedule('empty')
   };
 
-  return <OceanHome posts={posts} locale={locale} schedule={schedule} />;
+  // 어드민 편집 가능한 미디어(배경영상·투어 카드·갤러리). 비우면 기본값 사용.
+  const heroOv = overrides[CONTENT_KEYS.hero] as
+    | { mediaUrl?: string; mediaType?: string }
+    | undefined;
+  const galleryItems = overrides[CONTENT_KEYS.gallery]?.items;
+  const galleryImages = Array.isArray(galleryItems)
+    ? (galleryItems as { image?: string }[]).map((g) => g.image ?? '').filter(Boolean)
+    : undefined;
+  const tourImagesOv = overrides[CONTENT_KEYS.homeTours]?.images;
+  const tourImages =
+    tourImagesOv && typeof tourImagesOv === 'object'
+      ? (tourImagesOv as Record<string, string>)
+      : undefined;
+
+  const media = {
+    hero: heroOv?.mediaUrl?.trim() ? { url: heroOv.mediaUrl, type: heroOv.mediaType } : undefined,
+    gallery: galleryImages,
+    tours: tourImages
+  };
+
+  return <OceanHome posts={posts} locale={locale} schedule={schedule} media={media} />;
 }

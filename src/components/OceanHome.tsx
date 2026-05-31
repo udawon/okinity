@@ -218,8 +218,11 @@ function WaveDivider({ flip = false, className = '' }: { flip?: boolean; classNa
 /* ────────────────────────────────────────────────────────────
    HERO
    ──────────────────────────────────────────────────────────── */
-function Hero() {
+function Hero({ media }: { media?: { url?: string; type?: string } }) {
   const reduce = useReducedMotion();
+  // 어드민 오버라이드(hero 키)의 배경 영상/이미지. 없으면 기본 노을 영상.
+  const heroUrl = media?.url?.trim() || '/videos/surface.mp4';
+  const heroIsVideo = media?.url?.trim() ? media.type === 'video' : true;
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -233,21 +236,32 @@ function Hero() {
       ref={ref}
       className="relative -mt-16 flex min-h-[100svh] items-center justify-center overflow-hidden sm:-mt-[111px]"
     >
-      {/* 히어로 영상 — 원본 색 그대로(딤·틴트 필터 없음). 저사양/reduced-motion 시 포스터/배경 그라데이션. */}
-      {!reduce && (
-        <video
-          className="absolute inset-0 h-full w-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          poster="/images/hero-placeholder.svg"
-          aria-hidden
-        >
-          <source src="/videos/surface.mp4" type="video/mp4" />
-        </video>
-      )}
+      {/* 히어로 배경 — 어드민 편집(hero 키). 영상은 원본 색 그대로. reduced-motion 시 영상은 포스터로 대체. */}
+      {heroIsVideo
+        ? !reduce && (
+            <video
+              key={heroUrl}
+              className="absolute inset-0 h-full w-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              poster="/images/hero-placeholder.svg"
+              aria-hidden
+            >
+              <source src={heroUrl} />
+            </video>
+          )
+        : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={heroUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              aria-hidden
+            />
+          )}
       {/* 가독성 스크림 — 영상 색을 가리지 않도록 상단·중앙은 투명, 하단만 어둡게(텍스트 대비 유지) */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#04202b]/85" />
       {/* 텍스트 영역 국소 스크림 — 영상 색(하늘·바다)은 가장자리에 남기고, 글자 뒤(중앙)만 충분히 어둡게(부제 AA 대비 확보) */}
@@ -335,13 +349,13 @@ function Hero() {
 /* ────────────────────────────────────────────────────────────
    ACTIVITY — 다이빙 / PADI / 낚시 / 스노클링 (가로 캐러셀, 좌우 스와이프)
    ──────────────────────────────────────────────────────────── */
-function ActivityCard({ a }: { a: Activity }) {
+function ActivityCard({ a, image }: { a: Activity; image: string }) {
   return (
     <article className="group flex w-[84vw] max-w-[400px] shrink-0 snap-start flex-col overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.04] shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-colors hover:border-white/20 sm:w-[400px]">
       {/* 이미지 */}
       <div className="relative aspect-[16/11] w-full overflow-hidden">
         <img
-          src={a.image}
+          src={image}
           alt={`${a.title} 투어 이미지`}
           width={1200}
           height={825}
@@ -422,7 +436,7 @@ function ActivityCard({ a }: { a: Activity }) {
   );
 }
 
-function ActivitiesSection() {
+function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string> }) {
   const reduce = useReducedMotion();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
@@ -560,7 +574,7 @@ function ActivitiesSection() {
           className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-5 overflow-x-auto scroll-px-6 px-6 pb-3"
         >
           {ACTIVITIES.map((a) => (
-            <ActivityCard key={a.id} a={a} />
+            <ActivityCard key={a.id} a={a} image={tourImages?.[a.id]?.trim() || a.image} />
           ))}
         </div>
       </div>
@@ -668,9 +682,10 @@ function BlogSection({ posts, locale }: { posts: BlogPost[]; locale: string }) {
 /* ────────────────────────────────────────────────────────────
    GALLERY — 두 줄 마퀴 (반대 방향)
    ──────────────────────────────────────────────────────────── */
-function GalleryMarquee() {
-  // 끊김 없는 루프를 위해 2배 복제
-  const row = [...GALLERY, ...GALLERY];
+function GalleryMarquee({ images }: { images?: string[] }) {
+  // 어드민 갤러리(gallery 키) 이미지가 있으면 사용, 없으면 기본. 끊김 없는 루프를 위해 2배 복제.
+  const list = images && images.length ? images : GALLERY;
+  const row = [...list, ...list];
   return (
     <section className="relative py-20 sm:py-24">
       <div className="mx-auto mb-12 max-w-container px-6 text-center">
@@ -839,14 +854,25 @@ function ReserveSection({ schedule, locale }: { schedule: ScheduleData; locale: 
 /* ────────────────────────────────────────────────────────────
    루트
    ──────────────────────────────────────────────────────────── */
-export default function OceanConcept({
+export type HomeMedia = {
+  /** Hero 배경(어드민 hero 키): mediaUrl + mediaType */
+  hero?: { url?: string; type?: string };
+  /** 투어 카테고리 카드 이미지(어드민 home_tours 키): { [activityId]: url } */
+  tours?: Record<string, string>;
+  /** 갤러리 이미지 URL 배열(어드민 gallery 키) */
+  gallery?: string[];
+};
+
+export default function OceanHome({
   posts,
   locale,
-  schedule
+  schedule,
+  media
 }: {
   posts: BlogPost[];
   locale: string;
   schedule: ScheduleData;
+  media?: HomeMedia;
 }) {
   const { scrollYProgress } = useScroll();
   return (
@@ -854,12 +880,12 @@ export default function OceanConcept({
       <CinematicBackground progress={scrollYProgress} />
       <Particles />
 
-      <Hero />
+      <Hero media={media?.hero} />
       <WaveDivider />
       <BlogSection posts={posts} locale={locale} />
-      <ActivitiesSection />
+      <ActivitiesSection tourImages={media?.tours} />
       <AssuranceSection />
-      <GalleryMarquee />
+      <GalleryMarquee images={media?.gallery} />
       <Testimonials />
       <WaveDivider flip />
       <ReserveSection schedule={schedule} locale={locale} />
