@@ -490,15 +490,6 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
     el.scrollBy({ left: dir * step, behavior: reduce ? 'auto' : 'smooth' });
   };
 
-  // 점 i 로 이동. 마지막 페이지는 끝까지(스크롤 max) → 마지막 카드가 온전히 보이게.
-  const goTo = (i: number) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const { step, max } = metrics();
-    const left = i >= pages - 1 ? max : Math.min(i * step, max);
-    el.scrollTo({ left, behavior: reduce ? 'auto' : 'smooth' });
-  };
-
   const showControls = pages > 1;
 
   return (
@@ -516,51 +507,41 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
           </R>
         </div>
 
-        {/* 컨트롤 — 점=스크롤 페이지 수(동적). 카드 위에 두어 "옆에 더 있다"를 즉시 인지.
-            데스크탑은 좌우 화살표가 점을 감싼다. 모바일은 점 + 스와이프. */}
+        {/* 컨트롤 — 미니멀 진행 바 + 좌우 화살표. 진행 바가 페이지만큼 차오른다. */}
         {showControls && (
-          <>
-            <div className="mt-8 flex items-center justify-center gap-4">
-              <button
-                type="button"
-                onClick={() => nudge(-1)}
-                aria-label="이전"
-                className="hidden h-11 w-11 place-items-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/50 hover:text-white sm:grid"
-              >
-                <ArrowRight className="h-5 w-5 rotate-180" />
-              </button>
+          <div className="mt-8 flex items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => nudge(-1)}
+              aria-label="이전"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/50 hover:text-white"
+            >
+              <ArrowRight className="h-5 w-5 rotate-180" />
+            </button>
 
-              <div className="flex items-center gap-2.5" role="tablist" aria-label="투어 카테고리 이동">
-                {Array.from({ length: pages }).map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    role="tab"
-                    onClick={() => goTo(i)}
-                    aria-label={`${i + 1} / ${pages} 페이지로 이동`}
-                    aria-selected={active === i}
-                    className={`h-2.5 rounded-full transition-all duration-300 ${
-                      active === i ? 'w-7 bg-cyan-300' : 'w-2.5 bg-white/30 hover:bg-white/55'
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => nudge(1)}
-                aria-label="다음"
-                className="hidden h-11 w-11 place-items-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/50 hover:text-white sm:grid"
-              >
-                <ArrowRight className="h-5 w-5" />
-              </button>
+            <div
+              className="relative h-[3px] w-32 overflow-hidden rounded-full bg-white/15 sm:w-44"
+              role="progressbar"
+              aria-valuemin={1}
+              aria-valuemax={pages}
+              aria-valuenow={active + 1}
+              aria-label="투어 카테고리 진행"
+            >
+              <div
+                className="absolute inset-y-0 left-0 rounded-full bg-cyan-300 transition-[width] duration-500 ease-out"
+                style={{ width: `${((active + 1) / pages) * 100}%` }}
+              />
             </div>
 
-            {/* 모바일 스와이프 힌트 */}
-            <p className="mt-3 text-center text-xs text-white/50 sm:hidden" aria-hidden>
-              ← 옆으로 밀어 더 보기 →
-            </p>
-          </>
+            <button
+              type="button"
+              onClick={() => nudge(1)}
+              aria-label="다음"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/50 hover:text-white"
+            >
+              <ArrowRight className="h-5 w-5" />
+            </button>
+          </div>
         )}
       </div>
 
