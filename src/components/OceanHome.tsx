@@ -351,7 +351,7 @@ function Hero({ media }: { media?: { url?: string; type?: string } }) {
    ──────────────────────────────────────────────────────────── */
 function ActivityCard({ a, image }: { a: Activity; image: string }) {
   return (
-    <article className="group flex w-[84vw] max-w-[400px] shrink-0 snap-start flex-col overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.04] shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-colors hover:border-white/20 sm:w-[400px]">
+    <article className="group flex w-[80vw] max-w-[400px] shrink-0 snap-start flex-col overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.04] shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-colors hover:border-white/20 sm:w-[400px]">
       {/* 이미지 */}
       <div className="relative aspect-[16/11] w-full overflow-hidden">
         <img
@@ -478,11 +478,11 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
     el.scrollBy({ left: dir * step, behavior: reduce ? 'auto' : 'smooth' });
   };
 
-  // 세로 위치: 모바일은 화살표가 카드 '위'에 얹혀 본문 텍스트를 가리므로, 텍스트가 없는
-  // 이미지 밴드(aspect-16/11) 중앙 ≈29vw(카드 400px 상한 시 138px)에 둔다. min()으로 클램프.
-  // PC(lg+)는 화살표가 카드 '바깥' lane에 있어 텍스트와 무관 → 전체 카드 세로중앙(top-1/2).
+  // 화살표는 PC(lg+)에서만 표시 — 카드 바깥 lane에 두어 텍스트와 무관, 세로는 카드 중앙(top-1/2).
+  // 모바일·태블릿(터치)은 화살표를 숨기고 'peek(옆 카드 살짝 노출) + 스와이프'로 좌우 탐색을 유도한다.
+  // (모바일에서 화살표를 카드 위에 얹으면 어느 높이든 본문 텍스트를 가리므로 근본적으로 제거.)
   const arrowCls =
-    'absolute top-[min(29vw,138px)] lg:top-1/2 z-10 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/25 bg-[#02101a]/60 text-white shadow-[0_8px_28px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-[#02101a]/85 disabled:pointer-events-none disabled:opacity-0 sm:h-14 sm:w-14';
+    'absolute lg:top-1/2 z-10 hidden lg:grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/25 bg-[#02101a]/60 text-white shadow-[0_8px_28px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-[#02101a]/85 disabled:pointer-events-none disabled:opacity-0 sm:h-14 sm:w-14';
 
   return (
     <section id="activities" className="relative scroll-mt-24 py-24 sm:py-32">
