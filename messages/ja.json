@@ -2,12 +2,12 @@
   "nav": {
     "home": "ホーム",
     "about": "紹介",
-    "diving": "ダイビング",
+    "diving": "スキューバダイビング",
     "padi": "PADI講習",
     "schedule": "スケジュール",
     "gallery": "ギャラリー",
     "contact": "予約",
-    "fishing": "釣りツアー",
+    "fishing": "釣り",
     "viewAll": "すべて見る",
     "tours": {
       "diving": {

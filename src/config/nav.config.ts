@@ -23,7 +23,15 @@ export type NavItem = {
 
 export const NAV: NavItem[] = [
   { key: 'about', href: '/about' },
-  { key: 'blog', href: '/blog' },
+  {
+    key: 'snorkeling',
+    href: '/contact',
+    children: [
+      { tKey: 'tours.snorkeling.cave', href: '/contact' },
+      { tKey: 'tours.snorkeling.boat', href: '/contact' },
+      { tKey: 'tours.snorkeling.beach', href: '/contact' }
+    ]
+  },
   {
     key: 'diving',
     href: '/diving',
@@ -55,15 +63,7 @@ export const NAV: NavItem[] = [
       { tKey: 'tours.fishing.biggame8', href: '/contact' }
     ]
   },
-  {
-    key: 'snorkeling',
-    href: '/contact',
-    children: [
-      { tKey: 'tours.snorkeling.cave', href: '/contact' },
-      { tKey: 'tours.snorkeling.boat', href: '/contact' },
-      { tKey: 'tours.snorkeling.beach', href: '/contact' }
-    ]
-  },
   { key: 'schedule', href: '/schedule' },
+  { key: 'blog', href: '/blog' },
   { key: 'gallery', href: '/gallery' }
 ];

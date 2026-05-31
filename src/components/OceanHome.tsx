@@ -296,7 +296,7 @@ function Hero({ media }: { media?: { url?: string; type?: string } }) {
           </R>
         </h1>
         <R delay={0.2} className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/90 sm:text-lg">
-          다이빙 · PADI 교육 · 낚시투어.{' '}
+          스쿠버다이빙 · PADI 교육 · 낚시.{' '}
           <br className="hidden sm:block" />
           초보자도 안심하는 소수정예 프라이빗 오션 투어.
         </R>
