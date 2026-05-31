@@ -7,12 +7,40 @@ import ProductForm from '@/components/admin/ProductForm';
 import GalleryForm from '@/components/admin/GalleryForm';
 import ScheduleForm from '@/components/admin/ScheduleForm';
 import TourImagesForm from '@/components/admin/TourImagesForm';
+import SectionPreview from '@/components/admin/SectionPreview';
 import { logout } from '../actions';
+import { type ReactNode } from 'react';
 
 export const dynamic = 'force-dynamic';
 
 const sectionCls = 'rounded-card border border-line bg-surface p-5 sm:p-6';
 const sectionTitleCls = 'text-lg font-bold text-ink';
+
+/** 편집기(좌) + 랜딩 적용 위치 미리보기(우) 2열 레이아웃 섹션 래퍼. */
+function EditSection({
+  title,
+  desc,
+  preview,
+  children
+}: {
+  title: string;
+  desc: ReactNode;
+  preview: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className={sectionCls}>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_240px]">
+        <div className="min-w-0">
+          <h2 className={sectionTitleCls}>{title}</h2>
+          <p className="mb-4 mt-1 text-sm text-muted">{desc}</p>
+          {children}
+        </div>
+        <div className="lg:border-l lg:border-line lg:pl-6">{preview}</div>
+      </div>
+    </section>
+  );
+}
 
 export default async function AdminContentPage() {
   const enabled = isSupabaseEnabled();
@@ -60,30 +88,42 @@ export default async function AdminContentPage() {
       )}
 
       <div className="mt-6 space-y-6">
-        <section className={sectionCls}>
-          <h2 className={sectionTitleCls}>Hero 배경 (홈 첫 화면)</h2>
-          <p className="mb-4 mt-1 text-sm text-muted">
-            홈 첫 화면의 <strong>배경 영상/이미지</strong>를 교체합니다. 비우면 기본 노을 영상.
-            동영상은 자동재생(무음 루프)됩니다. (제목·부제 문구는 현재 코드 고정 — 배경만 반영)
-          </p>
+        <EditSection
+          title="Hero 배경 (홈 첫 화면)"
+          desc={
+            <>
+              홈 첫 화면의 <strong>배경 영상/이미지</strong>를 교체합니다. 비우면 기본 노을 영상.
+              동영상은 자동재생(무음 루프)됩니다. (제목·부제 문구는 현재 코드 고정 — 배경만 반영)
+            </>
+          }
+          preview={
+            <SectionPreview highlight="hero" note="홈 맨 위 전체화면 배경에 적용됩니다." />
+          }
+        >
           <HeroForm defaults={hero} disabled={!enabled} />
-        </section>
+        </EditSection>
 
-        <section className={sectionCls}>
-          <h2 className={sectionTitleCls}>투어 카테고리 이미지 (홈 캐러셀)</h2>
-          <p className="mb-4 mt-1 text-sm text-muted">
-            홈 투어 카테고리 카드(다이빙·PADI·낚시·스노클링)의 이미지. 비운 항목은 기본 이미지를
-            사용합니다.
-          </p>
+        <EditSection
+          title="투어 카테고리 이미지 (홈 캐러셀)"
+          desc="홈 투어 카테고리 카드(다이빙·PADI·낚시·스노클링)의 이미지. 비운 항목은 기본 이미지를 사용합니다."
+          preview={
+            <SectionPreview
+              highlight="tours"
+              note="홈 '네 가지 방법으로 만나는 바다' 캐러셀 카드 이미지."
+            />
+          }
+        >
           <TourImagesForm defaults={tourImages} disabled={!enabled} />
-        </section>
+        </EditSection>
 
-        <section className={sectionCls}>
-          <h2 className={sectionTitleCls}>투어 상품 (상품 상세 페이지)</h2>
-          <p className="mb-4 mt-1 text-sm text-muted">
-            각 상품의 이미지·제목·설명·가격. 비운 항목은 기본값(content/*.md)을 사용합니다.
-          </p>
-          <div className="grid gap-4 lg:grid-cols-2">
+        <EditSection
+          title="투어 상품 (상품 상세 페이지)"
+          desc="각 상품의 이미지·제목·설명·가격. 비운 항목은 기본값(content/*.md)을 사용합니다."
+          preview={
+            <SectionPreview note="홈에는 미노출 — 메뉴 ▸ 각 투어의 상세(/products) 페이지에 적용됩니다." />
+          }
+        >
+          <div className="grid gap-4 xl:grid-cols-2">
             {products.map((p) => (
               <ProductForm
                 key={p.slug}
@@ -94,23 +134,23 @@ export default async function AdminContentPage() {
               />
             ))}
           </div>
-        </section>
+        </EditSection>
 
-        <section className={sectionCls}>
-          <h2 className={sectionTitleCls}>갤러리</h2>
-          <p className="mb-4 mt-1 text-sm text-muted">
-            홈 갤러리(가로로 흐르는 띠)와 /갤러리 페이지에 노출됩니다. 이미지를 추가/삭제하세요.
-          </p>
+        <EditSection
+          title="갤러리"
+          desc="홈 갤러리(가로로 흐르는 띠)와 /갤러리 페이지에 노출됩니다. 이미지를 추가/삭제하세요."
+          preview={<SectionPreview highlight="gallery" note="홈 갤러리 띠 + /gallery 페이지." />}
+        >
           <GalleryForm defaults={galleryDefaults} disabled={!enabled} />
-        </section>
+        </EditSection>
 
-        <section className={sectionCls}>
-          <h2 className={sectionTitleCls}>일정표</h2>
-          <p className="mb-4 mt-1 text-sm text-muted">
-            /일정표 달력에 표시됩니다. 날짜·프로그램·상태를 추가/삭제하세요.
-          </p>
+        <EditSection
+          title="일정표"
+          desc="홈 하단 '일정 · 예약' 달력과 /일정표 페이지에 표시됩니다. 날짜·프로그램·상태를 추가/삭제하세요."
+          preview={<SectionPreview highlight="schedule" note="홈 맨 아래 예약 섹션 + /schedule 페이지." />}
+        >
           <ScheduleForm defaults={scheduleDefaults} disabled={!enabled} />
-        </section>
+        </EditSection>
       </div>
     </main>
   );
