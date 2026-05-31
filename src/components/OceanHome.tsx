@@ -478,10 +478,11 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
     el.scrollBy({ left: dir * step, behavior: reduce ? 'auto' : 'smooth' });
   };
 
-  // 전체 카드 세로 중앙(top-1/2)에 배치. 가로: 모바일은 카드 가장자리, PC(lg+)는
-  // 트랙 좌우 여백(lg:px-20)으로 카드 '바깥' gutter에 안착 → 화면 밖 잘림 없이 카드와 겹치지 않음.
+  // 세로 위치: 모바일은 화살표가 카드 '위'에 얹혀 본문 텍스트를 가리므로, 텍스트가 없는
+  // 이미지 밴드(aspect-16/11) 중앙 ≈29vw(카드 400px 상한 시 138px)에 둔다. min()으로 클램프.
+  // PC(lg+)는 화살표가 카드 '바깥' lane에 있어 텍스트와 무관 → 전체 카드 세로중앙(top-1/2).
   const arrowCls =
-    'absolute top-1/2 z-10 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/25 bg-[#02101a]/60 text-white shadow-[0_8px_28px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-[#02101a]/85 disabled:pointer-events-none disabled:opacity-0 sm:h-14 sm:w-14';
+    'absolute top-[min(29vw,138px)] lg:top-1/2 z-10 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/25 bg-[#02101a]/60 text-white shadow-[0_8px_28px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-[#02101a]/85 disabled:pointer-events-none disabled:opacity-0 sm:h-14 sm:w-14';
 
   return (
     <section id="activities" className="relative scroll-mt-24 py-24 sm:py-32">
