@@ -64,6 +64,5 @@ export const NAV: NavItem[] = [
     ]
   },
   { key: 'schedule', href: '/schedule' },
-  { key: 'blog', href: '/blog' },
-  { key: 'gallery', href: '/gallery' }
+  { key: 'blog', href: '/blog' }
 ];
