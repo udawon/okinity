@@ -500,9 +500,10 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
       </div>
 
       {/* 가로 스크롤 트랙 + 양옆 글래스 화살표(끝에선 자동 숨김)
-          PC(lg+): 래퍼에 좌우 패딩(lg:px-20)으로 '스크롤과 무관한' 고정 lane을 만들고
-          그 안에 화살표를 둔다. 스크롤러 자체에 패딩을 주면 스크롤 시 밀려나 카드 위로 겹친다. */}
-      <div className="relative mx-auto mt-12 max-w-container lg:px-20">
+          PC(lg+): max-w 제한을 풀어 카드 영역을 화면 폭만큼 넓히고(답답함 해소),
+          래퍼 좌우 패딩(lg:px-20)으로 '스크롤과 무관한' 고정 lane을 만들어 화살표를 페이지 양 끝에 둔다.
+          스크롤러 자체에 패딩을 주면 스크롤 시 밀려나 카드 위로 겹친다. 모바일/태블릿은 컨테이너 폭 유지. */}
+      <div className="relative mx-auto mt-12 max-w-container lg:max-w-none lg:px-20">
         <div
           ref={scrollerRef}
           role="region"
