@@ -21,8 +21,24 @@ export type Activity = {
 
 export const ACTIVITIES: Activity[] = [
   {
-    id: 'diving',
+    id: 'snorkeling',
     no: '01',
+    kicker: 'SNORKELING',
+    title: '스노클링',
+    tagline: '온 가족이 함께, 수면 위 산호 정원',
+    desc: '구명조끼와 가이드가 늘 함께해 아이도 어르신도 안심. 푸른동굴의 신비한 빛과 산호초, 열대어를 수면에서 만나는 가장 쉬운 바다 체험입니다.',
+    tours: ['푸른동굴 스노클링', '보트 스노클링', '스노클링'],
+    meta: [
+      { label: '수심', value: '0–3m' },
+      { label: '소요', value: '2–3시간' },
+      { label: '대상', value: '입문 · 가족' }
+    ],
+    image: '/images/ph-2.svg',
+    accent: '#5fd6e2'
+  },
+  {
+    id: 'diving',
+    no: '02',
     kicker: 'SCUBA DIVING',
     title: '스쿠버다이빙',
     tagline: '숨을 멈추고, 푸른 심연으로',
@@ -38,7 +54,7 @@ export const ACTIVITIES: Activity[] = [
   },
   {
     id: 'padi',
-    no: '02',
+    no: '03',
     kicker: 'PADI COURSES',
     title: 'PADI 교육',
     tagline: '평생 함께할 다이버 자격증',
@@ -59,7 +75,7 @@ export const ACTIVITIES: Activity[] = [
   },
   {
     id: 'fishing',
-    no: '03',
+    no: '04',
     kicker: 'FISHING TOURS',
     title: '낚시',
     tagline: '오키나와의 손맛, 트로피컬 게임피싱',
@@ -72,22 +88,6 @@ export const ACTIVITIES: Activity[] = [
     ],
     image: '/images/ph-3.svg',
     accent: '#f6a623'
-  },
-  {
-    id: 'snorkeling',
-    no: '04',
-    kicker: 'SNORKELING',
-    title: '스노클링',
-    tagline: '온 가족이 함께, 수면 위 산호 정원',
-    desc: '구명조끼와 가이드가 늘 함께해 아이도 어르신도 안심. 푸른동굴의 신비한 빛과 산호초, 열대어를 수면에서 만나는 가장 쉬운 바다 체험입니다.',
-    tours: ['푸른동굴 스노클링', '보트 스노클링', '스노클링'],
-    meta: [
-      { label: '수심', value: '0–3m' },
-      { label: '소요', value: '2–3시간' },
-      { label: '대상', value: '입문 · 가족' }
-    ],
-    image: '/images/ph-2.svg',
-    accent: '#5fd6e2'
   }
 ];
 
