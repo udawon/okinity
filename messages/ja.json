@@ -114,7 +114,7 @@
     "subtitle": "内容をご記入いただければ、インストラクターが直接確認のうえご連絡します。",
     "form": {
       "product": "ご希望のツアー",
-      "productPlaceholder": "ツアーを選択",
+      "productPlaceholder": "ツアーを選択してください",
       "date": "ご希望の日付",
       "people": "人数",
       "name": "お名前",
