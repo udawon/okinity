@@ -6,7 +6,35 @@
     "padi": "PADI Courses",
     "schedule": "Schedule",
     "gallery": "Gallery",
-    "contact": "Book"
+    "contact": "Book",
+    "fishing": "Fishing",
+    "viewAll": "View all",
+    "tours": {
+      "diving": {
+        "cave": "Blue Cave Boat Discovery Dive",
+        "kerama": "Kerama Boat Discovery Dive",
+        "fun": "Fun Diving"
+      },
+      "padi": {
+        "ow": "Open Water Course",
+        "aow": "Advanced Course",
+        "owaow": "OW + AOW Combined Course",
+        "specialty": "Specialty Course"
+      },
+      "fishing": {
+        "trial4": "4hr Trial Fishing",
+        "five6": "6hr 5-Species Fishing",
+        "overnight": "2-Day Full Fishing",
+        "biggame8": "8hr Big Game Trolling"
+      },
+      "snorkeling": {
+        "cave": "Blue Cave Snorkeling",
+        "boat": "Boat Snorkeling",
+        "beach": "Snorkeling"
+      }
+    },
+    "blog": "Blog",
+    "snorkeling": "Snorkeling"
   },
   "home": {
     "categoriesTitle": "Programs",

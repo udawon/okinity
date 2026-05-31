@@ -98,6 +98,99 @@ html {
   }
 }
 
+/* ============================================================
+   OCEAN 시안 (/design/ocean) 전용 시네마틱 모션
+   모두 prefers-reduced-motion: reduce 에서 비활성.
+   transform / opacity / background-position 만 사용(레이아웃 리플로우 0).
+   ============================================================ */
+
+/* 수중 광선(god rays) — 천천히 흔들리는 빛기둥 */
+@keyframes ocean-rays {
+  0%,
+  100% {
+    transform: translateX(-3%) skewX(-8deg) scaleY(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateX(3%) skewX(-12deg) scaleY(1.06);
+    opacity: 0.7;
+  }
+}
+.ocean-rays {
+  animation: ocean-rays 9s ease-in-out infinite;
+}
+
+/* 코스틱(수면 굴절 무늬) — 은은히 흐름 */
+@keyframes ocean-caustics {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 220px 140px;
+  }
+}
+.ocean-caustics {
+  animation: ocean-caustics 18s linear infinite;
+}
+
+/* 떠다니는 입자(플랑크톤/기포) — 위로 천천히 상승 */
+@keyframes ocean-rise {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  12% {
+    opacity: var(--p-op, 0.5);
+  }
+  88% {
+    opacity: var(--p-op, 0.5);
+  }
+  100% {
+    transform: translateY(-130px) translateX(var(--p-x, 8px));
+    opacity: 0;
+  }
+}
+.ocean-particle {
+  animation: ocean-rise var(--p-dur, 9s) ease-in-out var(--p-delay, 0s) infinite;
+}
+
+/* 가로 무한 흐름(갤러리 마퀴) */
+@keyframes ocean-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.ocean-marquee {
+  animation: ocean-marquee var(--m-dur, 40s) linear infinite;
+}
+
+/* 부드러운 상하 부유(배지/스크롤 큐) */
+@keyframes ocean-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.ocean-bob {
+  animation: ocean-bob 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ocean-rays,
+  .ocean-caustics,
+  .ocean-particle,
+  .ocean-marquee,
+  .ocean-bob {
+    animation: none !important;
+  }
+}
+
 /* Hero 스크롤 인디케이터 — 아래 화살표가 위아래로 둥둥 (trickyknot 톤) */
 @keyframes float-down {
   0%,

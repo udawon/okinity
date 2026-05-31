@@ -6,7 +6,35 @@
     "padi": "PADI講習",
     "schedule": "スケジュール",
     "gallery": "ギャラリー",
-    "contact": "予約"
+    "contact": "予約",
+    "fishing": "釣りツアー",
+    "viewAll": "すべて見る",
+    "tours": {
+      "diving": {
+        "cave": "青の洞窟 ボート体験ダイビング",
+        "kerama": "慶良間 ボート体験ダイビング",
+        "fun": "ファンダイビング"
+      },
+      "padi": {
+        "ow": "オープンウォーター講習",
+        "aow": "アドバンス講習",
+        "owaow": "OW+AOW 連続講習",
+        "specialty": "スペシャルティ講習"
+      },
+      "fishing": {
+        "trial4": "4時間 体験釣り",
+        "five6": "6時間 5目釣り",
+        "overnight": "1泊2日 終日釣り",
+        "biggame8": "8時間 ビッグゲームトローリング"
+      },
+      "snorkeling": {
+        "cave": "青の洞窟シュノーケリング",
+        "boat": "ボートシュノーケリング",
+        "beach": "シュノーケリング"
+      }
+    },
+    "blog": "ブログ",
+    "snorkeling": "シュノーケリング"
   },
   "home": {
     "categoriesTitle": "プログラム案内",

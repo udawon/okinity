@@ -6,15 +6,8 @@ import { site } from '@/config/site.config';
 import Container from './Container';
 import LocaleSwitcher from './LocaleSwitcher';
 import MobileNav from './MobileNav';
+import DesktopNav from './DesktopNav';
 import HeaderShell from './HeaderShell';
-
-const NAV = [
-  { href: '/about', key: 'about' },
-  { href: '/diving', key: 'diving' },
-  { href: '/padi', key: 'padi' },
-  { href: '/schedule', key: 'schedule' },
-  { href: '/gallery', key: 'gallery' }
-] as const;
 
 export default async function Header({ locale }: { locale: Locale }) {
   const t = await getTranslations('nav');
@@ -33,17 +26,11 @@ export default async function Header({ locale }: { locale: Locale }) {
           />
         </Link>
 
-        {/* 데스크탑 내비 */}
-        <nav className="hidden items-center gap-7 text-sm font-medium text-white/70 lg:flex">
-          {NAV.map((it) => (
-            <Link key={it.key} href={it.href} className="transition-colors hover:text-white">
-              {t(it.key)}
-            </Link>
-          ))}
-        </nav>
+        {/* 데스크탑 내비 (3 카테고리 드롭다운) */}
+        <DesktopNav />
 
         <div className="flex items-center gap-3">
-          <div className="hidden lg:block">
+          <div className="hidden xl:block">
             <LocaleSwitcher current={locale} />
           </div>
           <Link

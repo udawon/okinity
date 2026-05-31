@@ -6,7 +6,35 @@
     "padi": "PADI 교육",
     "schedule": "일정표",
     "gallery": "갤러리",
-    "contact": "예약"
+    "contact": "예약",
+    "fishing": "낚시투어",
+    "viewAll": "전체 보기",
+    "tours": {
+      "diving": {
+        "cave": "푸른동굴 보트 체험다이빙",
+        "kerama": "케라마 보트 체험다이빙",
+        "fun": "펀다이빙"
+      },
+      "padi": {
+        "ow": "오픈워터 라이센스 코스",
+        "aow": "어드밴스드 라이센스 코스",
+        "owaow": "OW+AOW 연속교육 코스",
+        "specialty": "스페셜티 라이센스 코스"
+      },
+      "fishing": {
+        "trial4": "4시간 체험낚시",
+        "five6": "6시간 5종낚시",
+        "overnight": "1박2일 종일낚시",
+        "biggame8": "8시간 빅게임 트롤링"
+      },
+      "snorkeling": {
+        "cave": "푸른동굴 스노클링",
+        "boat": "보트 스노클링",
+        "beach": "스노클링"
+      }
+    },
+    "blog": "블로그",
+    "snorkeling": "스노클링"
   },
   "home": {
     "categoriesTitle": "프로그램 안내",
