@@ -499,14 +499,16 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
         </div>
       </div>
 
-      {/* 가로 스크롤 트랙 + 양옆 글래스 화살표(끝에선 자동 숨김) */}
-      <div className="relative mx-auto mt-12 max-w-container">
+      {/* 가로 스크롤 트랙 + 양옆 글래스 화살표(끝에선 자동 숨김)
+          PC(lg+): 래퍼에 좌우 패딩(lg:px-20)으로 '스크롤과 무관한' 고정 lane을 만들고
+          그 안에 화살표를 둔다. 스크롤러 자체에 패딩을 주면 스크롤 시 밀려나 카드 위로 겹친다. */}
+      <div className="relative mx-auto mt-12 max-w-container lg:px-20">
         <div
           ref={scrollerRef}
           role="region"
           aria-label="투어 카테고리"
           tabIndex={0}
-          className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-5 overflow-x-auto scroll-px-6 px-6 pb-3 lg:scroll-px-20 lg:px-20"
+          className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-5 overflow-x-auto scroll-px-6 px-6 pb-3 lg:scroll-px-0 lg:px-0"
         >
           {ACTIVITIES.map((a) => (
             <ActivityCard key={a.id} a={a} image={tourImages?.[a.id]?.trim() || a.image} />
