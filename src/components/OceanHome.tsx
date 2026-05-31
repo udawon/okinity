@@ -772,8 +772,8 @@ function ReserveSection({ schedule, locale }: { schedule: ScheduleData; locale: 
         }}
         aria-hidden
       />
-      <div className="relative mx-auto max-w-3xl px-6">
-        <div className="text-center">
+      <div className="relative mx-auto max-w-container px-6">
+        <div className="mx-auto max-w-2xl text-center">
           <R as="p" className="text-xs font-semibold uppercase tracking-[0.3em] [text-indent:0.3em] text-cyan-200/80">
             Reserve
           </R>
