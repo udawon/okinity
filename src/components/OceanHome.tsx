@@ -439,58 +439,49 @@ function ActivityCard({ a, image }: { a: Activity; image: string }) {
 function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string> }) {
   const reduce = useReducedMotion();
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
-  // 인디케이터 점 개수 = 실제 스크롤 "페이지" 수. 데스크탑처럼 카드 여러 장이 한 번에
-  // 보이면 페이지(스크롤 멈춤 위치)가 카드 수보다 적다. 점=카드 로 두면 마지막 점에
-  // 절대 닿지 못하는 버그가 생기므로, 점 개수를 스크롤 가능 범위로부터 동적 계산한다.
-  const [pages, setPages] = useState(1);
-
-  // 카드폭+gap(step)과 스크롤 가능 거리(max)를 측정
-  const metrics = () => {
-    const el = scrollerRef.current;
-    if (!el) return { step: 1, max: 0 };
-    const card = el.querySelector('article');
-    const step = card ? card.getBoundingClientRect().width + 20 : el.clientWidth || 1;
-    const max = el.scrollWidth - el.clientWidth;
-    return { step, max };
-  };
-  const pageCount = () => {
-    const { step, max } = metrics();
-    return Math.max(1, Math.min(ACTIVITIES.length, Math.round(max / step) + 1));
-  };
+  // 스크롤 가능 여부 + 시작/끝 위치(양옆 화살표 표시·비활성용)
+  const [scrollable, setScrollable] = useState(false);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
 
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
     let raf = 0;
-    const recompute = () => {
-      const p = pageCount();
-      setPages(p);
-      const { step } = metrics();
-      setActive(Math.max(0, Math.min(p - 1, Math.round(el.scrollLeft / step))));
+    const update = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      setScrollable(max > 4);
+      setAtStart(el.scrollLeft <= 2);
+      setAtEnd(el.scrollLeft >= max - 2);
     };
     const onScroll = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(recompute);
+      raf = requestAnimationFrame(update);
     };
-    recompute();
+    update();
+    const t = setTimeout(update, 300); // 이미지·레이아웃 안정 후 재측정
     el.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', recompute);
+    window.addEventListener('resize', update);
     return () => {
       el.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', recompute);
+      window.removeEventListener('resize', update);
       cancelAnimationFrame(raf);
+      clearTimeout(t);
     };
   }, []);
 
   const nudge = (dir: number) => {
     const el = scrollerRef.current;
     if (!el) return;
-    const { step } = metrics();
+    const card = el.querySelector('article');
+    const step = card ? card.getBoundingClientRect().width + 20 : el.clientWidth * 0.8;
     el.scrollBy({ left: dir * step, behavior: reduce ? 'auto' : 'smooth' });
   };
 
-  const showControls = pages > 1;
+  // 카드가 길어(약 780px) 세로 중앙에 두면 본문 텍스트와 겹친다.
+  // 이미지 밴드(aspect-16/11, 카드 폭의 11/16) 세로 중앙에 고정 → 모바일 ≈29vw, 카드 폭 400px 고정 시 ≈138px. min()으로 클램프.
+  const arrowCls =
+    'absolute top-[min(29vw,138px)] z-10 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/25 bg-[#02101a]/60 text-white shadow-[0_8px_28px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-[#02101a]/85 disabled:pointer-events-none disabled:opacity-0 sm:h-14 sm:w-14';
 
   return (
     <section id="activities" className="relative scroll-mt-24 py-24 sm:py-32">
@@ -506,47 +497,10 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
             깊이 잠수하든, 자격증을 따든, 손맛을 즐기든, 수면을 떠다니든 — 옆으로 넘기며 골라보세요.
           </R>
         </div>
-
-        {/* 컨트롤 — 미니멀 진행 바 + 좌우 화살표. 진행 바가 페이지만큼 차오른다. */}
-        {showControls && (
-          <div className="mt-8 flex items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={() => nudge(-1)}
-              aria-label="이전"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/50 hover:text-white"
-            >
-              <ArrowRight className="h-5 w-5 rotate-180" />
-            </button>
-
-            <div
-              className="relative h-[3px] w-32 overflow-hidden rounded-full bg-white/15 sm:w-44"
-              role="progressbar"
-              aria-valuemin={1}
-              aria-valuemax={pages}
-              aria-valuenow={active + 1}
-              aria-label="투어 카테고리 진행"
-            >
-              <div
-                className="absolute inset-y-0 left-0 rounded-full bg-cyan-300 transition-[width] duration-500 ease-out"
-                style={{ width: `${((active + 1) / pages) * 100}%` }}
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => nudge(1)}
-              aria-label="다음"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/50 hover:text-white"
-            >
-              <ArrowRight className="h-5 w-5" />
-            </button>
-          </div>
-        )}
       </div>
 
-      {/* 가로 스크롤 트랙 — 스냅 + 터치 스와이프. 마지막 카드는 옆에서 살짝 보임(스크롤 가능 힌트) */}
-      <div className="mx-auto mt-10 max-w-container">
+      {/* 가로 스크롤 트랙 + 양옆 글래스 화살표(끝에선 자동 숨김) */}
+      <div className="relative mx-auto mt-12 max-w-container">
         <div
           ref={scrollerRef}
           role="region"
@@ -558,6 +512,29 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
             <ActivityCard key={a.id} a={a} image={tourImages?.[a.id]?.trim() || a.image} />
           ))}
         </div>
+
+        {scrollable && (
+          <>
+            <button
+              type="button"
+              onClick={() => nudge(-1)}
+              disabled={atStart}
+              aria-label="이전 투어"
+              className={`${arrowCls} left-2 sm:left-4`}
+            >
+              <ArrowRight className="h-6 w-6 rotate-180" />
+            </button>
+            <button
+              type="button"
+              onClick={() => nudge(1)}
+              disabled={atEnd}
+              aria-label="다음 투어"
+              className={`${arrowCls} right-2 sm:right-4`}
+            >
+              <ArrowRight className="h-6 w-6" />
+            </button>
+          </>
+        )}
       </div>
     </section>
   );
