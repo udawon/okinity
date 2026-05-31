@@ -34,7 +34,8 @@
       }
     },
     "blog": "Blog",
-    "snorkeling": "Snorkeling"
+    "snorkeling": "Snorkeling",
+    "notice": "Notices"
   },
   "home": {
     "categoriesTitle": "Programs",
@@ -140,5 +141,11 @@
     "sectionIntro": "Diving stories and updates from the heart of Okinawa.",
     "more": "View all posts",
     "empty": "No posts yet."
+  },
+  "notice": {
+    "title": "Notices",
+    "intro": "Latest news and announcements from OKINITY.",
+    "empty": "No notices yet.",
+    "back": "← Notices"
   }
 }

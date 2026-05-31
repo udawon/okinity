@@ -34,7 +34,8 @@
       }
     },
     "blog": "ブログ",
-    "snorkeling": "シュノーケリング"
+    "snorkeling": "シュノーケリング",
+    "notice": "お知らせ"
   },
   "home": {
     "categoriesTitle": "プログラム案内",
@@ -140,5 +141,11 @@
     "sectionIntro": "沖縄の現地から届けるダイビングの物語とニュース。",
     "more": "すべての記事",
     "empty": "まだ記事がありません。"
+  },
+  "notice": {
+    "title": "お知らせ",
+    "intro": "OKINITYからの最新のお知らせをお届けします。",
+    "empty": "お知らせはまだありません。",
+    "back": "← お知らせ"
   }
 }

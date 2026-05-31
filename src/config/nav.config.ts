@@ -66,6 +66,7 @@ export const NAV: NavItem[] = [
       { tKey: 'tours.fishing.biggame8', href: '/contact' }
     ]
   },
+  { key: 'notice', href: '/notice' },
   { key: 'schedule', href: '/schedule' },
   { key: 'blog', href: '/blog' }
 ];

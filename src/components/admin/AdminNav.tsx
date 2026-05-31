@@ -6,7 +6,8 @@ import { usePathname } from 'next/navigation';
 const TABS = [
   { href: '/admin', label: '예약 문의' },
   { href: '/admin/content', label: '콘텐츠 편집' },
-  { href: '/admin/blog', label: '블로그' }
+  { href: '/admin/blog', label: '블로그' },
+  { href: '/admin/notice', label: '공지사항' }
 ];
 
 /** 어드민 상단 탭. (/admin 은 [locale] 밖이라 next/link 사용) */
