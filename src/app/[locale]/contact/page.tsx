@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import type { Locale } from '@/i18n/routing';
-import { getAllProducts } from '@/lib/content';
 import Container from '@/components/Container';
 import InquiryForm from '@/components/InquiryForm';
+import { ACTIVITIES } from '@/components/ocean-home-data';
 
 export async function generateMetadata({
   params
@@ -24,16 +23,16 @@ export default async function ContactPage({
   setRequestLocale(locale);
 
   const t = await getTranslations('contact');
-  const products = getAllProducts(locale as Locale).map((p) => ({
-    slug: p.slug,
-    title: p.title
-  }));
+  // 관심 투어 드롭다운 — 새 투어 카테고리의 하위 투어로 구성
+  const products = ACTIVITIES.flatMap((a) =>
+    a.tours.map((tour) => ({ slug: `${a.id}:${tour}`, title: `${a.title} · ${tour}` }))
+  );
 
   return (
     <section className="py-12 sm:py-16">
       <Container className="max-w-2xl">
-        <h1 className="text-3xl font-extrabold text-ink sm:text-4xl">{t('title')}</h1>
-        <p className="mt-2 text-muted">{t('subtitle')}</p>
+        <h1 className="font-serif text-3xl font-normal text-white sm:text-4xl">{t('title')}</h1>
+        <p className="mt-2 text-white/70">{t('subtitle')}</p>
         <div className="mt-8">
           <InquiryForm products={products} />
         </div>

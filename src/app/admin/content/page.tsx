@@ -1,9 +1,8 @@
-import { getAllProducts, getGallery, getSchedule, type GalleryItem, type ScheduleItem } from '@/lib/content';
+import { getGallery, getSchedule, type GalleryItem, type ScheduleItem } from '@/lib/content';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import AdminNav from '@/components/admin/AdminNav';
 import HeroForm from '@/components/admin/HeroForm';
-import ProductForm from '@/components/admin/ProductForm';
 import GalleryForm from '@/components/admin/GalleryForm';
 import ScheduleForm from '@/components/admin/ScheduleForm';
 import TourImagesForm from '@/components/admin/TourImagesForm';
@@ -46,7 +45,6 @@ export default async function AdminContentPage() {
   const enabled = isSupabaseEnabled();
   const overrides = enabled ? await getSiteContentMap() : {};
   const hero = overrides[CONTENT_KEYS.hero] ?? {};
-  const products = getAllProducts('ko');
   const galleryOverrideItems = overrides[CONTENT_KEYS.gallery]?.items;
   const galleryDefaults: GalleryItem[] = Array.isArray(galleryOverrideItems)
     ? (galleryOverrideItems as GalleryItem[])
@@ -114,26 +112,6 @@ export default async function AdminContentPage() {
           }
         >
           <TourImagesForm defaults={tourImages} disabled={!enabled} />
-        </EditSection>
-
-        <EditSection
-          title="투어 상품 (상품 상세 페이지)"
-          desc="각 상품의 이미지·제목·설명·가격. 비운 항목은 기본값(content/*.md)을 사용합니다."
-          preview={
-            <SectionPreview note="홈에는 미노출 — 메뉴 ▸ 각 투어의 상세(/products) 페이지에 적용됩니다." />
-          }
-        >
-          <div className="grid gap-4 xl:grid-cols-2">
-            {products.map((p) => (
-              <ProductForm
-                key={p.slug}
-                slug={p.slug}
-                baseTitle={p.title}
-                defaults={overrides[CONTENT_KEYS.product(p.slug)] ?? {}}
-                disabled={!enabled}
-              />
-            ))}
-          </div>
         </EditSection>
 
         <EditSection

@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import type { Locale } from '@/i18n/routing';
-import { getProductsByCategories } from '@/lib/content';
-import Container from '@/components/Container';
-import ProductCard from '@/components/ProductCard';
+import { notFound } from 'next/navigation';
+import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
+import TourCategoryDetail, { getActivity } from '@/components/TourCategoryDetail';
+
+// 어드민 투어 카테고리 이미지(home_tours) 즉시 반영
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params
@@ -23,31 +25,13 @@ export default async function DivingPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const tNav = await getTranslations('nav');
-  const tProducts = await getTranslations('products');
-  // 다이빙 = 체험·펀·그룹 (자격증은 PADI 교육으로 분리)
-  const products = getProductsByCategories(locale as Locale, ['experience', 'fun', 'freediving', 'group']);
+  const activity = getActivity('diving');
+  if (!activity) notFound();
 
-  return (
-    <section className="py-12 sm:py-16">
-      <Container>
-        <h1 className="font-serif text-3xl font-normal text-ink sm:text-4xl">
-          {tNav('diving')}
-        </h1>
-        <p className="mt-3 font-mono text-sm tracking-[0.02em] text-muted">
-          {tProducts('sectionSubtitle')}
-        </p>
+  const overrides = await getSiteContentMap();
+  const image = (overrides[CONTENT_KEYS.homeTours]?.images as Record<string, string> | undefined)?.[
+    activity.id
+  ];
 
-        {products.length === 0 ? (
-          <p className="mt-8 text-muted">{tProducts('empty')}</p>
-        ) : (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((p) => (
-              <ProductCard key={p.slug} product={p} />
-            ))}
-          </div>
-        )}
-      </Container>
-    </section>
-  );
+  return <TourCategoryDetail activity={activity} image={image} />;
 }
