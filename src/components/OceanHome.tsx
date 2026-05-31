@@ -478,10 +478,10 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
     el.scrollBy({ left: dir * step, behavior: reduce ? 'auto' : 'smooth' });
   };
 
-  // 카드가 길어(약 780px) 세로 중앙에 두면 본문 텍스트와 겹친다.
-  // 이미지 밴드(aspect-16/11, 카드 폭의 11/16) 세로 중앙에 고정 → 모바일 ≈29vw, 카드 폭 400px 고정 시 ≈138px. min()으로 클램프.
+  // 전체 카드 세로 중앙(top-1/2)에 배치. 가로: 모바일은 카드 가장자리, PC(lg+)는
+  // 트랙 좌우 여백(lg:px-20)으로 카드 '바깥' gutter에 안착 → 화면 밖 잘림 없이 카드와 겹치지 않음.
   const arrowCls =
-    'absolute top-[min(29vw,138px)] z-10 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/25 bg-[#02101a]/60 text-white shadow-[0_8px_28px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-[#02101a]/85 disabled:pointer-events-none disabled:opacity-0 sm:h-14 sm:w-14';
+    'absolute top-1/2 z-10 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/25 bg-[#02101a]/60 text-white shadow-[0_8px_28px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-[#02101a]/85 disabled:pointer-events-none disabled:opacity-0 sm:h-14 sm:w-14';
 
   return (
     <section id="activities" className="relative scroll-mt-24 py-24 sm:py-32">
@@ -506,7 +506,7 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
           role="region"
           aria-label="투어 카테고리"
           tabIndex={0}
-          className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-5 overflow-x-auto scroll-px-6 px-6 pb-3"
+          className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-5 overflow-x-auto scroll-px-6 px-6 pb-3 lg:scroll-px-20 lg:px-20"
         >
           {ACTIVITIES.map((a) => (
             <ActivityCard key={a.id} a={a} image={tourImages?.[a.id]?.trim() || a.image} />
@@ -520,7 +520,7 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
               onClick={() => nudge(-1)}
               disabled={atStart}
               aria-label="이전 투어"
-              className={`${arrowCls} left-2 sm:left-4`}
+              className={`${arrowCls} left-2 sm:left-4 lg:left-3`}
             >
               <ArrowRight className="h-6 w-6 rotate-180" />
             </button>
@@ -529,7 +529,7 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
               onClick={() => nudge(1)}
               disabled={atEnd}
               aria-label="다음 투어"
-              className={`${arrowCls} right-2 sm:right-4`}
+              className={`${arrowCls} right-2 sm:right-4 lg:right-3`}
             >
               <ArrowRight className="h-6 w-6" />
             </button>
