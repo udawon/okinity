@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useReducedMotion } from 'framer-motion';
 
 export type OceanVideos = {
   surface?: string | null;
@@ -13,13 +15,12 @@ export type OceanVideos = {
  * 바다 하강 배경 — 화면 고정(fixed). "현재 섹션"에 따라 깊이를 이산적으로 전환한다:
  *   해수면(surface) → 바다(mid) → 깊은 바다(deep).
  *
- * 연속 스크롤 진행도로 교차페이드하던 이전 방식은 섹션 사이 넓은 구간에서 두 영상이
- * 오래 섞여 보였다. 스냅이 섹션 단위로 안착하므로, 각 섹션에 머무는 동안엔 항상 한
- * 영상만 보이게 하고(블렌드 정체 없음), 다음 섹션으로 넘어갈 때만 CSS로 부드럽게 전환.
+ * 단, 영상 배경은 **홈(시네마틱 풀스크린)에서만** 사용한다. 서브 페이지(/contact·/blog·
+ * /gallery·/tours/* 등)는 영상 대신 정적 "물결+공기방울" 앰비언트 배경(OceanAmbient)을 깐다.
+ * 서브 페이지는 일반 문서형 레이아웃이라 풀스크린 Hero 영상이 어울리지 않기 때문.
  *
  * 섹션 인덱스 → 깊이 매핑(홈 기준):
  *   Hero=해수면(surface), 투어=바다(mid), 시그니처=수중(under), 갤러리·후기=깊은바다(deep).
- * 영상이 없으면 색 틴트만으로 동일한 깊이감을 보여준다(graceful).
  */
 const DEPTH_BY_SECTION = [0, 1, 2, 3, 3]; // 0=surface, 1=mid, 2=under, 3=deep
 
@@ -30,10 +31,83 @@ const TINT = [
   'rgba(5,28,42,0.66)' // 깊은 바다 deep
 ];
 
+// 떠오르는 공기방울 입자 — 결정론적 배치(SSR-safe, Math.random 미사용).
+const PARTICLES = Array.from({ length: 18 }, (_, i) => {
+  const left = (i * 61.8) % 100; // 황금각 분산
+  const size = 2 + ((i * 7) % 5);
+  const dur = 8 + ((i * 3) % 8);
+  const delay = (i % 9) * 0.8;
+  const op = 0.16 + (i % 4) * 0.1;
+  const drift = (i % 2 === 0 ? 1 : -1) * (6 + (i % 5) * 4);
+  return { left, size, dur, delay, op, drift, bottom: (i * 37) % 92 };
+});
+
+const CAUSTICS_SVG =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cg fill='none' stroke='%2389f0ff' stroke-width='1.2' stroke-opacity='0.6'%3E%3Cpath d='M0 60 Q55 20 110 60 T220 60'/%3E%3Cpath d='M0 120 Q55 80 110 120 T220 120'/%3E%3Cpath d='M0 180 Q55 140 110 180 T220 180'/%3E%3C/g%3E%3C/svg%3E\")";
+
+/** 서브 페이지 정적 배경 — 깊은 바다 그라데이션 + 빛기둥 + 물결 코스틱 + 떠오르는 공기방울. */
+function OceanAmbient() {
+  const reduce = useReducedMotion();
+  return (
+    <div className="fixed inset-0 -z-10 overflow-hidden bg-[#06151d]" aria-hidden>
+      {/* 깊은 바다 그라데이션 */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(120% 100% at 50% 28%, #0b4658 0%, #063040 52%, #03161e 100%)'
+        }}
+      />
+      {/* 수중 광선(빛기둥) */}
+      <div
+        className="ocean-rays absolute -top-1/4 left-1/2 h-[150%] w-[72%] -translate-x-1/2 mix-blend-screen"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(150,240,255,0.22) 0%, rgba(120,220,240,0.05) 45%, transparent 80%)',
+          filter: 'blur(10px)'
+        }}
+      />
+      {/* 물결 코스틱(수면 굴절 무늬) */}
+      <div
+        className="ocean-caustics absolute inset-0 opacity-[0.10] mix-blend-screen"
+        style={{ backgroundImage: CAUSTICS_SVG, backgroundSize: '220px 220px' }}
+      />
+      {/* 떠오르는 공기방울 */}
+      {!reduce &&
+        PARTICLES.map((p, i) => (
+          <span
+            key={i}
+            className="ocean-particle absolute rounded-full bg-cyan-100/80"
+            style={
+              {
+                left: `${p.left}%`,
+                bottom: `${p.bottom}%`,
+                width: p.size,
+                height: p.size,
+                ['--p-dur']: `${p.dur}s`,
+                ['--p-delay']: `${p.delay}s`,
+                ['--p-op']: p.op,
+                ['--p-x']: `${p.drift}px`,
+                boxShadow: '0 0 6px rgba(180,240,255,0.7)'
+              } as React.CSSProperties
+            }
+          />
+        ))}
+      {/* 비네팅(가장자리 어둡게) */}
+      <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_38%,transparent_55%,rgba(0,0,0,0.5)_100%)]" />
+    </div>
+  );
+}
+
 export default function OceanBackground({ videos }: { videos?: OceanVideos }) {
+  const pathname = usePathname();
   const [depth, setDepth] = useState(0);
 
+  // 홈(로케일 루트, 예: /ko)만 영상 배경. 그 외 서브 페이지는 정적 앰비언트.
+  const isHome = pathname.split('/').filter(Boolean).length <= 1;
+
   useEffect(() => {
+    if (!isHome) return; // 서브 페이지는 깊이 스크롤 추적 불필요
     const main = document.querySelector('main');
     if (!main) return;
 
@@ -64,7 +138,9 @@ export default function OceanBackground({ videos }: { videos?: OceanVideos }) {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
-  }, []);
+  }, [isHome]);
+
+  if (!isHome) return <OceanAmbient />;
 
   const layers = [videos?.surface, videos?.mid, videos?.under, videos?.deep];
 
