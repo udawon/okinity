@@ -70,7 +70,13 @@ export async function uploadMedia(file: File, pathPrefix: string): Promise<strin
   const objectPath = `${pathPrefix}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${safeExt}`;
   const { error } = await sb.storage
     .from(MEDIA_BUCKET)
-    .upload(objectPath, file, { upsert: false, contentType: file.type || undefined });
+    // 파일명이 매 업로드 고유(타임스탬프-랜덤)라 immutable — 1년 캐시로 재방문·재렌더 시 즉시 표시.
+    // (콘텐츠 교체 시엔 새 URL이 생기므로 캐시가 갱신을 막지 않는다.)
+    .upload(objectPath, file, {
+      upsert: false,
+      contentType: file.type || undefined,
+      cacheControl: '31536000'
+    });
   if (error) throw new Error(`업로드 실패: ${error.message}`);
   return sb.storage.from(MEDIA_BUCKET).getPublicUrl(objectPath).data.publicUrl;
 }
