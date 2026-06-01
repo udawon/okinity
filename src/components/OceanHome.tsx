@@ -351,7 +351,7 @@ function Hero({ media }: { media?: { url?: string; type?: string } }) {
    ──────────────────────────────────────────────────────────── */
 function ActivityCard({ a, image }: { a: Activity; image: string }) {
   return (
-    <article className="group flex w-[80vw] max-w-[400px] shrink-0 snap-start flex-col overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.04] shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-colors hover:border-white/20 sm:w-[400px]">
+    <article className="group flex w-[80vw] max-w-[400px] shrink-0 snap-start flex-col overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.04] shadow-[0_16px_36px_-18px_rgba(0,0,0,0.5)] transition-colors hover:border-white/20 sm:w-[400px]">
       {/* 이미지 */}
       <div className="relative aspect-[16/11] w-full overflow-hidden">
         <img
