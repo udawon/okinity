@@ -22,6 +22,8 @@ export const CONTENT_KEYS = {
   homeTours: 'home_tours',
   /** 하위 투어 상세 콘텐츠. value: TourDetail. 목록은 코드 카탈로그(lib/tour) 고정. */
   tour: (slug: string) => `tour:${slug}`,
+  /** 소개(About) 페이지 콘텐츠. value: AboutContent(lib/about). */
+  about: 'about',
   product: (slug: string) => `product:${slug}`
 } as const;
 

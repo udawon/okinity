@@ -1,24 +1,18 @@
 import type { Metadata } from 'next';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
-import type { Locale } from '@/i18n/routing';
-import { getInstructor, getReviews } from '@/lib/content';
+import { setRequestLocale } from 'next-intl/server';
 import Container from '@/components/Container';
-import Markdown from '@/components/Markdown';
-import ReviewList from '@/components/ReviewList';
+import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
+import { parseAbout, resolveAbout, splitList } from '@/lib/about';
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'about' });
-  const instructor = getInstructor(locale as Locale);
-  return {
-    title: t('title'),
-    description: instructor?.headline,
-    robots: instructor?.fellBackToDefault ? { index: false, follow: true } : undefined
-  };
+  await params;
+  return { title: '소개' };
 }
 
 export default async function AboutPage({
@@ -29,77 +23,107 @@ export default async function AboutPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const t = await getTranslations('about');
-  const tInstructor = await getTranslations('instructor');
-  const tCommon = await getTranslations('common');
-  const instructor = getInstructor(locale as Locale);
-  const reviews = getReviews(locale as Locale);
+  const about = resolveAbout(parseAbout(await getSiteContent(CONTENT_KEYS.about)));
+  const titleLines = about.title.split('\n');
+  const bodyParas = about.body.split('\n').filter((p) => p.trim());
+  const certs = splitList(about.instructorCerts);
 
   return (
-    <>
-      <section className="py-12 sm:py-16">
-        <Container className="max-w-3xl">
-          <h1 className="font-serif text-3xl font-normal text-ink sm:text-4xl">
-            {t('title')}
-          </h1>
+    <section className="py-14 sm:py-20">
+      <Container className="max-w-3xl [text-shadow:0_2px_14px_rgba(0,0,0,0.45)]">
+        {/* 상단 소개 */}
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200/80">
+          {about.eyebrow}
+        </p>
+        <h1 className="mt-3 font-serif text-4xl leading-tight text-white sm:text-5xl">
+          {titleLines.map((line, i) => {
+            const accent = titleLines.length > 1 && i === titleLines.length - 1;
+            return (
+              <span key={i} className={i === 0 ? 'block' : 'mt-1 block'}>
+                {accent ? <span className="text-ocean">{line}</span> : line}
+              </span>
+            );
+          })}
+        </h1>
+        {about.intro && (
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/80">{about.intro}</p>
+        )}
 
-          {instructor && (
-            <>
-              {instructor.fellBackToDefault && (
-                <p className="mt-6 border border-accent px-4 py-3 font-mono text-xs text-ink">
-                  {tCommon('translationPending')}
-                </p>
-              )}
+        {about.heroImage && (
+          <div className="mt-8 overflow-hidden rounded-card border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={about.heroImage}
+              alt={about.instructorName || '소개 이미지'}
+              className="aspect-[16/9] w-full object-cover"
+            />
+          </div>
+        )}
 
-              <div className="mt-8 flex flex-col items-start gap-6 sm:flex-row">
-                <div
-                  className="h-48 w-48 shrink-0 bg-brand-light bg-cover bg-center"
-                  style={{ backgroundImage: `url(${instructor.photo})` }}
-                  role="img"
-                  aria-label={instructor.name}
-                />
-                <div>
-                  <p className="font-serif text-2xl text-ink">{instructor.name}</p>
-                  <p className="mt-2 font-mono text-sm tracking-[0.02em] text-brand-dark">
-                    {instructor.headline}
-                  </p>
-                  {instructor.yearsExperience != null && (
-                    <p className="mt-1 font-mono text-xs text-muted">
-                      {tInstructor('experience', { years: instructor.yearsExperience })}
-                    </p>
-                  )}
-                </div>
+        {bodyParas.length > 0 && (
+          <div className="mt-8 space-y-4 text-[15px] leading-relaxed text-white/80">
+            {bodyParas.map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
+          </div>
+        )}
+
+        {/* 핵심 강점 */}
+        {about.strengths.length > 0 && (
+          <div className="mt-12 grid gap-4 sm:grid-cols-3">
+            {about.strengths.map((s, i) => (
+              <div
+                key={i}
+                className="rounded-card border border-white/10 bg-white/[0.04] p-5 shadow-[0_16px_36px_-18px_rgba(0,0,0,0.5)]"
+              >
+                <h3 className="font-serif text-lg text-white">{s.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/70">{s.desc}</p>
               </div>
+            ))}
+          </div>
+        )}
 
-              {instructor.certifications.length > 0 && (
-                <div className="mt-8">
-                  <h2 className="font-serif text-lg text-ink">
-                    {tInstructor('certifications')}
-                  </h2>
+        {/* 대표 강사 */}
+        {(about.instructorName || about.instructorBody) && (
+          <div className="mt-14 border-t border-white/10 pt-10">
+            <div className="flex flex-col items-start gap-6 sm:flex-row">
+              {about.instructorPhoto && (
+                <div
+                  className="h-40 w-40 shrink-0 overflow-hidden rounded-card border border-white/10 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${about.instructorPhoto})` }}
+                  role="img"
+                  aria-label={about.instructorName}
+                />
+              )}
+              <div>
+                {about.instructorName && (
+                  <p className="font-serif text-2xl text-white">{about.instructorName}</p>
+                )}
+                {about.instructorRole && (
+                  <p className="mt-1 text-sm font-medium text-cyan-200/80">{about.instructorRole}</p>
+                )}
+                {certs.length > 0 && (
                   <ul className="mt-3 flex flex-wrap gap-2">
-                    {instructor.certifications.map((c, i) => (
+                    {certs.map((c, i) => (
                       <li
                         key={i}
-                        className="border border-line px-3 py-1 font-mono text-xs uppercase tracking-[0.06em] text-muted"
+                        className="rounded-full border border-white/15 px-3 py-1 text-xs text-white/70"
                       >
                         {c}
                       </li>
                     ))}
                   </ul>
-                </div>
-              )}
-
-              {instructor.body && (
-                <div className="mt-8">
-                  <Markdown>{instructor.body}</Markdown>
-                </div>
-              )}
-            </>
-          )}
-        </Container>
-      </section>
-
-      <ReviewList reviews={reviews} />
-    </>
+                )}
+              </div>
+            </div>
+            {about.instructorBody && (
+              <p className="mt-6 whitespace-pre-wrap text-[15px] leading-relaxed text-white/80">
+                {about.instructorBody}
+              </p>
+            )}
+          </div>
+        )}
+      </Container>
+    </section>
   );
 }
