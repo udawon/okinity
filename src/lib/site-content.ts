@@ -20,6 +20,8 @@ export const CONTENT_KEYS = {
   notice: 'notice',
   /** 홈 투어 카테고리 카드 이미지(다이빙·PADI·낚시·스노클링). value: { images: { [id]: url } } */
   homeTours: 'home_tours',
+  /** 하위 투어 상세 콘텐츠. value: TourDetail. 목록은 코드 카탈로그(lib/tour) 고정. */
+  tour: (slug: string) => `tour:${slug}`,
   product: (slug: string) => `product:${slug}`
 } as const;
 

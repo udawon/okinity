@@ -1,0 +1,168 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { saveTour } from '@/app/admin/tour-actions';
+import { type TourDetail } from '@/lib/tour';
+import MediaInput from './MediaInput';
+
+const labelCls = 'block text-sm font-medium text-ink';
+const inputCls =
+  'mt-1 w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted';
+
+/** 투어 상세 편집 폼 — 요약·이미지·소요·가격·포함·본문·공개. (목록은 코드 고정) */
+export default function TourEditor({
+  slug,
+  detail,
+  disabled = false
+}: {
+  slug: string;
+  detail: TourDetail;
+  disabled?: boolean;
+}) {
+  const router = useRouter();
+  const [published, setPublished] = useState(detail.published);
+  const [summary, setSummary] = useState(detail.summary);
+  const [heroImage, setHeroImage] = useState(detail.heroImage);
+  const [duration, setDuration] = useState(detail.duration);
+  const [price, setPrice] = useState(detail.price);
+  const [included, setIncluded] = useState(detail.included);
+  const [body, setBody] = useState(detail.body);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  async function save() {
+    setSaving(true);
+    setMsg('');
+    const res = await saveTour(slug, {
+      published,
+      summary,
+      heroImage,
+      duration,
+      price,
+      included,
+      body
+    });
+    setSaving(false);
+    if (res.error) setMsg(res.error);
+    else {
+      setMsg('저장되었습니다.');
+      router.refresh();
+    }
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="rounded-card border border-line bg-surface p-5 sm:p-6">
+        <label className="flex items-center gap-2 text-sm font-medium text-ink">
+          <input
+            type="checkbox"
+            checked={published}
+            onChange={(e) => setPublished(e.target.checked)}
+            disabled={disabled}
+            className="h-4 w-4"
+          />
+          상세 내용 공개 (체크 해제 시 상세 페이지는 기본 정보 + 예약 문의만 노출)
+        </label>
+
+        <div className="mt-4">
+          <label className={labelCls} htmlFor="tour-summary">
+            한 줄 요약
+          </label>
+          <input
+            id="tour-summary"
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+            placeholder="예) 보트로 5분, 케라마 블루의 투명한 바다에서 즐기는 체험다이빙"
+            disabled={disabled}
+            className={inputCls}
+          />
+        </div>
+
+        <div className="mt-4">
+          <label className={labelCls}>상단 이미지</label>
+          <div className="mt-1">
+            <MediaInput
+              prefix="tours"
+              accept="image/*"
+              defaultUrl={heroImage}
+              disabled={disabled}
+              onChange={setHeroImage}
+            />
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className={labelCls} htmlFor="tour-duration">
+              소요 시간
+            </label>
+            <input
+              id="tour-duration"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              placeholder="예) 약 3시간 (반일)"
+              disabled={disabled}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls} htmlFor="tour-price">
+              가격 안내
+            </label>
+            <input
+              id="tour-price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="예) 1인 12,000엔부터"
+              disabled={disabled}
+              className={inputCls}
+            />
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <label className={labelCls} htmlFor="tour-included">
+            포함 사항 <span className="font-normal text-muted">(줄바꿈 또는 쉼표로 구분)</span>
+          </label>
+          <textarea
+            id="tour-included"
+            value={included}
+            onChange={(e) => setIncluded(e.target.value)}
+            placeholder={'장비 일체\n한국어 가이드\n수중 사진 원본\n숙소 픽업'}
+            rows={4}
+            disabled={disabled}
+            className={`${inputCls} resize-y !rounded-card`}
+          />
+        </div>
+      </div>
+
+      <div className="rounded-card border border-line bg-surface p-5 sm:p-6">
+        <label className={labelCls} htmlFor="tour-body">
+          상세 본문
+        </label>
+        <textarea
+          id="tour-body"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="투어 진행 과정, 일정, 준비물, 유의사항 등 (줄바꿈 가능)"
+          rows={12}
+          disabled={disabled}
+          className={`${inputCls} resize-y !rounded-card`}
+        />
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={save}
+          disabled={disabled || saving}
+          className="rounded-button bg-brand px-6 py-2.5 text-sm font-semibold text-brand-contrast hover:bg-brand-dark disabled:opacity-50"
+        >
+          {saving ? '저장 중…' : '투어 상세 저장'}
+        </button>
+        {msg && <span className="text-sm text-muted">{msg}</span>}
+      </div>
+    </div>
+  );
+}

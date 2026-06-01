@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 const TABS = [
   { href: '/admin', label: '예약 문의' },
   { href: '/admin/content', label: '콘텐츠 편집' },
+  { href: '/admin/tours', label: '투어 상세' },
   { href: '/admin/blog', label: '블로그' },
   { href: '/admin/notice', label: '공지사항' }
 ];

@@ -25,7 +25,7 @@ export default async function ContactPage({
   const t = await getTranslations('contact');
   // 관심 투어 드롭다운 — 새 투어 카테고리의 하위 투어로 구성
   const products = ACTIVITIES.flatMap((a) =>
-    a.tours.map((tour) => ({ slug: `${a.id}:${tour}`, title: `${a.title} · ${tour}` }))
+    a.tours.map((tour) => ({ slug: tour.slug, title: `${a.title} · ${tour.name}` }))
   );
 
   return (

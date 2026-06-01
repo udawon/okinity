@@ -60,9 +60,9 @@ export default function TourCategoryDetail({
           <h2 className="font-serif text-2xl text-white sm:text-3xl">투어 구성</h2>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2">
             {activity.tours.map((t) => (
-              <li key={t}>
+              <li key={t.slug}>
                 <Link
-                  href="/contact"
+                  href={`/tours/${t.slug}`}
                   className="group flex items-center justify-between rounded-card border border-white/10 bg-white/[0.04] px-5 py-4 text-sm text-white/85 transition-colors hover:border-white/25 hover:bg-white/[0.07] hover:text-white"
                 >
                   <span className="flex items-center gap-3">
@@ -70,10 +70,10 @@ export default function TourCategoryDetail({
                       className="h-1.5 w-1.5 shrink-0 rounded-full"
                       style={{ backgroundColor: activity.accent }}
                     />
-                    {t}
+                    {t.name}
                   </span>
                   <span className="shrink-0 text-white/45 transition-colors group-hover:text-white">
-                    예약 문의 →
+                    자세히 →
                   </span>
                 </Link>
               </li>

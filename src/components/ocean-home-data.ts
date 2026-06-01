@@ -4,6 +4,9 @@
  * 이미지는 현재 public/images 의 SVG 플레이스홀더 — 실제 수중 사진으로 교체 전제.
  */
 
+/** 하위 투어 참조 — slug(상세 페이지 URL·콘텐츠 키)와 표시명. */
+export type TourRef = { slug: string; name: string };
+
 export type Activity = {
   id: 'diving' | 'padi' | 'fishing' | 'snorkeling';
   no: string;
@@ -11,8 +14,8 @@ export type Activity = {
   title: string;
   tagline: string;
   desc: string;
-  /** 하위 투어 메뉴 (실제 예약 상품) */
-  tours: string[];
+  /** 하위 투어 메뉴 (실제 예약 상품). 각 항목은 /tours/{slug} 상세 페이지로 연결. */
+  tours: TourRef[];
   meta: { label: string; value: string }[];
   image: string;
   /** 카드 글로우/포인트 색 */
@@ -27,7 +30,11 @@ export const ACTIVITIES: Activity[] = [
     title: '스노클링',
     tagline: '온 가족이 함께, 수면 위 산호 정원',
     desc: '구명조끼와 가이드가 늘 함께해 아이도 어르신도 안심. 푸른동굴의 신비한 빛과 산호초, 열대어를 수면에서 만나는 가장 쉬운 바다 체험입니다.',
-    tours: ['푸른동굴 스노클링', '보트 스노클링', '스노클링'],
+    tours: [
+      { slug: 'blue-cave-snorkeling', name: '푸른동굴 스노클링' },
+      { slug: 'boat-snorkeling', name: '보트 스노클링' },
+      { slug: 'beach-snorkeling', name: '스노클링' }
+    ],
     meta: [
       { label: '수심', value: '0–3m' },
       { label: '소요', value: '2–3시간' },
@@ -43,7 +50,11 @@ export const ACTIVITIES: Activity[] = [
     title: '스쿠버다이빙',
     tagline: '숨을 멈추고, 푸른 심연으로',
     desc: '자격증이 없어도 전문 강사가 1:2로 동행합니다. 푸른동굴의 신비한 빛부터 케라마 블루의 투명함까지, 오키나와 대표 포인트를 보트로 누비세요.',
-    tours: ['푸른동굴 보트 체험다이빙', '케라마 보트 체험다이빙', '펀다이빙'],
+    tours: [
+      { slug: 'blue-cave-dive', name: '푸른동굴 보트 체험다이빙' },
+      { slug: 'kerama-dive', name: '케라마 보트 체험다이빙' },
+      { slug: 'fun-dive', name: '펀다이빙' }
+    ],
     meta: [
       { label: '수심', value: '5–18m' },
       { label: '소요', value: '반일 · 종일' },
@@ -60,10 +71,10 @@ export const ACTIVITIES: Activity[] = [
     tagline: '평생 함께할 다이버 자격증',
     desc: '국제 공인 PADI 강사진이 한국어로 진행합니다. 첫 자격증부터 전문 스페셜티까지, 단계별로 안전하게 성장하세요.',
     tours: [
-      '오픈워터 라이센스 코스',
-      '어드밴스드 라이센스 코스',
-      'OW+AOW 연속교육 코스',
-      '스페셜티 라이센스 코스'
+      { slug: 'ow-course', name: '오픈워터 라이센스 코스' },
+      { slug: 'aow-course', name: '어드밴스드 라이센스 코스' },
+      { slug: 'owaow-course', name: 'OW+AOW 연속교육 코스' },
+      { slug: 'specialty-course', name: '스페셜티 라이센스 코스' }
     ],
     meta: [
       { label: '기간', value: '2–4일' },
@@ -80,7 +91,12 @@ export const ACTIVITIES: Activity[] = [
     title: '낚시',
     tagline: '오키나와의 손맛, 트로피컬 게임피싱',
     desc: '쿠로시오 난류가 키운 풍성한 어장. 가볍게 즐기는 체험낚시부터 만새기를 노리는 빅게임 트롤링까지, 장비·미끼는 전부 포함입니다.',
-    tours: ['4시간 체험낚시', '6시간 5종낚시', '1박2일 종일낚시', '8시간 빅게임 트롤링'],
+    tours: [
+      { slug: 'trial-fishing-4h', name: '4시간 체험낚시' },
+      { slug: 'fishing-5species-6h', name: '6시간 5종낚시' },
+      { slug: 'overnight-fishing', name: '1박2일 종일낚시' },
+      { slug: 'biggame-trolling-8h', name: '8시간 빅게임 트롤링' }
+    ],
     meta: [
       { label: '시간', value: '4시간~1박2일' },
       { label: '포함', value: '장비 · 미끼' },

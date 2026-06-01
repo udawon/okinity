@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { routing } from '@/i18n/routing';
 import { site } from '@/config/site.config';
+import { TOUR_CATALOG } from '@/lib/tour';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPaths = [
@@ -12,7 +13,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/gallery',
     '/contact',
     '/blog',
-    '/notice'
+    '/notice',
+    ...TOUR_CATALOG.map((t) => `/tours/${t.slug}`)
   ];
 
   const entries: MetadataRoute.Sitemap = [];

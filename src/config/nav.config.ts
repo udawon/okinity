@@ -27,11 +27,11 @@ export const NAV: NavItem[] = [
   { key: 'about', href: '/about', groupEnd: true },
   {
     key: 'snorkeling',
-    href: '/contact',
+    href: '/tours/blue-cave-snorkeling',
     children: [
-      { tKey: 'tours.snorkeling.cave', href: '/contact' },
-      { tKey: 'tours.snorkeling.boat', href: '/contact' },
-      { tKey: 'tours.snorkeling.beach', href: '/contact' }
+      { tKey: 'tours.snorkeling.cave', href: '/tours/blue-cave-snorkeling' },
+      { tKey: 'tours.snorkeling.boat', href: '/tours/boat-snorkeling' },
+      { tKey: 'tours.snorkeling.beach', href: '/tours/beach-snorkeling' }
     ]
   },
   {
@@ -39,9 +39,9 @@ export const NAV: NavItem[] = [
     href: '/diving',
     hub: '/diving',
     children: [
-      { tKey: 'tours.diving.cave', href: '/contact' },
-      { tKey: 'tours.diving.kerama', href: '/contact' },
-      { tKey: 'tours.diving.fun', href: '/contact' }
+      { tKey: 'tours.diving.cave', href: '/tours/blue-cave-dive' },
+      { tKey: 'tours.diving.kerama', href: '/tours/kerama-dive' },
+      { tKey: 'tours.diving.fun', href: '/tours/fun-dive' }
     ]
   },
   {
@@ -49,21 +49,21 @@ export const NAV: NavItem[] = [
     href: '/padi',
     hub: '/padi',
     children: [
-      { tKey: 'tours.padi.ow', href: '/contact' },
-      { tKey: 'tours.padi.aow', href: '/contact' },
-      { tKey: 'tours.padi.owaow', href: '/contact' },
-      { tKey: 'tours.padi.specialty', href: '/contact' }
+      { tKey: 'tours.padi.ow', href: '/tours/ow-course' },
+      { tKey: 'tours.padi.aow', href: '/tours/aow-course' },
+      { tKey: 'tours.padi.owaow', href: '/tours/owaow-course' },
+      { tKey: 'tours.padi.specialty', href: '/tours/specialty-course' }
     ]
   },
   {
     key: 'fishing',
-    href: '/contact',
+    href: '/tours/trial-fishing-4h',
     groupEnd: true,
     children: [
-      { tKey: 'tours.fishing.trial4', href: '/contact' },
-      { tKey: 'tours.fishing.five6', href: '/contact' },
-      { tKey: 'tours.fishing.overnight', href: '/contact' },
-      { tKey: 'tours.fishing.biggame8', href: '/contact' }
+      { tKey: 'tours.fishing.trial4', href: '/tours/trial-fishing-4h' },
+      { tKey: 'tours.fishing.five6', href: '/tours/fishing-5species-6h' },
+      { tKey: 'tours.fishing.overnight', href: '/tours/overnight-fishing' },
+      { tKey: 'tours.fishing.biggame8', href: '/tours/biggame-trolling-8h' }
     ]
   },
   { key: 'notice', href: '/notice' },

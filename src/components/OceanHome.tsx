@@ -395,14 +395,14 @@ function ActivityCard({ a, image }: { a: Activity; image: string }) {
         </p>
         <ul className="divide-y divide-white/10">
           {a.tours.map((t) => (
-            <li key={t}>
+            <li key={t.slug}>
               <Link
-                href="/contact"
+                href={`/tours/${t.slug}`}
                 className="group/row -mx-2 flex items-center justify-between rounded-lg px-2 py-2.5 text-sm text-white/85 transition-colors hover:bg-white/5 hover:text-white"
               >
                 <span className="flex items-center gap-3">
                   <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: a.accent }} />
-                  {t}
+                  {t.name}
                 </span>
                 <ArrowRight
                   className="h-4 w-4 shrink-0 opacity-0 transition-all duration-200 group-hover/row:translate-x-0.5 group-hover/row:opacity-100"
@@ -413,7 +413,7 @@ function ActivityCard({ a, image }: { a: Activity; image: string }) {
           ))}
         </ul>
 
-        {/* 메타 + CTA (카드 하단 정렬) */}
+        {/* 메타 (카드 하단 정렬) — 하위 투어를 누르면 각 상세 페이지로 이동 */}
         <div className="mt-auto">
           <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-4">
             {a.meta.map((m) => (
@@ -423,13 +423,6 @@ function ActivityCard({ a, image }: { a: Activity; image: string }) {
               </div>
             ))}
           </div>
-          <Link
-            href="/contact"
-            className="group/cta mt-5 inline-flex items-center gap-2 text-sm font-semibold text-white transition-colors hover:text-amber-300"
-          >
-            이 투어 예약 문의
-            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover/cta:translate-x-1" />
-          </Link>
         </div>
       </div>
     </article>
