@@ -1,5 +1,6 @@
 import { getGallery, getSchedule, type GalleryItem, type ScheduleItem } from '@/lib/content';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
+import { HERO_DEFAULTS } from '@/components/ocean-home-data';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import AdminNav from '@/components/admin/AdminNav';
 import HeroForm from '@/components/admin/HeroForm';
@@ -44,7 +45,21 @@ function EditSection({
 export default async function AdminContentPage() {
   const enabled = isSupabaseEnabled();
   const overrides = enabled ? await getSiteContentMap() : {};
-  const hero = overrides[CONTENT_KEYS.hero] ?? {};
+  // Hero 폼 기본값 — 저장된 오버라이드가 있으면 그 값, 없으면 현재 표시되는 기본 문구.
+  const heroOv = (overrides[CONTENT_KEYS.hero] ?? {}) as {
+    eyebrow?: string;
+    title?: string;
+    subtitle?: string;
+    mediaUrl?: string;
+    mediaType?: string;
+  };
+  const hero = {
+    eyebrow: heroOv.eyebrow?.trim() || HERO_DEFAULTS.eyebrow,
+    title: heroOv.title?.trim() || HERO_DEFAULTS.title,
+    subtitle: heroOv.subtitle?.trim() || HERO_DEFAULTS.subtitle,
+    mediaUrl: heroOv.mediaUrl,
+    mediaType: heroOv.mediaType
+  };
   const galleryOverrideItems = overrides[CONTENT_KEYS.gallery]?.items;
   const galleryDefaults: GalleryItem[] = Array.isArray(galleryOverrideItems)
     ? (galleryOverrideItems as GalleryItem[])

@@ -48,7 +48,7 @@ export default async function HomePage({
 
   // 어드민 편집 가능한 미디어(배경영상·투어 카드·갤러리). 비우면 기본값 사용.
   const heroOv = overrides[CONTENT_KEYS.hero] as
-    | { mediaUrl?: string; mediaType?: string }
+    | { mediaUrl?: string; mediaType?: string; eyebrow?: string; title?: string; subtitle?: string }
     | undefined;
   const galleryItems = overrides[CONTENT_KEYS.gallery]?.items;
   const galleryImages = Array.isArray(galleryItems)
@@ -62,6 +62,11 @@ export default async function HomePage({
 
   const media = {
     hero: heroOv?.mediaUrl?.trim() ? { url: heroOv.mediaUrl, type: heroOv.mediaType } : undefined,
+    heroText: {
+      eyebrow: heroOv?.eyebrow,
+      title: heroOv?.title,
+      subtitle: heroOv?.subtitle
+    },
     gallery: galleryImages,
     tours: tourImages
   };

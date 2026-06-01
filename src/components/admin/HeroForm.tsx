@@ -84,13 +84,17 @@ export default function HeroForm({
         <label className={labelCls} htmlFor="hero-title">
           제목
         </label>
-        <input
+        <p className="mb-1 mt-0.5 text-xs text-muted">
+          줄바꿈(Enter)으로 여러 줄. 줄이 2개 이상이면 마지막 줄이 강조색(오션)으로 표시됩니다.
+        </p>
+        <textarea
           id="hero-title"
           name="title"
           defaultValue={defaults.title}
           placeholder="비우면 기본 문구"
           disabled={disabled}
-          className={inputCls}
+          rows={2}
+          className={`${inputCls} !rounded-card`}
         />
       </div>
 
@@ -98,6 +102,7 @@ export default function HeroForm({
         <label className={labelCls} htmlFor="hero-subtitle">
           부제
         </label>
+        <p className="mb-1 mt-0.5 text-xs text-muted">줄바꿈(Enter) 가능.</p>
         <textarea
           id="hero-subtitle"
           name="subtitle"

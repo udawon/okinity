@@ -18,6 +18,7 @@ import {
   ASSURANCES,
   TESTIMONIALS,
   GALLERY,
+  HERO_DEFAULTS,
   type Activity
 } from './ocean-home-data';
 
@@ -218,11 +219,21 @@ function WaveDivider({ flip = false, className = '' }: { flip?: boolean; classNa
 /* ────────────────────────────────────────────────────────────
    HERO
    ──────────────────────────────────────────────────────────── */
-function Hero({ media }: { media?: { url?: string; type?: string } }) {
+function Hero({
+  media,
+  text
+}: {
+  media?: { url?: string; type?: string };
+  text?: { eyebrow?: string; title?: string; subtitle?: string };
+}) {
   const reduce = useReducedMotion();
   // 어드민 오버라이드(hero 키)의 배경 영상/이미지. 없으면 기본 노을 영상.
   const heroUrl = media?.url?.trim() || '/videos/surface.mp4';
   const heroIsVideo = media?.url?.trim() ? media.type === 'video' : true;
+  // 텍스트도 어드민 오버라이드 → 비어 있으면 기본값. 제목/부제는 \n 으로 여러 줄.
+  const eyebrow = text?.eyebrow?.trim() || HERO_DEFAULTS.eyebrow;
+  const titleLines = (text?.title?.trim() || HERO_DEFAULTS.title).split('\n');
+  const subtitleLines = (text?.subtitle?.trim() || HERO_DEFAULTS.subtitle).split('\n');
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -285,20 +296,27 @@ function Hero({ media }: { media?: { url?: string; type?: string } }) {
         className="relative mx-auto max-w-3xl px-6 text-center [text-shadow:0_1px_3px_rgba(0,0,0,0.55),0_2px_22px_rgba(0,0,0,0.45)]"
       >
         <R as="p" className="mb-5 text-xs font-semibold uppercase tracking-[0.32em] [text-indent:0.32em] text-cyan-200/90">
-          OKINAWA · OCEAN LIFE
+          {eyebrow}
         </R>
         <h1 className="font-serif text-[2.6rem] font-medium leading-[1.08] text-white sm:text-6xl lg:text-7xl">
-          <R as="span" className="block" delay={0.05}>
-            바다가 시작되는 곳,
-          </R>
-          <R as="span" className="mt-1 block" delay={0.12}>
-            <span className="text-ocean">오키나와</span>
-          </R>
+          {titleLines.map((line, i) => {
+            // 줄이 2개 이상이면 마지막 줄을 강조색(오션)으로
+            const accent = titleLines.length > 1 && i === titleLines.length - 1;
+            return (
+              <R key={i} as="span" className={i === 0 ? 'block' : 'mt-1 block'} delay={0.05 + i * 0.07}>
+                {accent ? <span className="text-ocean">{line}</span> : line}
+              </R>
+            );
+          })}
         </h1>
         <R delay={0.2} className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/90 sm:text-lg">
-          스쿠버다이빙 · PADI 교육 · 낚시.{' '}
-          <br className="hidden sm:block" />
-          초보자도 안심하는 소수정예 프라이빗 오션 투어.
+          {subtitleLines.map((line, i) => (
+            <span key={i}>
+              {i > 0 && <br className="hidden sm:block" />}
+              {line}
+              {i < subtitleLines.length - 1 ? ' ' : ''}
+            </span>
+          ))}
         </R>
 
         <R delay={0.3} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -822,6 +840,8 @@ function ReserveSection({ schedule, locale }: { schedule: ScheduleData; locale: 
 export type HomeMedia = {
   /** Hero 배경(어드민 hero 키): mediaUrl + mediaType */
   hero?: { url?: string; type?: string };
+  /** Hero 텍스트(어드민 hero 키): eyebrow/title/subtitle. 비우면 기본값 */
+  heroText?: { eyebrow?: string; title?: string; subtitle?: string };
   /** 투어 카테고리 카드 이미지(어드민 home_tours 키): { [activityId]: url } */
   tours?: Record<string, string>;
   /** 갤러리 이미지 URL 배열(어드민 gallery 키) */
@@ -845,7 +865,7 @@ export default function OceanHome({
       <CinematicBackground progress={scrollYProgress} />
       <Particles />
 
-      <Hero media={media?.hero} />
+      <Hero media={media?.hero} text={media?.heroText} />
       <WaveDivider />
       <BlogSection posts={posts} locale={locale} />
       <ActivitiesSection tourImages={media?.tours} />

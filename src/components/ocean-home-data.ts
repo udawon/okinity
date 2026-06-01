@@ -4,6 +4,17 @@
  * 이미지는 현재 public/images 의 SVG 플레이스홀더 — 실제 수중 사진으로 교체 전제.
  */
 
+/**
+ * Hero(홈 첫 화면) 기본 텍스트 — 어드민 hero 오버라이드(eyebrow/title/subtitle)가
+ * 비어 있을 때의 기본값. 제목·부제는 줄바꿈(\n)으로 여러 줄을 표현하며,
+ * 제목은 줄이 2개 이상이면 마지막 줄을 강조색(오션)으로 렌더한다.
+ */
+export const HERO_DEFAULTS = {
+  eyebrow: 'OKINAWA · OCEAN LIFE',
+  title: '바다가 시작되는 곳,\n오키나와',
+  subtitle: '스쿠버다이빙 · PADI 교육 · 낚시.\n초보자도 안심하는 소수정예 프라이빗 오션 투어.'
+} as const;
+
 /** 하위 투어 참조 — slug(상세 페이지 URL·콘텐츠 키)와 표시명. */
 export type TourRef = { slug: string; name: string };
 
