@@ -109,10 +109,11 @@ function R({
    ──────────────────────────────────────────────────────────── */
 function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
   const reduce = useReducedMotion();
-  // 깊이 단계별 그라데이션 레이어 페이드 (수면 → 중층 → 심해)
-  const surfaceOpacity = useTransform(progress, [0, 0.35], [1, 0]);
-  const midOpacity = useTransform(progress, [0.2, 0.45, 0.7], [0, 1, 0]);
-  const deepOpacity = useTransform(progress, [0.55, 1], [0, 1]);
+  // 깊이 단계별 레이어 — "쌓고 유지"(차오르면 0으로 빠지지 않음)해 위→아래 단조 하강.
+  // 수면(밝음)이 사라지며 베이스(밝은 바다)가 드러나고, 그 위로 중층→심해가 차례로 덮어 점점 깊어진다.
+  const surfaceOpacity = useTransform(progress, [0, 0.32], [1, 0]);
+  const midOpacity = useTransform(progress, [0.18, 0.45], [0, 1]);
+  const deepOpacity = useTransform(progress, [0.5, 0.92], [0, 1]);
 
   return (
     <div className="pointer-events-none fixed inset-0" style={{ zIndex: -5 }} aria-hidden>
@@ -133,7 +134,7 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
         style={{
           opacity: reduce ? 0.55 : midOpacity,
           background:
-            'radial-gradient(125% 95% at 50% 25%, #127a8c 0%, #0f6878 42%, #0c5a6a 72%, #0a4d5d 100%)'
+            'radial-gradient(125% 95% at 50% 25%, #0d5667 0%, #0b4a5b 42%, #093f4d 72%, #083845 100%)'
         }}
       />
       {/* 심해 — 깊고 어두운 청록(대비 확보) */}
@@ -142,7 +143,7 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
         style={{
           opacity: reduce ? 0 : deepOpacity,
           background:
-            'radial-gradient(100% 100% at 50% 60%, #0e6173 0%, #0b5263 55%, #093f4d 100%)'
+            'radial-gradient(100% 100% at 50% 60%, #093f4d 0%, #072f3b 55%, #05222c 100%)'
         }}
       />
       {/* 코스틱(수면 굴절 무늬) */}
