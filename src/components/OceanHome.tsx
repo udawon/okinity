@@ -12,7 +12,7 @@ import { Link } from '@/i18n/routing';
 import { type BlogPost } from '@/lib/blog';
 import { type ScheduleItem } from '@/lib/content';
 import BlogCard from '@/components/BlogCard';
-import ScheduleCalendar from '@/components/ScheduleCalendar';
+import ReservePlanner from '@/components/ReservePlanner';
 import {
   ACTIVITIES,
   ASSURANCES,
@@ -810,36 +810,14 @@ function ReserveSection({ schedule, locale }: { schedule: ScheduleData; locale: 
           </R>
         </div>
 
-        {/* 일정표 캘린더 (실제 데이터) */}
+        {/* 일정표 + 예약 통합 플래너 */}
         <R delay={0.15} className="mt-12">
-          <div className="rounded-card border border-white/10 bg-[#06151d]/70 p-5 shadow-[0_16px_50px_rgba(0,0,0,0.4)] backdrop-blur-md sm:p-7">
-            <ScheduleCalendar
-              items={schedule.items}
-              locale={locale}
-              statusLabel={schedule.statusLabel}
-              emptyLabel={schedule.emptyLabel}
-            />
-          </div>
-        </R>
-
-        {/* 예약 CTA */}
-        <R delay={0.2} className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
-            href="/contact"
-            className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 px-9 py-4 text-sm font-bold text-[#06202a] shadow-[0_8px_30px_rgba(246,166,35,0.4)] transition-[transform,box-shadow,background-color] duration-200 hover:bg-amber-300 hover:shadow-[0_12px_42px_rgba(246,166,35,0.55)] active:scale-[0.97] sm:w-auto"
-          >
-            예약 · 견적 문의하기
-            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-          </Link>
-          <a
-            href="mailto:hello@ponyokinawa.com"
-            className="inline-flex w-full items-center justify-center rounded-full border border-white/25 bg-white/5 px-9 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-colors duration-200 hover:border-white/50 hover:bg-white/10 sm:w-auto"
-          >
-            이메일로 문의
-          </a>
-        </R>
-        <R delay={0.28} className="mt-7 text-center text-xs text-white/65">
-          예약 전 상담은 언제나 무료입니다 · 당일 취소 수수료 없음
+          <ReservePlanner
+            items={schedule.items}
+            locale={locale}
+            statusLabel={schedule.statusLabel}
+            emptyLabel={schedule.emptyLabel}
+          />
         </R>
       </div>
     </section>

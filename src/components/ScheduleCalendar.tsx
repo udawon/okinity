@@ -23,12 +23,20 @@ export default function ScheduleCalendar({
   items,
   locale,
   statusLabel,
-  emptyLabel
+  emptyLabel,
+  selectable = false,
+  selectedKey = null,
+  onSelectDate
 }: {
   items: ScheduleItem[];
   locale: string;
   statusLabel: Record<Status, string>;
   emptyLabel: string;
+  /** true면 예약가능 날짜를 클릭할 수 있다(예약 통합용). 미지정 시 읽기전용(기존 동작). */
+  selectable?: boolean;
+  /** 현재 선택된 날짜 키(YYYY-MM-DD). */
+  selectedKey?: string | null;
+  onSelectDate?: (key: string, events: ScheduleItem[]) => void;
 }) {
   // 날짜별 이벤트 맵 (ISO 'YYYY-MM-DD' 기준). 표시용 문자열만 있는 항목은 캘린더에서 제외.
   const byDate = useMemo(() => {
@@ -87,6 +95,12 @@ export default function ScheduleCalendar({
   const navBtn =
     'flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/80 transition-colors hover:border-white/40 hover:text-white';
 
+  const pick = (key: string, evs: ScheduleItem[]) => {
+    if (selectable && onSelectDate && evs.some((e) => e.status === 'available')) {
+      onSelectDate(key, evs);
+    }
+  };
+
   return (
     <div>
       {/* 헤더: 월 이동 */}
@@ -118,13 +132,11 @@ export default function ScheduleCalendar({
           const key = dateKey(day);
           const evs = byDate.get(key) ?? [];
           const isToday = key === todayKey;
-          return (
-            <div
-              key={i}
-              className={`min-h-[72px] p-1.5 sm:min-h-[96px] sm:p-2 ${
-                evs.length ? 'bg-[#0e2c3a]/80' : 'bg-[#06151d]/70'
-              }`}
-            >
+          const canBook = selectable && evs.some((e) => e.status === 'available');
+          const isSelected = selectedKey === key;
+
+          const inner = (
+            <>
               <span
                 className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs ${
                   isToday ? 'bg-brand font-semibold text-brand-contrast' : 'text-white/70'
@@ -145,6 +157,31 @@ export default function ScheduleCalendar({
                   </div>
                 ))}
               </div>
+            </>
+          );
+
+          const base = `min-h-[72px] p-1.5 text-left sm:min-h-[96px] sm:p-2 ${
+            evs.length ? 'bg-[#0e2c3a]/80' : 'bg-[#06151d]/70'
+          }`;
+
+          if (canBook) {
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => pick(key, evs)}
+                aria-pressed={isSelected}
+                className={`${base} w-full cursor-pointer transition-colors hover:bg-[#15506a]/90 ${
+                  isSelected ? 'ring-2 ring-inset ring-[#5fd6e2]' : ''
+                }`}
+              >
+                {inner}
+              </button>
+            );
+          }
+          return (
+            <div key={i} className={base}>
+              {inner}
             </div>
           );
         })}
@@ -158,6 +195,9 @@ export default function ScheduleCalendar({
             {statusLabel[s]}
           </span>
         ))}
+        {selectable && (
+          <span className="text-white/45">· 예약 가능한 날짜를 누르면 예약이 시작됩니다</span>
+        )}
       </div>
 
       {/* 해당 월 일정 리스트 (모바일 가독성 보강) */}
@@ -172,13 +212,24 @@ export default function ScheduleCalendar({
               day: 'numeric',
               weekday: 'short'
             }).format(d);
+            const canBook = selectable && e.status === 'available';
+            const isSelected = selectedKey === e.key;
             return (
-              <li key={i} className="flex items-center justify-between gap-4 py-3 text-sm">
-                <span className="w-28 shrink-0 text-white/55">{label}</span>
-                <span className="flex-1 text-white/90">{e.program}</span>
-                <span className={`shrink-0 font-medium ${STATUS[e.status].text}`}>
-                  {statusLabel[e.status]}
-                </span>
+              <li key={i}>
+                <button
+                  type="button"
+                  disabled={!canBook}
+                  onClick={() => pick(e.key, byDate.get(e.key) ?? [])}
+                  className={`flex w-full items-center justify-between gap-4 rounded-lg px-2 py-3 text-left text-sm transition-colors ${
+                    canBook ? 'cursor-pointer hover:bg-white/5' : 'cursor-default'
+                  } ${isSelected ? 'bg-white/5 ring-1 ring-inset ring-[#5fd6e2]/60' : ''}`}
+                >
+                  <span className="w-28 shrink-0 text-white/55">{label}</span>
+                  <span className="flex-1 text-white/90">{e.program}</span>
+                  <span className={`shrink-0 font-medium ${STATUS[e.status].text}`}>
+                    {statusLabel[e.status]}
+                  </span>
+                </button>
               </li>
             );
           })}
