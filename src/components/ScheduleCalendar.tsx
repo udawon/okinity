@@ -95,8 +95,9 @@ export default function ScheduleCalendar({
   const navBtn =
     'flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/80 transition-colors hover:border-white/40 hover:text-white';
 
+  // 빈 날짜(상품 미등록) + 오늘 이후 → 예약 가능. 상품이 박힌 날짜는 정보 표시(클릭 불가).
   const pick = (key: string, evs: ScheduleItem[]) => {
-    if (selectable && onSelectDate && evs.some((e) => e.status === 'available')) {
+    if (selectable && onSelectDate && evs.length === 0 && key >= todayKey) {
       onSelectDate(key, evs);
     }
   };
@@ -132,56 +133,73 @@ export default function ScheduleCalendar({
           const key = dateKey(day);
           const evs = byDate.get(key) ?? [];
           const isToday = key === todayKey;
-          const canBook = selectable && evs.some((e) => e.status === 'available');
           const isSelected = selectedKey === key;
+          const canBook = selectable && evs.length === 0 && key >= todayKey;
 
-          const inner = (
-            <>
-              <span
-                className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs ${
-                  isToday ? 'bg-brand font-semibold text-brand-contrast' : 'text-white/70'
-                }`}
-              >
-                {day}
-              </span>
-              <div className="mt-1 space-y-1">
-                {evs.map((e, j) => (
-                  <div key={j} className="flex items-center gap-1">
-                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS[e.status].dot}`} />
-                    <span
-                      className={`truncate text-[10px] leading-tight sm:text-[11px] ${STATUS[e.status].text}`}
-                      title={e.program}
-                    >
-                      {e.program}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </>
+          const dayNum = (
+            <span
+              className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs ${
+                isToday ? 'bg-brand font-semibold text-brand-contrast' : 'text-white/70'
+              }`}
+            >
+              {day}
+            </span>
           );
 
           const base = `min-h-[72px] p-1.5 text-left sm:min-h-[96px] sm:p-2 ${
             evs.length ? 'bg-[#0e2c3a]/80' : 'bg-[#06151d]/70'
           }`;
 
+          // 상품이 박힌 날짜 → 정보 표시(마감/고정 일정), 클릭 불가
+          if (evs.length > 0) {
+            return (
+              <div key={i} className={base}>
+                {dayNum}
+                <div className="mt-1 space-y-1">
+                  {evs.map((e, j) => (
+                    <div key={j} className="flex items-center gap-1">
+                      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS[e.status].dot}`} />
+                      <span
+                        className={`truncate text-[10px] leading-tight sm:text-[11px] ${STATUS[e.status].text}`}
+                        title={e.program}
+                      >
+                        {e.program}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+
+          // 빈 날짜(오늘 이후) → 예약 가능, 클릭
           if (canBook) {
             return (
               <button
                 key={i}
                 type="button"
-                onClick={() => pick(key, evs)}
+                onClick={() => pick(key, [])}
                 aria-pressed={isSelected}
-                className={`${base} w-full cursor-pointer transition-colors hover:bg-[#15506a]/90 ${
-                  isSelected ? 'ring-2 ring-inset ring-[#5fd6e2]' : ''
+                className={`group ${base} w-full cursor-pointer transition-colors hover:bg-[#15506a]/70 ${
+                  isSelected ? 'bg-[#15506a]/60 ring-2 ring-inset ring-[#5fd6e2]' : ''
                 }`}
               >
-                {inner}
+                {dayNum}
+                <span
+                  className={`mt-2 block text-[10px] font-medium text-[#5fd6e2] transition-opacity ${
+                    isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  }`}
+                >
+                  + 예약
+                </span>
               </button>
             );
           }
+
+          // 빈 날짜(과거) 또는 읽기전용 모드
           return (
             <div key={i} className={base}>
-              {inner}
+              {dayNum}
             </div>
           );
         })}
@@ -196,7 +214,7 @@ export default function ScheduleCalendar({
           </span>
         ))}
         {selectable && (
-          <span className="text-white/45">· 예약 가능한 날짜를 누르면 예약이 시작됩니다</span>
+          <span className="text-white/45">· 비어 있는 날짜를 누르면 예약 문의를 시작할 수 있어요</span>
         )}
       </div>
 
@@ -212,24 +230,13 @@ export default function ScheduleCalendar({
               day: 'numeric',
               weekday: 'short'
             }).format(d);
-            const canBook = selectable && e.status === 'available';
-            const isSelected = selectedKey === e.key;
             return (
-              <li key={i}>
-                <button
-                  type="button"
-                  disabled={!canBook}
-                  onClick={() => pick(e.key, byDate.get(e.key) ?? [])}
-                  className={`flex w-full items-center justify-between gap-4 rounded-lg px-2 py-3 text-left text-sm transition-colors ${
-                    canBook ? 'cursor-pointer hover:bg-white/5' : 'cursor-default'
-                  } ${isSelected ? 'bg-white/5 ring-1 ring-inset ring-[#5fd6e2]/60' : ''}`}
-                >
-                  <span className="w-28 shrink-0 text-white/55">{label}</span>
-                  <span className="flex-1 text-white/90">{e.program}</span>
-                  <span className={`shrink-0 font-medium ${STATUS[e.status].text}`}>
-                    {statusLabel[e.status]}
-                  </span>
-                </button>
+              <li key={i} className="flex items-center justify-between gap-4 py-3 text-sm">
+                <span className="w-28 shrink-0 text-white/55">{label}</span>
+                <span className="flex-1 text-white/90">{e.program}</span>
+                <span className={`shrink-0 font-medium ${STATUS[e.status].text}`}>
+                  {statusLabel[e.status]}
+                </span>
               </li>
             );
           })}
