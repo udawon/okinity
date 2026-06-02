@@ -86,21 +86,25 @@ export default async function AboutPage({
         {/* 대표 강사 */}
         {(about.instructorName || about.instructorBody) && (
           <div className="mt-14 border-t border-white/10 pt-10">
-            <div className="flex flex-col items-start gap-6 sm:flex-row">
+            <div className="flex flex-col gap-7 sm:flex-row sm:items-start sm:gap-8">
               {about.instructorPhoto && (
                 <div
-                  className="h-40 w-40 shrink-0 overflow-hidden rounded-card border border-white/10 bg-cover bg-center"
+                  className="aspect-square w-48 shrink-0 overflow-hidden rounded-card border border-white/10 bg-cover bg-center shadow-[0_18px_40px_-20px_rgba(0,0,0,0.65)] sm:w-72"
                   style={{ backgroundImage: `url(${about.instructorPhoto})` }}
                   role="img"
                   aria-label={about.instructorName}
                 />
               )}
-              <div>
+              <div className="min-w-0 flex-1">
                 {about.instructorName && (
-                  <p className="font-serif text-2xl text-white">{about.instructorName}</p>
+                  <p className="font-serif text-2xl text-white sm:text-3xl">
+                    {about.instructorName}
+                  </p>
                 )}
                 {about.instructorRole && (
-                  <p className="mt-1 text-sm font-medium text-cyan-200/80">{about.instructorRole}</p>
+                  <p className="mt-1.5 text-sm font-medium text-cyan-200/80">
+                    {about.instructorRole}
+                  </p>
                 )}
                 {certs.length > 0 && (
                   <ul className="mt-3 flex flex-wrap gap-2">
@@ -114,13 +118,13 @@ export default async function AboutPage({
                     ))}
                   </ul>
                 )}
+                {about.instructorBody && (
+                  <p className="mt-5 whitespace-pre-wrap text-[15px] leading-relaxed text-white/80">
+                    {about.instructorBody}
+                  </p>
+                )}
               </div>
             </div>
-            {about.instructorBody && (
-              <p className="mt-6 whitespace-pre-wrap text-[15px] leading-relaxed text-white/80">
-                {about.instructorBody}
-              </p>
-            )}
           </div>
         )}
       </Container>
