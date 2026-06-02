@@ -37,3 +37,6 @@ next-env.d.ts
 .playwright-mcp/
 /*.jpeg
 /*.png
+
+# Hero 원본 4K 동영상(119MB) — 압축본(turtle-hero.mp4)만 커밋
+public/videos/turtle2.mp4
