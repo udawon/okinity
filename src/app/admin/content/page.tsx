@@ -2,13 +2,12 @@ import { getGallery, getSchedule, type GalleryItem, type ScheduleItem } from '@/
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { HERO_DEFAULTS } from '@/components/ocean-home-data';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
-import AdminNav from '@/components/admin/AdminNav';
+import AdminShell from '@/components/admin/AdminShell';
 import HeroForm from '@/components/admin/HeroForm';
 import GalleryForm from '@/components/admin/GalleryForm';
 import ScheduleForm from '@/components/admin/ScheduleForm';
 import TourImagesForm from '@/components/admin/TourImagesForm';
 import SectionPreview from '@/components/admin/SectionPreview';
-import { logout } from '../actions';
 import { type ReactNode } from 'react';
 
 export const dynamic = 'force-dynamic';
@@ -71,46 +70,18 @@ export default async function AdminContentPage() {
   const tourImages = (overrides[CONTENT_KEYS.homeTours]?.images as Record<string, string>) ?? {};
 
   return (
-    <main className="mx-auto w-full max-w-container px-5 py-8 sm:px-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-ink">콘텐츠 편집</h1>
-        <form action={logout}>
-          <button
-            type="submit"
-            className="rounded-button border border-line px-3 py-2 text-sm text-muted hover:text-ink"
-          >
-            로그아웃
-          </button>
-        </form>
-      </div>
-
-      <div className="mt-4">
-        <AdminNav />
-      </div>
-
-      {!enabled && (
-        <div className="mt-6 rounded-card border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-          <p className="font-semibold">Supabase가 아직 연결되지 않았습니다.</p>
-          <p className="mt-1">
-            콘텐츠 편집·이미지 업로드를 사용하려면 <code>.env.local</code> 에{' '}
-            <code>SUPABASE_URL</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code> 를 설정하고{' '}
-            <code>supabase/schema.sql</code> 을 실행하세요. 그 전까지 메인은 기본
-            콘텐츠(content/*.md)로 정상 표시됩니다.
-          </p>
-        </div>
-      )}
-
-      <div className="mt-6 space-y-6">
+    <AdminShell title="콘텐츠 편집">
+      <div className="space-y-6">
         <EditSection
-          title="Hero 배경 (홈 첫 화면)"
+          title="Hero (홈 첫 화면)"
           desc={
             <>
-              홈 첫 화면의 <strong>배경 영상/이미지</strong>를 교체합니다. 비우면 기본 노을 영상.
-              동영상은 자동재생(무음 루프)됩니다. (제목·부제 문구는 현재 코드 고정 — 배경만 반영)
+              홈 첫 화면의 <strong>배경 영상/이미지</strong>와 <strong>제목·부제 문구</strong>를
+              교체합니다. 비우면 기본값이 사용됩니다. 동영상은 자동재생(무음 루프)됩니다.
             </>
           }
           preview={
-            <SectionPreview highlight="hero" note="홈 맨 위 전체화면 배경에 적용됩니다." />
+            <SectionPreview highlight="hero" note="홈 맨 위 전체화면 배경·문구에 적용됩니다." />
           }
         >
           <HeroForm defaults={hero} disabled={!enabled} />
@@ -131,8 +102,8 @@ export default async function AdminContentPage() {
 
         <EditSection
           title="갤러리"
-          desc="홈 갤러리(가로로 흐르는 띠)와 /갤러리 페이지에 노출됩니다. 이미지를 추가/삭제하세요."
-          preview={<SectionPreview highlight="gallery" note="홈 갤러리 띠 + /gallery 페이지." />}
+          desc="홈 갤러리(반응형 그리드)와 /갤러리 페이지에 올린 순서대로 노출됩니다. 이미지를 추가/삭제하세요."
+          preview={<SectionPreview highlight="gallery" note="홈 갤러리 그리드 + /gallery 페이지." />}
         >
           <GalleryForm defaults={galleryDefaults} disabled={!enabled} />
         </EditSection>
@@ -145,6 +116,6 @@ export default async function AdminContentPage() {
           <ScheduleForm defaults={scheduleDefaults} disabled={!enabled} />
         </EditSection>
       </div>
-    </main>
+    </AdminShell>
   );
 }

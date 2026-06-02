@@ -3,8 +3,7 @@ import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import { ACTIVITIES } from '@/components/ocean-home-data';
 import { parseTourDetail } from '@/lib/tour';
-import AdminNav from '@/components/admin/AdminNav';
-import { logout } from '../actions';
+import AdminShell from '@/components/admin/AdminShell';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,33 +14,8 @@ export default async function AdminToursPage() {
   const map = enabled ? await getSiteContentMap(keys) : {};
 
   return (
-    <main className="mx-auto w-full max-w-container px-5 py-8 sm:px-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-ink">투어 상세</h1>
-        <form action={logout}>
-          <button
-            type="submit"
-            className="rounded-button border border-line px-3 py-2 text-sm text-muted hover:text-ink"
-          >
-            로그아웃
-          </button>
-        </form>
-      </div>
-
-      <div className="mt-4">
-        <AdminNav />
-      </div>
-
-      {!enabled && (
-        <div className="mt-6 rounded-card border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-          <p className="font-semibold">Supabase가 연결되지 않아 투어 상세를 저장할 수 없습니다.</p>
-          <p className="mt-1">
-            <code>.env.local</code> 에 SUPABASE 환경변수를 설정하세요.
-          </p>
-        </div>
-      )}
-
-      <p className="mb-6 mt-6 text-sm text-muted">
+    <AdminShell title="투어 상세">
+      <p className="mb-6 text-sm text-muted">
         투어 목록은 고정되어 있고, 각 투어를 눌러 상세 내용을 등록합니다. 공개된 상세는{' '}
         <code>/tours/&#123;slug&#125;</code> 페이지에 표시됩니다.
       </p>
@@ -87,6 +61,6 @@ export default async function AdminToursPage() {
           </section>
         ))}
       </div>
-    </main>
+    </AdminShell>
   );
 }

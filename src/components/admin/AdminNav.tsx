@@ -16,7 +16,7 @@ const TABS = [
 export default function AdminNav() {
   const pathname = usePathname();
   return (
-    <nav className="flex gap-1 border-b border-line">
+    <nav className="flex gap-1 overflow-x-auto border-b border-line [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {TABS.map((t) => {
         // /admin 은 정확 일치만, 그 외엔 하위 경로(편집 페이지 등) 포함.
         const active = t.href === '/admin' ? pathname === '/admin' : pathname.startsWith(t.href);
@@ -24,7 +24,7 @@ export default function AdminNav() {
           <Link
             key={t.href}
             href={t.href}
-            className={`-mb-px border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
+            className={`-mb-px whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
               active
                 ? 'border-brand text-ink'
                 : 'border-transparent text-muted hover:text-ink'
