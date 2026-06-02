@@ -116,8 +116,8 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
 
   return (
     <div className="pointer-events-none fixed inset-0" style={{ zIndex: -5 }} aria-hidden>
-      {/* 베이스(항상 깔리는 심해색 — 살짝 밝은 틸블랙) */}
-      <div className="absolute inset-0 bg-[#04202b]" />
+      {/* 베이스(항상 깔리는 심해색 — 밝은 트로피컬 틸로 리프트) */}
+      <div className="absolute inset-0 bg-[#07333f]" />
       {/* 수면 — 햇살 비치는 밝은 터콰이즈 */}
       <motion.div
         className="absolute inset-0"
@@ -133,7 +133,7 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
         style={{
           opacity: reduce ? 0.55 : midOpacity,
           background:
-            'radial-gradient(125% 95% at 50% 25%, #1f9bb0 0%, #11697d 42%, #0a4252 72%, #062c39 100%)'
+            'radial-gradient(125% 95% at 50% 25%, #2bb4c8 0%, #128097 42%, #0d5365 72%, #0a4452 100%)'
         }}
       />
       {/* 심해 — 깊고 어두운 청록(대비 확보) */}
@@ -142,7 +142,7 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
         style={{
           opacity: reduce ? 0 : deepOpacity,
           background:
-            'radial-gradient(100% 100% at 50% 60%, #0a4250 0%, #052832 55%, #031820 100%)'
+            'radial-gradient(100% 100% at 50% 60%, #0c5364 0%, #093f4d 55%, #06303c 100%)'
         }}
       />
       {/* 코스틱(수면 굴절 무늬) */}
@@ -154,8 +154,8 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
           backgroundSize: '220px 220px'
         }}
       />
-      {/* 비네팅(가장자리 어둡게 — 시네마틱) */}
-      <div className="absolute inset-0 bg-[radial-gradient(110%_80%_at_50%_40%,transparent_55%,rgba(0,0,0,0.55)_100%)]" />
+      {/* 비네팅(가장자리 살짝 — 청록 틴트로 완화, 시네마틱은 유지) */}
+      <div className="absolute inset-0 bg-[radial-gradient(110%_80%_at_50%_40%,transparent_58%,rgba(3,28,36,0.30)_100%)]" />
     </div>
   );
 }
@@ -209,7 +209,7 @@ function WaveDivider({ flip = false, className = '' }: { flip?: boolean; classNa
       >
         <path
           d="M0 40 C240 80 480 0 720 30 C960 60 1200 90 1440 40 L1440 80 L0 80 Z"
-          fill="rgba(2,16,26,0.55)"
+          fill="rgba(6,44,55,0.45)"
         />
       </svg>
     </div>
