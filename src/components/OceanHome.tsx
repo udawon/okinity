@@ -673,19 +673,19 @@ function GallerySection({ images }: { images?: string[] }) {
         {/* 모든 사진 순서대로 — 반응형 격자(모바일 2 · sm 3 · lg 4열) */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
           {list.map((src, i) => (
-            <div
-              key={`${i}-${src}`}
-              className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]"
-            >
-              <img
-                src={src}
-                alt=""
-                loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                aria-hidden
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#02101a]/40 to-transparent" />
-            </div>
+            // 스크롤 진입 시 좌상단부터 순서대로 떠오르는 stagger(delay는 누적 상한).
+            <R key={`${i}-${src}`} y={20} delay={Math.min(i * 0.05, 0.45)}>
+              <div className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
+                <img
+                  src={src}
+                  alt=""
+                  loading="lazy"
+                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                  aria-hidden
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#02101a]/40 to-transparent" />
+              </div>
+            </R>
           ))}
         </div>
       </div>
