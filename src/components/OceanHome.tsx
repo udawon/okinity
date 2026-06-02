@@ -653,55 +653,41 @@ function BlogSection({ posts, locale }: { posts: BlogPost[]; locale: string }) {
 }
 
 /* ────────────────────────────────────────────────────────────
-   GALLERY — 두 줄 마퀴 (반대 방향)
+   GALLERY — 어드민에 올린 모든 사진을 순서대로 반응형 그리드로
    ──────────────────────────────────────────────────────────── */
-function GalleryMarquee({ images }: { images?: string[] }) {
-  // 어드민 갤러리(gallery 키) 이미지가 있으면 사용, 없으면 기본. 끊김 없는 루프를 위해 2배 복제.
+function GallerySection({ images }: { images?: string[] }) {
+  // 어드민 갤러리(gallery 키) 이미지가 있으면 그대로(순서 유지), 없으면 기본.
   const list = images && images.length ? images : GALLERY;
-  const row = [...list, ...list];
   return (
     <section className="relative py-20 sm:py-24">
-      <div className="mx-auto mb-12 max-w-container px-6 text-center">
-        <R as="p" className="text-xs font-semibold uppercase tracking-[0.3em] [text-indent:0.3em] text-cyan-200/80">
-          Gallery
-        </R>
-        <R delay={0.06}>
-          <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">물속에서 만난 순간들</h2>
-        </R>
-      </div>
+      <div className="mx-auto max-w-container px-6">
+        <div className="mb-12 text-center">
+          <R as="p" className="text-xs font-semibold uppercase tracking-[0.3em] [text-indent:0.3em] text-cyan-200/80">
+            Gallery
+          </R>
+          <R delay={0.06}>
+            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">물속에서 만난 순간들</h2>
+          </R>
+        </div>
 
-      <div className="space-y-4 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
-        {[0, 1].map((rowIdx) => (
-          <div key={rowIdx} className="flex w-max">
+        {/* 모든 사진 순서대로 — 반응형 격자(모바일 2 · sm 3 · lg 4열) */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+          {list.map((src, i) => (
             <div
-              className="ocean-marquee flex gap-4 pr-4"
-              style={
-                {
-                  ['--m-dur']: rowIdx === 0 ? '46s' : '60s',
-                  animationDirection: rowIdx === 1 ? 'reverse' : 'normal'
-                } as React.CSSProperties
-              }
+              key={`${i}-${src}`}
+              className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]"
             >
-              {row.map((src, i) => (
-                <div
-                  key={`${rowIdx}-${i}`}
-                  className="relative h-44 w-64 shrink-0 overflow-hidden rounded-xl border border-white/10 sm:h-52 sm:w-80"
-                >
-                  <img
-                    src={src}
-                    alt=""
-                    width={320}
-                    height={208}
-                    loading="lazy"
-                    className="h-full w-full object-cover"
-                    aria-hidden
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#02101a]/40 to-transparent" />
-                </div>
-              ))}
+              <img
+                src={src}
+                alt=""
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                aria-hidden
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#02101a]/40 to-transparent" />
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <R delay={0.1} className="mt-10 text-center">
@@ -870,7 +856,7 @@ export default function OceanHome({
       <BlogSection posts={posts} locale={locale} />
       <ActivitiesSection tourImages={media?.tours} />
       <AssuranceSection />
-      <GalleryMarquee images={media?.gallery} />
+      <GallerySection images={media?.gallery} />
       <Testimonials />
       <WaveDivider flip />
       <ReserveSection schedule={schedule} locale={locale} />
