@@ -67,3 +67,11 @@ export async function updateInquiryStatus(
   await store.updateStatus(id, status as InquiryStatus);
   revalidatePath('/admin');
 }
+
+export async function deleteInquiry(id: string): Promise<void> {
+  // 서버액션은 외부에서 직접 호출 가능하므로 세션을 재검증한다(미들웨어 외 2차 방어).
+  await requireAdmin();
+  const store = await getInquiryStore();
+  await store.delete(id);
+  revalidatePath('/admin');
+}

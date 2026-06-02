@@ -1,5 +1,6 @@
 import { getInquiryStore, type InquiryStatus } from '@/lib/inquiries';
 import StatusControl from '@/components/admin/StatusControl';
+import DeleteInquiryButton from '@/components/admin/DeleteInquiryButton';
 import AdminNav from '@/components/admin/AdminNav';
 import { logout } from './actions';
 
@@ -28,7 +29,7 @@ export default async function AdminDashboard() {
     <main className="mx-auto w-full max-w-container px-5 py-8 sm:px-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-ink">예약 문의</h1>
+          <h1 className="text-2xl font-bold text-ink">예약 관리</h1>
           <p className="mt-1 text-sm text-muted">
             총 {inquiries.length}건 · 신규 {counts.new ?? 0} · 확정{' '}
             {counts.confirmed ?? 0} · 완료 {counts.done ?? 0}
@@ -63,6 +64,7 @@ export default async function AdminDashboard() {
                 <th className="px-4 py-3 font-medium">인원</th>
                 <th className="px-4 py-3 font-medium">메시지</th>
                 <th className="px-4 py-3 font-medium">상태</th>
+                <th className="px-4 py-3 font-medium text-right">관리</th>
               </tr>
             </thead>
             <tbody>
@@ -83,6 +85,9 @@ export default async function AdminDashboard() {
                   </td>
                   <td className="px-4 py-3">
                     <StatusControl id={q.id} status={q.status as InquiryStatus} />
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-right">
+                    <DeleteInquiryButton id={q.id} name={q.name} />
                   </td>
                 </tr>
               ))}

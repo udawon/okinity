@@ -25,4 +25,5 @@ export interface InquiryStore {
   create(input: NewInquiry): Promise<Inquiry>;
   list(): Promise<Inquiry[]>;
   updateStatus(id: string, status: InquiryStatus): Promise<boolean>;
+  delete(id: string): Promise<boolean>;
 }

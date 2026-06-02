@@ -51,5 +51,13 @@ export const jsonStore: InquiryStore = {
     rows[idx].status = status;
     await writeAll(rows);
     return true;
+  },
+
+  async delete(id: string): Promise<boolean> {
+    const rows = await readAll();
+    const next = rows.filter((r) => r.id !== id);
+    if (next.length === rows.length) return false;
+    await writeAll(next);
+    return true;
   }
 };

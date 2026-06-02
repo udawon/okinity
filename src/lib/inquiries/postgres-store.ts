@@ -79,5 +79,11 @@ export const postgresStore: InquiryStore = {
       UPDATE inquiries SET status = ${status} WHERE id = ${id}
     `;
     return (rowCount ?? 0) > 0;
+  },
+
+  async delete(id: string): Promise<boolean> {
+    await ensureTable();
+    const { rowCount } = await sql`DELETE FROM inquiries WHERE id = ${id}`;
+    return (rowCount ?? 0) > 0;
   }
 };
