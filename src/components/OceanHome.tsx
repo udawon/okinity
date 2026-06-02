@@ -6,7 +6,7 @@ import {
   useReducedMotion,
   useScroll,
   useTransform,
-  type MotionValue
+  useMotionValue
 } from 'framer-motion';
 import { Link } from '@/i18n/routing';
 import { type BlogPost } from '@/lib/blog';
@@ -107,8 +107,33 @@ function R({
    시네마틱 배경 — 스크롤 깊이에 따라 수면→심해로 색이 가라앉음.
    고정(fixed) 레이어. 상속된 OceanBackground(-z-10) 위, 본문 아래.
    ──────────────────────────────────────────────────────────── */
-function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
+function CinematicBackground() {
   const reduce = useReducedMotion();
+  // 스크롤 진행도를 직접 계산(scrollY ÷ 최대스크롤, 0~1 clamp) → 단조 증가 보장.
+  // (framer useScroll()이 본 레이아웃에서 비단조로 동작 — 최하단에서 progress가 0으로 되돌아가
+  //  배경이 다시 밝아지는 버그가 있어, 신뢰 가능한 자체 계산으로 대체.)
+  const progress = useMotionValue(0);
+  useEffect(() => {
+    if (reduce) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      progress.set(max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [reduce, progress]);
+
   // 깊이 단계별 레이어 — "쌓고 유지"(차오르면 0으로 빠지지 않음)해 위→아래 단조 하강.
   // 수면(밝음)이 사라지며 베이스(밝은 바다)가 드러나고, 그 위로 중층→심해가 차례로 덮어 점점 깊어진다.
   const surfaceOpacity = useTransform(progress, [0, 0.32], [1, 0]);
@@ -846,10 +871,9 @@ export default function OceanHome({
   schedule: ScheduleData;
   media?: HomeMedia;
 }) {
-  const { scrollYProgress } = useScroll();
   return (
     <div className="relative text-white">
-      <CinematicBackground progress={scrollYProgress} />
+      <CinematicBackground />
       <Particles />
 
       <Hero media={media?.hero} text={media?.heroText} />
