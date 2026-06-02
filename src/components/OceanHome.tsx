@@ -853,9 +853,9 @@ export default function OceanHome({
 
       <Hero media={media?.hero} text={media?.heroText} />
       <WaveDivider />
-      <BlogSection posts={posts} locale={locale} />
       <ActivitiesSection tourImages={media?.tours} />
       <AssuranceSection />
+      <BlogSection posts={posts} locale={locale} />
       <GallerySection images={media?.gallery} />
       <Testimonials />
       <WaveDivider flip />
