@@ -18,6 +18,8 @@ export interface Inquiry extends NewInquiry {
   id: string;
   createdAt: string; // ISO
   status: InquiryStatus;
+  /** 운영자 내부 메모(통화 결과·특이사항). 고객에게 노출되지 않음. */
+  note?: string;
 }
 
 /** 저장소 어댑터 인터페이스. JSON/Postgres가 동일 계약을 구현한다. */
@@ -25,5 +27,6 @@ export interface InquiryStore {
   create(input: NewInquiry): Promise<Inquiry>;
   list(): Promise<Inquiry[]>;
   updateStatus(id: string, status: InquiryStatus): Promise<boolean>;
+  updateNote(id: string, note: string): Promise<boolean>;
   delete(id: string): Promise<boolean>;
 }

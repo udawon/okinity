@@ -21,6 +21,7 @@ type Row = {
   contact: string;
   message: string | null;
   status: string;
+  note: string | null;
 };
 
 function toInquiry(r: Row): Inquiry {
@@ -33,7 +34,8 @@ function toInquiry(r: Row): Inquiry {
     name: r.name,
     contact: r.contact,
     message: r.message ?? undefined,
-    status: r.status as InquiryStatus
+    status: r.status as InquiryStatus,
+    note: r.note ?? undefined
   };
 }
 
@@ -79,6 +81,16 @@ export const supabaseStore: InquiryStore = {
       .eq('id', id)
       .select('id');
     if (error) throw new Error(`상태 변경 실패: ${error.message}`);
+    return (data?.length ?? 0) > 0;
+  },
+
+  async updateNote(id: string, note: string): Promise<boolean> {
+    const { data, error } = await client()
+      .from(TABLE)
+      .update({ note: note.trim() || null })
+      .eq('id', id)
+      .select('id');
+    if (error) throw new Error(`메모 저장 실패: ${error.message}`);
     return (data?.length ?? 0) > 0;
   },
 

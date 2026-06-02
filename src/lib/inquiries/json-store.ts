@@ -53,6 +53,15 @@ export const jsonStore: InquiryStore = {
     return true;
   },
 
+  async updateNote(id: string, note: string): Promise<boolean> {
+    const rows = await readAll();
+    const idx = rows.findIndex((r) => r.id === id);
+    if (idx === -1) return false;
+    rows[idx].note = note.trim() || undefined;
+    await writeAll(rows);
+    return true;
+  },
+
   async delete(id: string): Promise<boolean> {
     const rows = await readAll();
     const next = rows.filter((r) => r.id !== id);

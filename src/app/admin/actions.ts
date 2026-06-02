@@ -68,6 +68,14 @@ export async function updateInquiryStatus(
   revalidatePath('/admin');
 }
 
+export async function updateInquiryNote(id: string, note: string): Promise<void> {
+  await requireAdmin();
+  if (note.length > 2000) throw new Error('note too long');
+  const store = await getInquiryStore();
+  await store.updateNote(id, note);
+  revalidatePath('/admin');
+}
+
 export async function deleteInquiry(id: string): Promise<void> {
   // 서버액션은 외부에서 직접 호출 가능하므로 세션을 재검증한다(미들웨어 외 2차 방어).
   await requireAdmin();

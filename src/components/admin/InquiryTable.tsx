@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import StatusControl from './StatusControl';
 import DeleteInquiryButton from './DeleteInquiryButton';
+import MemoCell from './MemoCell';
 import type { Inquiry, InquiryStatus } from '@/lib/inquiries/types';
 
 /** 접수 시각은 운영지(오키나와) 기준 JST로 고정 표기 → 서버/클라 일치 + 현지 정확. */
@@ -104,7 +105,7 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
         </p>
       ) : (
         <div className="mt-4 overflow-x-auto rounded-card border border-line bg-surface">
-          <table className="w-full min-w-[760px] text-left text-sm">
+          <table className="w-full min-w-[900px] text-left text-sm">
             <thead className="border-b border-line text-muted">
               <tr>
                 <th className="px-4 py-3 font-medium">접수(JST)</th>
@@ -114,6 +115,7 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
                 <th className="px-4 py-3 font-medium">희망일</th>
                 <th className="px-4 py-3 font-medium">인원</th>
                 <th className="px-4 py-3 font-medium">메시지</th>
+                <th className="px-4 py-3 font-medium">메모</th>
                 <th className="px-4 py-3 font-medium">상태</th>
                 <th className="px-4 py-3 font-medium text-right">관리</th>
               </tr>
@@ -133,6 +135,9 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
                   <td className="whitespace-nowrap px-4 py-3 text-ink">{q.date ?? '-'}</td>
                   <td className="px-4 py-3 text-ink">{q.people ?? '-'}</td>
                   <td className="max-w-xs px-4 py-3 text-muted">{q.message ?? '-'}</td>
+                  <td className="px-4 py-3">
+                    <MemoCell id={q.id} note={q.note} />
+                  </td>
                   <td className="px-4 py-3">
                     <StatusControl id={q.id} status={q.status} />
                   </td>

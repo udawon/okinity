@@ -21,9 +21,12 @@ async function ensureTable(): Promise<void> {
       name        TEXT NOT NULL,
       contact     TEXT NOT NULL,
       message     TEXT,
-      status      TEXT NOT NULL DEFAULT 'new'
+      status      TEXT NOT NULL DEFAULT 'new',
+      note        TEXT
     )
   `;
+  // 기존 테이블 호환: note 컬럼이 없으면 추가
+  await sql`ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS note TEXT`;
   initialized = true;
 }
 
@@ -37,6 +40,7 @@ type Row = {
   contact: string;
   message: string | null;
   status: string;
+  note: string | null;
 };
 
 function toInquiry(r: Row): Inquiry {
@@ -49,7 +53,8 @@ function toInquiry(r: Row): Inquiry {
     name: r.name,
     contact: r.contact,
     message: r.message ?? undefined,
-    status: r.status as InquiryStatus
+    status: r.status as InquiryStatus,
+    note: r.note ?? undefined
   };
 }
 
@@ -77,6 +82,14 @@ export const postgresStore: InquiryStore = {
     await ensureTable();
     const { rowCount } = await sql`
       UPDATE inquiries SET status = ${status} WHERE id = ${id}
+    `;
+    return (rowCount ?? 0) > 0;
+  },
+
+  async updateNote(id: string, note: string): Promise<boolean> {
+    await ensureTable();
+    const { rowCount } = await sql`
+      UPDATE inquiries SET note = ${note.trim() || null} WHERE id = ${id}
     `;
     return (rowCount ?? 0) > 0;
   },
