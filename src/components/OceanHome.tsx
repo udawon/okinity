@@ -124,7 +124,7 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
         style={{
           opacity: reduce ? 0.6 : surfaceOpacity,
           background:
-            'radial-gradient(125% 85% at 50% -12%, #5fd4e2 0%, #2ba6bb 30%, #137e92 52%, #0a5466 74%, #073847 100%)'
+            'radial-gradient(125% 85% at 50% -12%, #6fdcea 0%, #38b6cb 28%, #1f97ac 50%, #15808f 72%, #106575 100%)'
         }}
       />
       {/* 중층 — 맑은 청록 */}
@@ -133,7 +133,7 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
         style={{
           opacity: reduce ? 0.55 : midOpacity,
           background:
-            'radial-gradient(125% 95% at 50% 25%, #2bb4c8 0%, #16899f 42%, #105f72 72%, #0d5365 100%)'
+            'radial-gradient(125% 95% at 50% 25%, #127a8c 0%, #0f6878 42%, #0c5a6a 72%, #0a4d5d 100%)'
         }}
       />
       {/* 심해 — 깊고 어두운 청록(대비 확보) */}
@@ -142,7 +142,7 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
         style={{
           opacity: reduce ? 0 : deepOpacity,
           background:
-            'radial-gradient(100% 100% at 50% 60%, #11697d 0%, #0d5365 55%, #0a4452 100%)'
+            'radial-gradient(100% 100% at 50% 60%, #0e6173 0%, #0b5263 55%, #093f4d 100%)'
         }}
       />
       {/* 코스틱(수면 굴절 무늬) */}
