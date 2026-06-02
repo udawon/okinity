@@ -761,12 +761,12 @@ function Testimonials() {
 function ReserveSection({ schedule, locale }: { schedule: ScheduleData; locale: string }) {
   return (
     <section className="relative overflow-hidden py-28 sm:py-32">
-      {/* 집중 글로우 */}
+      {/* 집중 글로우 — 가장 깊은 구간이라 아주 미세하게만(단조 하강 유지) */}
       <div
         className="pointer-events-none absolute left-1/2 top-0 h-[120%] w-[120%] -translate-x-1/2"
         style={{
           background:
-            'radial-gradient(50% 50% at 50% 30%, rgba(34,211,238,0.16) 0%, transparent 70%)'
+            'radial-gradient(50% 50% at 50% 30%, rgba(34,211,238,0.05) 0%, transparent 70%)'
         }}
         aria-hidden
       />
