@@ -116,8 +116,8 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
 
   return (
     <div className="pointer-events-none fixed inset-0" style={{ zIndex: -5 }} aria-hidden>
-      {/* 베이스(항상 깔리는 심해색 — 밝은 트로피컬 틸로 리프트) */}
-      <div className="absolute inset-0 bg-[#07333f]" />
+      {/* 베이스(항상 깔리는 색 — 심해 대신 밝은 바다 틸) */}
+      <div className="absolute inset-0 bg-[#0e5a6b]" />
       {/* 수면 — 햇살 비치는 밝은 터콰이즈 */}
       <motion.div
         className="absolute inset-0"
@@ -133,7 +133,7 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
         style={{
           opacity: reduce ? 0.55 : midOpacity,
           background:
-            'radial-gradient(125% 95% at 50% 25%, #2bb4c8 0%, #128097 42%, #0d5365 72%, #0a4452 100%)'
+            'radial-gradient(125% 95% at 50% 25%, #2bb4c8 0%, #16899f 42%, #105f72 72%, #0d5365 100%)'
         }}
       />
       {/* 심해 — 깊고 어두운 청록(대비 확보) */}
@@ -142,7 +142,7 @@ function CinematicBackground({ progress }: { progress: MotionValue<number> }) {
         style={{
           opacity: reduce ? 0 : deepOpacity,
           background:
-            'radial-gradient(100% 100% at 50% 60%, #0c5364 0%, #093f4d 55%, #06303c 100%)'
+            'radial-gradient(100% 100% at 50% 60%, #11697d 0%, #0d5365 55%, #0a4452 100%)'
         }}
       />
       {/* 코스틱(수면 굴절 무늬) */}
