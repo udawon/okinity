@@ -89,7 +89,7 @@ export default async function AboutPage({
             <div className="flex flex-col gap-7 sm:flex-row sm:items-start sm:gap-8">
               {about.instructorPhoto && (
                 <div
-                  className="aspect-square w-48 shrink-0 overflow-hidden rounded-card border border-white/10 bg-cover bg-center shadow-[0_18px_40px_-20px_rgba(0,0,0,0.65)] sm:w-72"
+                  className="aspect-[3/4] w-48 shrink-0 overflow-hidden rounded-card border border-white/10 bg-cover bg-center shadow-[0_18px_40px_-20px_rgba(0,0,0,0.65)] sm:w-72"
                   style={{ backgroundImage: `url(${about.instructorPhoto})` }}
                   role="img"
                   aria-label={about.instructorName}
