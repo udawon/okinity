@@ -3,15 +3,18 @@ import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import { ACTIVITIES } from '@/components/ocean-home-data';
 import { parseTourDetail } from '@/lib/tour';
+import { parseTourPrices } from '@/lib/tour-pricing';
 import AdminShell from '@/components/admin/AdminShell';
+import TourPricingForm from '@/components/admin/TourPricingForm';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminToursPage() {
   const enabled = isSupabaseEnabled();
-  // 모든 투어 상세를 한 번에 조회해 공개 여부 표시
+  // 모든 투어 상세 + 단가를 한 번에 조회
   const keys = ACTIVITIES.flatMap((a) => a.tours.map((t) => CONTENT_KEYS.tour(t.slug)));
-  const map = enabled ? await getSiteContentMap(keys) : {};
+  const map = enabled ? await getSiteContentMap([...keys, CONTENT_KEYS.tourPrices]) : {};
+  const prices = parseTourPrices(map[CONTENT_KEYS.tourPrices]);
 
   return (
     <AdminShell title="투어 상세">
@@ -19,6 +22,10 @@ export default async function AdminToursPage() {
         투어 목록은 고정되어 있고, 각 투어를 눌러 상세 내용을 등록합니다. 공개된 상세는{' '}
         <code>/tours/&#123;slug&#125;</code> 페이지에 표시됩니다.
       </p>
+
+      <div className="mb-8">
+        <TourPricingForm defaults={prices} disabled={!enabled} />
+      </div>
 
       <div className="space-y-8">
         {ACTIVITIES.map((a) => (

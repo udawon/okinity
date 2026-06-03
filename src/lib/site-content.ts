@@ -24,6 +24,8 @@ export const CONTENT_KEYS = {
   tour: (slug: string) => `tour:${slug}`,
   /** 소개(About) 페이지 콘텐츠. value: AboutContent(lib/about). */
   about: 'about',
+  /** 투어별 기준 단가(운영 보드 예상매출용, 고객 비노출). value: { prices: { [slug]: number } } */
+  tourPrices: 'tour_prices',
   product: (slug: string) => `product:${slug}`
 } as const;
 
