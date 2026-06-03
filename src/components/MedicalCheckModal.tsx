@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-/** 안전 체크리스트 — 그룹으로 묶어 긴 목록의 가독성 확보. */
+/** 안전 체크리스트 — 6개 그룹을 아코디언으로. 펼쳐 읽고 그룹 단위로 '해당 없음' 확인. */
 const GROUPS: { title: string; items: string[] }[] = [
   {
     title: '다이빙 후 비행',
@@ -56,7 +56,7 @@ const GROUPS: { title: string; items: string[] }[] = [
   }
 ];
 
-const TOTAL = GROUPS.reduce((n, g) => n + g.items.length, 0);
+const TOTAL = GROUPS.length;
 
 export default function MedicalCheckModal({
   onCancel,
@@ -67,15 +67,24 @@ export default function MedicalCheckModal({
   onConfirm: () => void;
   submitting: boolean;
 }) {
-  const [checked, setChecked] = useState<Set<string>>(new Set());
-  const toggle = (id: string) =>
-    setChecked((s) => {
+  const [openSet, setOpenSet] = useState<Set<number>>(new Set());
+  const [confirmed, setConfirmed] = useState<Set<number>>(new Set());
+
+  const toggleOpen = (i: number) =>
+    setOpenSet((s) => {
       const n = new Set(s);
-      n.has(id) ? n.delete(id) : n.add(id);
+      n.has(i) ? n.delete(i) : n.add(i);
       return n;
     });
-  const allChecked = checked.size === TOTAL;
-  const pct = Math.round((checked.size / TOTAL) * 100);
+  const toggleConfirm = (i: number) =>
+    setConfirmed((s) => {
+      const n = new Set(s);
+      n.has(i) ? n.delete(i) : n.add(i);
+      return n;
+    });
+
+  const allConfirmed = confirmed.size === TOTAL;
+  const pct = Math.round((confirmed.size / TOTAL) * 100);
 
   return (
     <div className="fixed inset-0 z-[60] flex items-stretch justify-center overflow-y-auto bg-black/60 sm:items-center sm:p-4">
@@ -110,56 +119,102 @@ export default function MedicalCheckModal({
               고객님께 있으며 <strong>예약금은 환불되지 않습니다</strong>(OKINITY 귀책 사유 없음).
             </p>
             <p className="mt-2 text-amber-200/80">
-              모든 항목을 읽고 ‘해당 없음’을 확인(체크)해 주세요.
+              각 영역을 <strong>펼쳐 내용을 확인</strong>한 뒤, 해당사항이 없으면 ‘해당 없음’에
+              체크해 주세요.
             </p>
           </div>
 
-          {GROUPS.map((g, gi) => (
-            <div key={gi} className="mt-5">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/45">
-                {g.title}
-              </p>
-              <div className="space-y-2">
-                {g.items.map((item, ii) => {
-                  const id = `${gi}-${ii}`;
-                  const on = checked.has(id);
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => toggle(id)}
-                      aria-pressed={on}
-                      className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors ${
-                        on
-                          ? 'border-[#5fd6e2]/50 bg-[#5fd6e2]/10'
-                          : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]'
-                      }`}
-                    >
+          <div className="mt-4 space-y-2">
+            {GROUPS.map((g, gi) => {
+              const open = openSet.has(gi);
+              const conf = confirmed.has(gi);
+              return (
+                <div
+                  key={gi}
+                  className={`overflow-hidden rounded-lg border ${
+                    conf ? 'border-[#5fd6e2]/40' : 'border-white/10'
+                  }`}
+                >
+                  {/* 아코디언 헤더 */}
+                  <button
+                    type="button"
+                    onClick={() => toggleOpen(gi)}
+                    aria-expanded={open}
+                    className="flex w-full items-center justify-between gap-3 bg-white/[0.03] px-4 py-3 text-left hover:bg-white/[0.05]"
+                  >
+                    <span className="flex items-center gap-2">
                       <span
-                        className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded text-[12px] font-bold ${
-                          on
-                            ? 'bg-[#5fd6e2] text-[#06202a]'
-                            : 'border border-white/30 text-transparent'
+                        className={`grid h-5 w-5 shrink-0 place-items-center rounded-full text-[11px] font-bold ${
+                          conf ? 'bg-[#5fd6e2] text-[#06202a]' : 'bg-white/10 text-white/50'
                         }`}
                       >
-                        ✓
+                        {conf ? '✓' : gi + 1}
                       </span>
-                      <span className="text-[13px] leading-relaxed text-white/85">{item}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+                      <span className="text-sm font-semibold text-white">{g.title}</span>
+                      <span className="text-[11px] text-white/40">{g.items.length}개</span>
+                    </span>
+                    <span className="flex items-center gap-2">
+                      {conf && (
+                        <span className="rounded-full bg-[#5fd6e2]/15 px-2 py-0.5 text-[11px] font-medium text-[#5fd6e2]">
+                          확인됨
+                        </span>
+                      )}
+                      <span
+                        className={`text-white/40 transition-transform ${open ? 'rotate-180' : ''}`}
+                        aria-hidden
+                      >
+                        ⌄
+                      </span>
+                    </span>
+                  </button>
+
+                  {/* 아코디언 본문 — 펼쳤을 때만 항목·체크박스 노출(접힌 상태에선 체크 불가) */}
+                  {open && (
+                    <div className="border-t border-white/10 px-4 py-3">
+                      <ul className="space-y-2 text-[13px] leading-relaxed text-white/80">
+                        {g.items.map((it, ii) => (
+                          <li key={ii} className="flex gap-2">
+                            <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-white/40" />
+                            <span>{it}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <button
+                        type="button"
+                        onClick={() => toggleConfirm(gi)}
+                        aria-pressed={conf}
+                        className={`mt-3 flex w-full items-center gap-2.5 rounded-lg border p-3 text-left transition-colors ${
+                          conf
+                            ? 'border-[#5fd6e2]/50 bg-[#5fd6e2]/10'
+                            : 'border-white/15 bg-white/[0.03] hover:bg-white/[0.06]'
+                        }`}
+                      >
+                        <span
+                          className={`grid h-5 w-5 shrink-0 place-items-center rounded text-[12px] font-bold ${
+                            conf ? 'bg-[#5fd6e2] text-[#06202a]' : 'border border-white/30 text-transparent'
+                          }`}
+                        >
+                          ✓
+                        </span>
+                        <span className="text-sm font-medium text-white">
+                          위 항목에 모두 해당사항이 없습니다
+                        </span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* 푸터(고정) */}
         <div className="border-t border-white/10 px-5 py-4">
           <div className="mb-2 flex items-center justify-between text-xs">
             <span className="text-white/60">
-              확인 <strong className="text-white">{checked.size}</strong> / {TOTAL}
+              확인 <strong className="text-white">{confirmed.size}</strong> / {TOTAL} 영역
             </span>
-            {!allChecked && <span className="text-amber-300">모든 항목을 확인해 주세요</span>}
+            {!allConfirmed && <span className="text-amber-300">모든 영역을 펼쳐 확인해 주세요</span>}
           </div>
           <div className="mb-3 h-1.5 overflow-hidden rounded-full bg-white/10">
             <div
@@ -178,7 +233,7 @@ export default function MedicalCheckModal({
             <button
               type="button"
               onClick={onConfirm}
-              disabled={!allChecked || submitting}
+              disabled={!allConfirmed || submitting}
               className="flex-1 rounded-full bg-amber-400 px-6 py-3 text-sm font-bold text-[#06202a] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-colors hover:bg-amber-300 disabled:opacity-40 disabled:shadow-none"
             >
               {submitting ? '보내는 중…' : '예약 문의 보내기'}
