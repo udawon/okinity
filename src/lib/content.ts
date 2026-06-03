@@ -196,27 +196,21 @@ export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
 
 /**
  * 확정(confirmed)된 예약을 공개 일정표 항목으로 변환한다(고객 정보 제외).
- * - 날짜에 확정 1건  → '예약됨'(투어명)
- * - 날짜에 확정 2건+ → '예약 많음'(자동, "예약 N건")  ← 수동 지정 아님
+ * 예약 건마다 한 줄씩 '예약됨'으로 노출하고, 세부 프로그램은 빼고 투어 종류(대분류)만 표시.
+ * (2건이면 2줄, 3건이면 3줄 — 집계하지 않음.)
  */
 export function confirmedBookingsToSchedule(
   bookings: { date?: string; product?: string; status: string }[]
 ): ScheduleItem[] {
-  const byDate = new Map<string, string[]>();
+  const out: ScheduleItem[] = [];
   for (const b of bookings) {
     if (b.status !== 'confirmed') continue;
     const date =
       typeof b.date === 'string' && /^\d{4}-\d{2}-\d{2}/.test(b.date) ? b.date.slice(0, 10) : null;
     if (!date) continue;
-    (byDate.get(date) ?? byDate.set(date, []).get(date)!).push((b.product || '예약').trim());
-  }
-  const out: ScheduleItem[] = [];
-  for (const [date, programs] of byDate) {
-    if (programs.length >= 2) {
-      out.push({ date, program: `예약 ${programs.length}건`, status: 'full' }); // 예약 많음(자동)
-    } else {
-      out.push({ date, program: programs[0], status: 'booked' }); // 예약됨
-    }
+    const product = (b.product || '예약').trim();
+    const category = product.split(' · ')[0].trim() || '예약'; // 대분류만
+    out.push({ date, program: category, status: 'booked' });
   }
   return out;
 }

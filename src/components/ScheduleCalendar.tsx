@@ -157,9 +157,8 @@ export default function ScheduleCalendar({
                   <span
                     key={j}
                     className="inline-flex w-fit max-w-full items-center gap-1 truncate rounded-md border border-rose-300/40 bg-rose-400/15 px-1.5 py-0.5 text-[10px] font-bold text-rose-100 sm:text-[11px]"
-                    title={e.program}
                   >
-                    🚫 {e.program}
+                    🚫 휴무
                   </span>
                 ) : (
                   <div key={j} className="flex items-center gap-1">
@@ -247,7 +246,9 @@ export default function ScheduleCalendar({
             return (
               <li key={i} className="flex items-center justify-between gap-4 py-3 text-sm">
                 <span className="w-28 shrink-0 text-white/55">{label}</span>
-                <span className="flex-1 text-white/90">{e.program}</span>
+                <span className="flex-1 text-white/90">
+                  {e.status === 'closed' ? '휴무' : e.program}
+                </span>
                 <span className={`shrink-0 font-medium ${STATUS[e.status].text}`}>
                   {statusLabel[e.status]}
                 </span>
