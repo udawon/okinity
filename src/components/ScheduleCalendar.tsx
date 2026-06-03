@@ -8,7 +8,7 @@ type Status = ScheduleItem['status'];
 const STATUS: Record<Status, { text: string; dot: string }> = {
   available: { text: 'text-[#5fd6e2]', dot: 'bg-[#5fd6e2]' },
   full: { text: 'text-[#f2c879]', dot: 'bg-[#f2c879]' },
-  closed: { text: 'text-white/40 line-through', dot: 'bg-white/30' },
+  closed: { text: 'text-rose-200', dot: 'bg-rose-300/80' },
   booked: { text: 'text-[#86efac]', dot: 'bg-[#4ade80]' }
 };
 
@@ -151,23 +151,35 @@ export default function ScheduleCalendar({
 
           const eventList = evs.length > 0 && (
             <div className="mt-1 space-y-1">
-              {evs.map((e, j) => (
-                <div key={j} className="flex items-center gap-1">
-                  <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS[e.status].dot}`} />
+              {evs.map((e, j) =>
+                e.status === 'closed' ? (
+                  // 휴무 — 취소줄 대신 눈에 띄는 배지로 명확히 표시
                   <span
-                    className={`truncate text-[10px] leading-tight sm:text-[11px] ${STATUS[e.status].text}`}
+                    key={j}
+                    className="inline-flex w-fit max-w-full items-center gap-1 truncate rounded-md border border-rose-300/40 bg-rose-400/15 px-1.5 py-0.5 text-[10px] font-bold text-rose-100 sm:text-[11px]"
                     title={e.program}
                   >
-                    {e.program}
+                    🚫 {e.program}
                   </span>
-                </div>
-              ))}
+                ) : (
+                  <div key={j} className="flex items-center gap-1">
+                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS[e.status].dot}`} />
+                    <span
+                      className={`truncate text-[10px] leading-tight sm:text-[11px] ${STATUS[e.status].text}`}
+                      title={e.program}
+                    >
+                      {e.program}
+                    </span>
+                  </div>
+                )
+              )}
             </div>
           );
 
           // 모든 칸을 상단 정렬(flex-col) — button/div 혼용 시 세로 정렬이 달라지는 문제 방지.
+          // 휴무는 셀 배경도 붉은 톤으로 구분해 한눈에 보이게.
           const base = `flex min-h-[72px] flex-col p-1.5 text-left sm:min-h-[96px] sm:p-2 ${
-            evs.length ? 'bg-[#0e2c3a]/80' : 'bg-[#06151d]/70'
+            hasClosed ? 'bg-rose-950/30' : evs.length ? 'bg-[#0e2c3a]/80' : 'bg-[#06151d]/70'
           }`;
 
           // 예약 가능(휴무·과거 제외) → 클릭. 빈 날짜는 '+예약' 힌트, 프로그램 날짜는 일정 표시 + 호버 강조.
