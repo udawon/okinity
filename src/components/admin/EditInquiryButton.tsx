@@ -2,7 +2,19 @@
 
 import { useState, useTransition, type FormEvent } from 'react';
 import { updateInquiry } from '@/app/admin/actions';
+import { ACTIVITIES } from '@/components/ocean-home-data';
 import type { Inquiry } from '@/lib/inquiries/types';
+
+const TIME_OPTS = ['오전', '오후', '종일', '시간 무관'];
+
+/** 기존 product 문자열("대분류 · 세부") → 대분류 id + 세부 slug 역매핑. */
+function parseProduct(product?: string): { catId: string; slug: string } {
+  if (!product) return { catId: '', slug: '' };
+  const a = ACTIVITIES.find((x) => product.startsWith(x.title));
+  const namePart = product.includes(' · ') ? product.split(' · ').slice(1).join(' · ') : '';
+  const tour = a?.tours.find((t) => t.name === namePart);
+  return { catId: a?.id ?? '', slug: tour?.slug ?? '' };
+}
 
 const inputCls =
   'mt-1 w-full rounded-button border border-line bg-bg px-3 py-2 text-sm text-ink focus:border-brand focus:outline-none';
@@ -16,13 +28,24 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
 
+  const init = parseProduct(inquiry.product);
+  const [catId, setCatId] = useState(init.catId);
+  const [slug, setSlug] = useState(init.slug);
+  const cat = ACTIVITIES.find((a) => a.id === catId);
+
+  // 기존 시간값이 표준 옵션에 없으면(직접 입력 등) 보존용으로 추가
+  const timeOptions =
+    inquiry.time && !TIME_OPTS.includes(inquiry.time) ? [inquiry.time, ...TIME_OPTS] : TIME_OPTS;
+
   function save(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
+    const tourName = cat?.tours.find((t) => t.slug === slug)?.name ?? '';
+    const product = cat ? `${cat.title}${tourName ? ' · ' + tourName : ''}` : '';
     start(async () => {
       try {
         await updateInquiry(inquiry.id, {
-          product: fd.get('product'),
+          product,
           date: fd.get('date'),
           time: fd.get('time'),
           people: fd.get('people'),
@@ -64,16 +87,45 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
 
             <div className="mt-4 space-y-3">
               <div>
-                <label htmlFor="ei-product" className={labelCls}>
-                  투어
+                <label htmlFor="ei-cat" className={labelCls}>
+                  투어 종류
                 </label>
-                <input
-                  id="ei-product"
-                  name="product"
-                  type="text"
-                  defaultValue={inquiry.product ?? ''}
+                <select
+                  id="ei-cat"
+                  value={catId}
+                  onChange={(e) => {
+                    setCatId(e.target.value);
+                    setSlug('');
+                  }}
                   className={inputCls}
-                />
+                >
+                  <option value="">선택 안 함</option>
+                  {ACTIVITIES.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="ei-tour" className={labelCls}>
+                  세부 프로그램
+                </label>
+                <select
+                  id="ei-tour"
+                  value={slug}
+                  disabled={!cat}
+                  onChange={(e) => setSlug(e.target.value)}
+                  className={`${inputCls} disabled:opacity-50`}
+                >
+                  <option value="">{cat ? '선택 안 함' : '먼저 투어 종류 선택'}</option>
+                  {cat?.tours.map((t) => (
+                    <option key={t.slug} value={t.slug}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -91,16 +143,21 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
                 </div>
                 <div>
                   <label htmlFor="ei-time" className={labelCls}>
-                    시간대
+                    희망 시간대
                   </label>
-                  <input
+                  <select
                     id="ei-time"
                     name="time"
-                    type="text"
                     defaultValue={inquiry.time ?? ''}
-                    placeholder="예: 오전, 14:00"
                     className={inputCls}
-                  />
+                  >
+                    <option value="">선택 안 함</option>
+                    {timeOptions.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
