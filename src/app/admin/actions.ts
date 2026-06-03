@@ -79,6 +79,16 @@ export async function updateInquiryNote(id: string, note: string): Promise<void>
   revalidatePath('/admin/board');
 }
 
+export async function updateScheduledTime(id: string, time: string): Promise<void> {
+  await requireAdmin();
+  // HH:MM 또는 빈 문자열만 허용
+  if (time && !/^([01]?\d|2[0-3]):[0-5]\d$/.test(time)) throw new Error('invalid time');
+  const store = await getInquiryStore();
+  await store.updateScheduledTime(id, time);
+  revalidatePath('/admin');
+  revalidatePath('/admin/board');
+}
+
 export async function updateInquiry(id: string, input: unknown): Promise<void> {
   await requireAdmin();
   const parsed = NewInquirySchema.safeParse(input);

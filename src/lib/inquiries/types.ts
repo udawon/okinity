@@ -23,6 +23,8 @@ export interface Inquiry extends NewInquiry {
   status: InquiryStatus;
   /** 운영자 내부 메모(통화 결과·특이사항). 고객에게 노출되지 않음. */
   note?: string;
+  /** 운영자가 배정한 실제 시각(HH:MM). 방문자 희망 time과 별개. 운영 보드 타임라인 배치용. */
+  scheduledTime?: string;
 }
 
 /** 저장소 어댑터 인터페이스. JSON/Postgres가 동일 계약을 구현한다. */
@@ -31,6 +33,8 @@ export interface InquiryStore {
   list(): Promise<Inquiry[]>;
   updateStatus(id: string, status: InquiryStatus): Promise<boolean>;
   updateNote(id: string, note: string): Promise<boolean>;
+  /** 운영자 배정 시각(HH:MM) 설정. 빈 값이면 미배정으로 되돌림. */
+  updateScheduledTime(id: string, time: string): Promise<boolean>;
   /** 예약 내용 수정(투어·날짜·시간·인원·이름·연락처·메시지). 상태·메모·접수시각은 유지. */
   update(id: string, input: NewInquiry): Promise<boolean>;
   delete(id: string): Promise<boolean>;

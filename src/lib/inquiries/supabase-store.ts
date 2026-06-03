@@ -23,6 +23,7 @@ type Row = {
   message: string | null;
   status: string;
   note: string | null;
+  scheduled_time: string | null;
 };
 
 function toInquiry(r: Row): Inquiry {
@@ -37,7 +38,8 @@ function toInquiry(r: Row): Inquiry {
     contact: r.contact,
     message: r.message ?? undefined,
     status: r.status as InquiryStatus,
-    note: r.note ?? undefined
+    note: r.note ?? undefined,
+    scheduledTime: r.scheduled_time ?? undefined
   };
 }
 
@@ -84,6 +86,16 @@ export const supabaseStore: InquiryStore = {
       .eq('id', id)
       .select('id');
     if (error) throw new Error(`상태 변경 실패: ${error.message}`);
+    return (data?.length ?? 0) > 0;
+  },
+
+  async updateScheduledTime(id: string, time: string): Promise<boolean> {
+    const { data, error } = await client()
+      .from(TABLE)
+      .update({ scheduled_time: time.trim() || null })
+      .eq('id', id)
+      .select('id');
+    if (error) throw new Error(`배정 시각 저장 실패: ${error.message}`);
     return (data?.length ?? 0) > 0;
   },
 

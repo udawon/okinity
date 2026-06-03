@@ -3,9 +3,8 @@
 import { useMemo, useState } from 'react';
 import StatusControl from './StatusControl';
 import EditInquiryButton from './EditInquiryButton';
-import { ACTIVITIES } from '@/components/ocean-home-data';
-import { TOUR_CATALOG } from '@/lib/tour';
-import { estimateRevenue, type TourPrices } from '@/lib/tour-pricing';
+import DayTimeline from './DayTimeline';
+import { estimateRevenue, tourMeta, type TourPrices } from '@/lib/tour-pricing';
 import type { Inquiry, InquiryStatus } from '@/lib/inquiries/types';
 
 const WON = (n: number) => '₩' + n.toLocaleString('ko-KR');
@@ -29,15 +28,6 @@ function weekStart(todayKey: string, offset: number): string {
 }
 
 const WD = ['월', '화', '수', '목', '금', '토', '일'];
-
-/** product 표시문자열 → 대분류 색 + 단가 계산용 slug. */
-function tourMeta(product?: string): { accent: string; slug: string | null } {
-  if (!product) return { accent: '#64748b', slug: null };
-  const a = ACTIVITIES.find((x) => product.startsWith(x.title));
-  const namePart = product.includes(' · ') ? product.split(' · ').slice(1).join(' · ') : '';
-  const entry = TOUR_CATALOG.find((t) => t.name === namePart);
-  return { accent: a?.accent ?? '#64748b', slug: entry?.slug ?? null };
-}
 
 function Card({ q, prices }: { q: Inquiry; prices: TourPrices }) {
   const { accent, slug } = tourMeta(q.product);
@@ -74,6 +64,7 @@ export default function WeekBoard({
   todayKey: string;
 }) {
   const [offset, setOffset] = useState(0);
+  const [openDay, setOpenDay] = useState<string | null>(null);
 
   // 날짜(YYYY-MM-DD)별 그룹
   const byDate = useMemo(() => {
@@ -137,14 +128,20 @@ export default function WeekBoard({
             const isToday = key === todayKey;
             return (
               <div key={key} className="rounded-card border border-line bg-bg/40">
-                <div
-                  className={`rounded-t-card border-b border-line px-2.5 py-2 ${
+                <button
+                  type="button"
+                  onClick={() => setOpenDay(key)}
+                  title="하루 상세(시간 배치) 열기"
+                  className={`block w-full rounded-t-card border-b border-line px-2.5 py-2 text-left transition-colors hover:bg-brand-light ${
                     isToday ? 'bg-brand-light' : ''
                   }`}
                 >
                   <p className={`text-xs ${i >= 5 ? 'text-rose-500' : 'text-muted'}`}>{WD[i]}</p>
-                  <p className="text-sm font-semibold text-ink">{key.slice(5).replace('-', '/')}</p>
-                </div>
+                  <p className="text-sm font-semibold text-ink">
+                    {key.slice(5).replace('-', '/')}
+                    {items.length > 0 && <span className="ml-1 text-xs text-muted">· {items.length}</span>}
+                  </p>
+                </button>
                 <div className="space-y-2 p-2">
                   {items.length === 0 ? (
                     <p className="py-4 text-center text-[11px] text-muted/60">—</p>
@@ -168,6 +165,15 @@ export default function WeekBoard({
             ))}
           </div>
         </div>
+      )}
+
+      {openDay && (
+        <DayTimeline
+          dateKey={openDay}
+          items={byDate.get(openDay) ?? []}
+          prices={prices}
+          onClose={() => setOpenDay(null)}
+        />
       )}
     </div>
   );

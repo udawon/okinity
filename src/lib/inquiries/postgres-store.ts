@@ -29,6 +29,7 @@ async function ensureTable(): Promise<void> {
   // 기존 테이블 호환: 없으면 컬럼 추가
   await sql`ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS note TEXT`;
   await sql`ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS time TEXT`;
+  await sql`ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS scheduled_time TEXT`;
   initialized = true;
 }
 
@@ -44,6 +45,7 @@ type Row = {
   message: string | null;
   status: string;
   note: string | null;
+  scheduled_time: string | null;
 };
 
 function toInquiry(r: Row): Inquiry {
@@ -58,7 +60,8 @@ function toInquiry(r: Row): Inquiry {
     contact: r.contact,
     message: r.message ?? undefined,
     status: r.status as InquiryStatus,
-    note: r.note ?? undefined
+    note: r.note ?? undefined,
+    scheduledTime: r.scheduled_time ?? undefined
   };
 }
 
@@ -86,6 +89,14 @@ export const postgresStore: InquiryStore = {
     await ensureTable();
     const { rowCount } = await sql`
       UPDATE inquiries SET status = ${status} WHERE id = ${id}
+    `;
+    return (rowCount ?? 0) > 0;
+  },
+
+  async updateScheduledTime(id: string, time: string): Promise<boolean> {
+    await ensureTable();
+    const { rowCount } = await sql`
+      UPDATE inquiries SET scheduled_time = ${time.trim() || null} WHERE id = ${id}
     `;
     return (rowCount ?? 0) > 0;
   },

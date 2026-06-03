@@ -53,6 +53,15 @@ export const jsonStore: InquiryStore = {
     return true;
   },
 
+  async updateScheduledTime(id: string, time: string): Promise<boolean> {
+    const rows = await readAll();
+    const idx = rows.findIndex((r) => r.id === id);
+    if (idx === -1) return false;
+    rows[idx].scheduledTime = time.trim() || undefined;
+    await writeAll(rows);
+    return true;
+  },
+
   async update(id: string, input: NewInquiry): Promise<boolean> {
     const rows = await readAll();
     const idx = rows.findIndex((r) => r.id === id);
