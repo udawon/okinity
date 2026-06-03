@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import StatusControl from './StatusControl';
+import EditInquiryButton from './EditInquiryButton';
 import { ACTIVITIES } from '@/components/ocean-home-data';
 import { TOUR_CATALOG } from '@/lib/tour';
 import { estimateRevenue, type TourPrices } from '@/lib/tour-pricing';
@@ -55,8 +56,9 @@ function Card({ q, prices }: { q: Inquiry; prices: TourPrices }) {
       </p>
       <p className="text-[11px] text-ink">{q.name}</p>
       {rev != null && <p className="mt-0.5 text-[11px] font-medium text-emerald-600">{WON(rev)} 예상</p>}
-      <div className="mt-1.5">
+      <div className="mt-1.5 flex items-center gap-1.5">
         <StatusControl id={q.id} status={q.status as InquiryStatus} />
+        <EditInquiryButton inquiry={q} />
       </div>
     </div>
   );

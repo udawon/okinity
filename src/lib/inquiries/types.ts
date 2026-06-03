@@ -31,5 +31,7 @@ export interface InquiryStore {
   list(): Promise<Inquiry[]>;
   updateStatus(id: string, status: InquiryStatus): Promise<boolean>;
   updateNote(id: string, note: string): Promise<boolean>;
+  /** 예약 내용 수정(투어·날짜·시간·인원·이름·연락처·메시지). 상태·메모·접수시각은 유지. */
+  update(id: string, input: NewInquiry): Promise<boolean>;
   delete(id: string): Promise<boolean>;
 }

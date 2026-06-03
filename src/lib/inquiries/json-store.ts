@@ -53,6 +53,24 @@ export const jsonStore: InquiryStore = {
     return true;
   },
 
+  async update(id: string, input: NewInquiry): Promise<boolean> {
+    const rows = await readAll();
+    const idx = rows.findIndex((r) => r.id === id);
+    if (idx === -1) return false;
+    rows[idx] = {
+      ...rows[idx],
+      product: input.product,
+      date: input.date,
+      time: input.time,
+      people: input.people,
+      name: input.name,
+      contact: input.contact,
+      message: input.message
+    };
+    await writeAll(rows);
+    return true;
+  },
+
   async updateNote(id: string, note: string): Promise<boolean> {
     const rows = await readAll();
     const idx = rows.findIndex((r) => r.id === id);

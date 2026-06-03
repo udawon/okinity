@@ -13,6 +13,7 @@ import {
 import {
   getInquiryStore,
   INQUIRY_STATUSES,
+  NewInquirySchema,
   type InquiryStatus
 } from '@/lib/inquiries';
 
@@ -74,6 +75,16 @@ export async function updateInquiryNote(id: string, note: string): Promise<void>
   if (note.length > 2000) throw new Error('note too long');
   const store = await getInquiryStore();
   await store.updateNote(id, note);
+  revalidatePath('/admin');
+  revalidatePath('/admin/board');
+}
+
+export async function updateInquiry(id: string, input: unknown): Promise<void> {
+  await requireAdmin();
+  const parsed = NewInquirySchema.safeParse(input);
+  if (!parsed.success) throw new Error('invalid inquiry');
+  const store = await getInquiryStore();
+  await store.update(id, parsed.data);
   revalidatePath('/admin');
   revalidatePath('/admin/board');
 }

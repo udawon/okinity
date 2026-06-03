@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import StatusControl from './StatusControl';
 import DeleteInquiryButton from './DeleteInquiryButton';
+import EditInquiryButton from './EditInquiryButton';
 import MemoCell from './MemoCell';
 import type { Inquiry, InquiryStatus } from '@/lib/inquiries/types';
 
@@ -144,7 +145,10 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
                     <StatusControl id={q.id} status={q.status} />
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
-                    <DeleteInquiryButton id={q.id} name={q.name} />
+                    <div className="flex items-center justify-end gap-1.5">
+                      <EditInquiryButton inquiry={q} />
+                      <DeleteInquiryButton id={q.id} name={q.name} />
+                    </div>
                   </td>
                 </tr>
               ))}

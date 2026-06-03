@@ -90,6 +90,18 @@ export const postgresStore: InquiryStore = {
     return (rowCount ?? 0) > 0;
   },
 
+  async update(id: string, input: NewInquiry): Promise<boolean> {
+    await ensureTable();
+    const { rowCount } = await sql`
+      UPDATE inquiries SET
+        product = ${input.product ?? null}, date = ${input.date ?? null},
+        time = ${input.time ?? null}, people = ${input.people ?? null},
+        name = ${input.name}, contact = ${input.contact}, message = ${input.message ?? null}
+      WHERE id = ${id}
+    `;
+    return (rowCount ?? 0) > 0;
+  },
+
   async updateNote(id: string, note: string): Promise<boolean> {
     await ensureTable();
     const { rowCount } = await sql`

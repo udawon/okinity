@@ -87,6 +87,24 @@ export const supabaseStore: InquiryStore = {
     return (data?.length ?? 0) > 0;
   },
 
+  async update(id: string, input: NewInquiry): Promise<boolean> {
+    const { data, error } = await client()
+      .from(TABLE)
+      .update({
+        product: input.product ?? null,
+        date: input.date ?? null,
+        time: input.time ?? null,
+        people: input.people ?? null,
+        name: input.name,
+        contact: input.contact,
+        message: input.message ?? null
+      })
+      .eq('id', id)
+      .select('id');
+    if (error) throw new Error(`예약 수정 실패: ${error.message}`);
+    return (data?.length ?? 0) > 0;
+  },
+
   async updateNote(id: string, note: string): Promise<boolean> {
     const { data, error } = await client()
       .from(TABLE)
