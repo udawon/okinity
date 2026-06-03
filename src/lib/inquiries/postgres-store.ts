@@ -22,7 +22,7 @@ async function ensureTable(): Promise<void> {
       name        TEXT NOT NULL,
       contact     TEXT NOT NULL,
       message     TEXT,
-      status      TEXT NOT NULL DEFAULT 'new',
+      status      TEXT NOT NULL DEFAULT 'tentative',
       note        TEXT
     )
   `;
@@ -70,7 +70,7 @@ export const postgresStore: InquiryStore = {
       INSERT INTO inquiries (id, product, date, time, people, name, contact, message, status)
       VALUES (${id}, ${input.product ?? null}, ${input.date ?? null}, ${input.time ?? null},
               ${input.people ?? null}, ${input.name}, ${input.contact},
-              ${input.message ?? null}, 'new')
+              ${input.message ?? null}, 'tentative')
       RETURNING *
     `;
     return toInquiry(rows[0]);

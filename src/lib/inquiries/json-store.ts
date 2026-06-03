@@ -32,7 +32,7 @@ export const jsonStore: InquiryStore = {
       ...input,
       id: randomUUID(),
       createdAt: new Date().toISOString(),
-      status: 'new'
+      status: 'tentative'
     };
     rows.unshift(inquiry);
     await writeAll(rows);

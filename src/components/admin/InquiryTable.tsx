@@ -19,7 +19,6 @@ function fmtDate(iso: string): string {
 
 const FILTERS: { key: 'all' | InquiryStatus; label: string }[] = [
   { key: 'all', label: '전체' },
-  { key: 'new', label: '신규' },
   { key: 'tentative', label: '가예약' },
   { key: 'confirmed', label: '확정' },
   { key: 'done', label: '완료' },

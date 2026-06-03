@@ -60,7 +60,7 @@ export const supabaseStore: InquiryStore = {
         name: input.name,
         contact: input.contact,
         message: input.message ?? null,
-        status: 'new'
+        status: 'tentative'
       })
       .select('*')
       .single();
