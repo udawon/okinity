@@ -24,7 +24,8 @@ export default function ReservePlanner({
   statusLabel: Record<Status, string>;
   emptyLabel: string;
 }) {
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [selected, setSelected] = useState<{ key: string; events: ScheduleItem[] } | null>(null);
+  const selectedKey = selected?.key ?? null;
 
   const dateLong = selectedKey
     ? new Intl.DateTimeFormat(locale, {
@@ -34,6 +35,12 @@ export default function ReservePlanner({
         weekday: 'long'
       }).format(new Date(selectedKey))
     : '';
+
+  // 선택한 날짜에 이미 예정된 일정(있으면) → 폼에 컨텍스트로 전달
+  const scheduled = selected?.events.map((e) => ({
+    program: e.program,
+    status: statusLabel[e.status]
+  }));
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(330px,400px)]">
@@ -46,7 +53,7 @@ export default function ReservePlanner({
           emptyLabel={emptyLabel}
           selectable
           selectedKey={selectedKey}
-          onSelectDate={(key) => setSelectedKey(key)}
+          onSelectDate={(key, events) => setSelected({ key, events })}
         />
       </div>
 
@@ -60,26 +67,27 @@ export default function ReservePlanner({
               </div>
               <p className="mt-5 font-serif text-xl text-white">날짜를 선택하세요</p>
               <p className="mt-2 max-w-[16rem] text-sm leading-relaxed text-white/60">
-                왼쪽 달력에서 <span className="text-[#5fd6e2]">비어 있는 날짜</span>를 누르면 여기에서
-                바로 예약을 시작할 수 있어요.
+                왼쪽 달력에서 <span className="text-[#5fd6e2]">휴무를 제외한 날짜</span>를 누르면
+                여기에서 바로 예약을 시작할 수 있어요.
               </p>
             </div>
           ) : (
             <ReservationForm
               key={selectedKey}
-              lockedDateKey={selectedKey}
+              lockedDateKey={selectedKey ?? undefined}
               lockedDateLabel={dateLong}
-              onReset={() => setSelectedKey(null)}
+              scheduled={scheduled}
+              onReset={() => setSelected(null)}
             />
           )}
         </div>
 
         <p className="mt-3 text-center text-xs text-white/50">
-          상품이 표시된 날짜는 마감·고정 일정입니다.{' '}
+          날짜가 정해지지 않았다면{' '}
           <Link href="/contact" className="text-[#5fd6e2] underline-offset-2 hover:underline">
             일반 문의
           </Link>
-          도 가능해요.
+          로도 보낼 수 있어요.
         </p>
       </div>
     </div>

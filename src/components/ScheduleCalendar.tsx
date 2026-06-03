@@ -95,9 +95,9 @@ export default function ScheduleCalendar({
   const navBtn =
     'flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/80 transition-colors hover:border-white/40 hover:text-white';
 
-  // 빈 날짜(상품 미등록) + 오늘 이후 → 예약 가능. 상품이 박힌 날짜는 정보 표시(클릭 불가).
+  // 휴무(closed)·과거만 예약 불가. 프로그램이 있어도 하루 2회+ 투어 여지가 있어 선택 가능.
   const pick = (key: string, evs: ScheduleItem[]) => {
-    if (selectable && onSelectDate && evs.length === 0 && key >= todayKey) {
+    if (selectable && onSelectDate && !evs.some((e) => e.status === 'closed') && key >= todayKey) {
       onSelectDate(key, evs);
     }
   };
@@ -134,7 +134,9 @@ export default function ScheduleCalendar({
           const evs = byDate.get(key) ?? [];
           const isToday = key === todayKey;
           const isSelected = selectedKey === key;
-          const canBook = selectable && evs.length === 0 && key >= todayKey;
+          // 휴무(closed) 또는 과거만 차단. 프로그램(예약가능/마감)이 있어도 다른 투어 예약 여지가 있으므로 선택 가능.
+          const hasClosed = evs.some((e) => e.status === 'closed');
+          const canBook = selectable && !hasClosed && key >= todayKey;
 
           const dayNum = (
             <span
@@ -146,60 +148,58 @@ export default function ScheduleCalendar({
             </span>
           );
 
+          const eventList = evs.length > 0 && (
+            <div className="mt-1 space-y-1">
+              {evs.map((e, j) => (
+                <div key={j} className="flex items-center gap-1">
+                  <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS[e.status].dot}`} />
+                  <span
+                    className={`truncate text-[10px] leading-tight sm:text-[11px] ${STATUS[e.status].text}`}
+                    title={e.program}
+                  >
+                    {e.program}
+                  </span>
+                </div>
+              ))}
+            </div>
+          );
+
           const base = `min-h-[72px] p-1.5 text-left sm:min-h-[96px] sm:p-2 ${
             evs.length ? 'bg-[#0e2c3a]/80' : 'bg-[#06151d]/70'
           }`;
 
-          // 상품이 박힌 날짜 → 정보 표시(마감/고정 일정), 클릭 불가
-          if (evs.length > 0) {
-            return (
-              <div key={i} className={base}>
-                {dayNum}
-                <div className="mt-1 space-y-1">
-                  {evs.map((e, j) => (
-                    <div key={j} className="flex items-center gap-1">
-                      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS[e.status].dot}`} />
-                      <span
-                        className={`truncate text-[10px] leading-tight sm:text-[11px] ${STATUS[e.status].text}`}
-                        title={e.program}
-                      >
-                        {e.program}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          }
-
-          // 빈 날짜(오늘 이후) → 예약 가능, 클릭
+          // 예약 가능(휴무·과거 제외) → 클릭. 빈 날짜는 '+예약' 힌트, 프로그램 날짜는 일정 표시 + 호버 강조.
           if (canBook) {
             return (
               <button
                 key={i}
                 type="button"
-                onClick={() => pick(key, [])}
+                onClick={() => pick(key, evs)}
                 aria-pressed={isSelected}
                 className={`group ${base} w-full cursor-pointer transition-colors hover:bg-[#15506a]/70 ${
                   isSelected ? 'bg-[#15506a]/60 ring-2 ring-inset ring-[#5fd6e2]' : ''
                 }`}
               >
                 {dayNum}
-                <span
-                  className={`mt-2 block text-[10px] font-medium text-[#5fd6e2] transition-opacity ${
-                    isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                  }`}
-                >
-                  + 예약
-                </span>
+                {eventList}
+                {evs.length === 0 && (
+                  <span
+                    className={`mt-2 block text-[10px] font-medium text-[#5fd6e2] transition-opacity ${
+                      isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                    }`}
+                  >
+                    + 예약
+                  </span>
+                )}
               </button>
             );
           }
 
-          // 빈 날짜(과거) 또는 읽기전용 모드
+          // 휴무(closed) 또는 과거 → 클릭 불가(정보 표시)
           return (
             <div key={i} className={base}>
               {dayNum}
+              {eventList}
             </div>
           );
         })}
@@ -214,7 +214,7 @@ export default function ScheduleCalendar({
           </span>
         ))}
         {selectable && (
-          <span className="text-white/45">· 비어 있는 날짜를 누르면 예약 문의를 시작할 수 있어요</span>
+          <span className="text-white/45">· 휴무를 제외한 날짜를 누르면 예약 문의를 시작할 수 있어요</span>
         )}
       </div>
 

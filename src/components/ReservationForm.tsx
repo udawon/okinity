@@ -18,10 +18,13 @@ type SubmitState = 'idle' | 'submitting' | 'success' | 'error';
 export default function ReservationForm({
   lockedDateKey,
   lockedDateLabel,
+  scheduled,
   onReset
 }: {
   lockedDateKey?: string;
   lockedDateLabel?: string;
+  /** 선택한 날짜에 이미 예정된 일정(정보 표시용). 하루 2회+ 투어가 가능하므로 추가 예약 안내. */
+  scheduled?: { program: string; status: string }[];
   /** 성공 후 동작(예: 플래너에서 날짜 선택 해제). 없으면 폼 내부에서 새 문의로 초기화. */
   onReset?: () => void;
 }) {
@@ -110,6 +113,23 @@ export default function ReservationForm({
         <div className="border-b border-white/10 pb-4">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5fd6e2]">Reserve</p>
           <p className="mt-1.5 font-serif text-2xl leading-tight text-white">{lockedDateLabel}</p>
+          {scheduled && scheduled.length > 0 && (
+            <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.04] p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-white/45">
+                이 날 예정된 일정
+              </p>
+              <ul className="mt-1.5 space-y-1">
+                {scheduled.map((s, i) => (
+                  <li key={i} className="text-sm text-white/80">
+                    {s.program} <span className="text-white/40">· {s.status}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-xs text-white/45">
+                다른 시간대·다른 투어도 예약 가능해요. 아래에서 원하는 투어를 선택해 문의해 주세요.
+              </p>
+            </div>
+          )}
         </div>
       ) : (
         <div>
