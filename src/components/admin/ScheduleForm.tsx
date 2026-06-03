@@ -9,7 +9,7 @@ type Item = { date: string; program: string; status: Status };
 
 const STATUS_OPTS: { value: Status; label: string }[] = [
   { value: 'available', label: '예약 가능' },
-  { value: 'full', label: '마감' },
+  { value: 'full', label: '예약 많음' },
   { value: 'closed', label: '휴무' }
 ];
 
@@ -37,8 +37,10 @@ export default function ScheduleForm({
   async function save() {
     setSaving(true);
     setMsg('');
+    // 날짜 필수. 휴무는 프로그램명 없이도 저장(자동 '휴무'). 그 외는 프로그램명 필요.
     const clean = items
-      .filter((it) => it.date && it.program.trim())
+      .filter((it) => it.date && (it.program.trim() || it.status === 'closed'))
+      .map((it) => ({ ...it, program: it.program.trim() || (it.status === 'closed' ? '휴무' : '') }))
       .sort((a, b) => a.date.localeCompare(b.date));
     const res = await saveContent('schedule', { items: clean });
     setSaving(false);
@@ -67,7 +69,7 @@ export default function ScheduleForm({
             <input
               value={it.program}
               onChange={(e) => patch(i, { program: e.target.value })}
-              placeholder="프로그램명"
+              placeholder="프로그램명 (휴무는 비워도 됨)"
               disabled={disabled}
               className={`${inputCls} min-w-[10rem] flex-1`}
             />
