@@ -9,7 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/about',
     '/diving',
     '/padi',
-    '/schedule',
+    '/reserve',
     '/gallery',
     '/contact',
     '/blog',

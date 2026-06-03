@@ -11,7 +11,7 @@ export default async function BookButton() {
   return (
     // 모바일: 우측 하단 고정 알약(헤더 예약 버튼은 햄버거 메뉴 안에 있어 상시 노출 필요)
     <Link
-      href="/contact"
+      href="/reserve"
       className="fixed bottom-5 right-5 z-50 rounded-button bg-brand px-6 py-3 text-sm font-semibold text-brand-contrast shadow-hover transition-colors hover:bg-brand-dark lg:hidden"
     >
       {t('contact')}

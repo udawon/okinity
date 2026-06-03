@@ -34,7 +34,7 @@ export default async function Header({ locale }: { locale: Locale }) {
             <LocaleSwitcher current={locale} />
           </div>
           <Link
-            href="/contact"
+            href="/reserve"
             className="hidden rounded-button bg-brand px-5 py-2.5 text-sm font-semibold text-brand-contrast transition-colors hover:bg-brand-dark sm:inline-block"
           >
             {t('contact')}
