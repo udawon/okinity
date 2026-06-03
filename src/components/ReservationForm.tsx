@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { ACTIVITIES } from './ocean-home-data';
+import MedicalCheckModal from './MedicalCheckModal';
 
 const inputCls =
   'w-full rounded-button border border-white/15 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-[#5fd6e2] focus:outline-none focus:ring-2 focus:ring-[#5fd6e2]/25';
@@ -32,8 +33,12 @@ export default function ReservationForm({
   const [slug, setSlug] = useState('');
   const [state, setState] = useState<SubmitState>('idle');
   const [done, setDone] = useState<{ product: string; dateLabel: string } | null>(null);
+  const [medOpen, setMedOpen] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const cat = ACTIVITIES.find((a) => a.id === catId);
+  // 낚시 외 투어는 메디컬 체크 필수
+  const needsMedical = !!cat && cat.id !== 'fishing';
   // 예약이 많은(마감 표기) 투어가 있는 날 → 조율 안내 문구로 전환
   const hasBusy = scheduled?.some((s) => s.badge);
 
@@ -51,14 +56,26 @@ export default function ReservationForm({
     setSlug('');
   }
 
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+  // 제출 버튼 클릭 — 필수값 검증 후, 낚시 외 투어는 메디컬 체크 모달로, 그 외는 바로 전송.
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!formRef.current?.reportValidity()) return;
+    if (needsMedical) setMedOpen(true);
+    else doSubmit(false);
+  }
+
+  async function doSubmit(medical: boolean) {
+    const form = formRef.current;
+    if (!form) return;
     setState('submitting');
-    const form = e.currentTarget;
     const fd = new FormData(form);
     const tourName = cat?.tours.find((t) => t.slug === slug)?.name ?? '';
     const product = cat ? `${cat.title}${tourName ? ' · ' + tourName : ''}` : '';
     const date = lockedDateKey ?? (String(fd.get('date') || '') || undefined);
+    const baseMsg = String(fd.get('message') || '');
+    const message = medical
+      ? `[메디컬 체크 완료 · 전 항목 확인]${baseMsg ? '\n' + baseMsg : ''}`
+      : baseMsg;
     try {
       const res = await fetch('/api/inquiry', {
         method: 'POST',
@@ -70,11 +87,12 @@ export default function ReservationForm({
           people: fd.get('people'),
           name: fd.get('name'),
           contact: fd.get('contact'),
-          message: fd.get('message'),
+          message,
           company: fd.get('company') // 허니팟
         })
       });
       if (!res.ok) throw new Error('failed');
+      setMedOpen(false);
       setDone({ product, dateLabel: lockedDateLabel ?? (date ?? '날짜 미정') });
       setState('success');
     } catch {
@@ -107,7 +125,7 @@ export default function ReservationForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="p-6" noValidate>
+    <form ref={formRef} onSubmit={handleSubmit} className="p-6" noValidate>
       {/* 허니팟 */}
       <input type="text" name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
 
@@ -257,8 +275,18 @@ export default function ReservationForm({
         disabled={state === 'submitting'}
         className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 px-6 py-3.5 text-sm font-bold text-[#06202a] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-[transform,box-shadow,background-color] duration-200 hover:bg-amber-300 hover:shadow-[0_12px_42px_rgba(246,166,35,0.5)] active:scale-[0.98] disabled:opacity-60"
       >
-        {state === 'submitting' ? '보내는 중…' : '예약 문의 보내기 →'}
+        {state === 'submitting'
+          ? '보내는 중…'
+          : needsMedical
+            ? '메디컬 체크 & 예약 문의 발송'
+            : '예약 문의 보내기 →'}
       </button>
+
+      {needsMedical && (
+        <p className="mt-2 text-center text-[11px] text-white/45">
+          안전을 위해 다음 단계에서 메디컬 체크 후 발송됩니다. (낚시는 제외)
+        </p>
+      )}
 
       {state === 'error' && (
         <p role="alert" className="mt-3 rounded-button bg-red-500/15 px-4 py-2.5 text-sm text-red-200">
@@ -269,6 +297,14 @@ export default function ReservationForm({
       <p className="mt-3 text-center text-xs text-white/45">
         예약 전 상담은 무료 · 당일 취소 수수료 없음
       </p>
+
+      {medOpen && (
+        <MedicalCheckModal
+          submitting={state === 'submitting'}
+          onCancel={() => setMedOpen(false)}
+          onConfirm={() => doSubmit(true)}
+        />
+      )}
     </form>
   );
 }
