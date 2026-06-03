@@ -34,6 +34,8 @@ export default function ReservationForm({
   const [done, setDone] = useState<{ product: string; dateLabel: string } | null>(null);
 
   const cat = ACTIVITIES.find((a) => a.id === catId);
+  // 예약이 많은(마감 표기) 투어가 있는 날 → 조율 안내 문구로 전환
+  const hasBusy = scheduled?.some((s) => s.badge);
 
   const todayKey = (() => {
     const t = new Date();
@@ -132,7 +134,9 @@ export default function ReservationForm({
                 ))}
               </ul>
               <p className="mt-2 text-xs text-white/45">
-                다른 시간대·다른 투어도 예약 가능해요. 아래에서 원하는 투어를 선택해 문의해 주세요.
+                {hasBusy
+                  ? '예약이 많은 날이에요. 시간 조율이 필요할 수 있으니 희망 시간대를 남겨주시면 최대한 맞춰드릴게요.'
+                  : '다른 시간대·다른 투어도 예약 가능해요. 아래에서 원하는 투어를 선택해 문의해 주세요.'}
               </p>
             </div>
           )}

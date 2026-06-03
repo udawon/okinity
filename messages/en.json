@@ -58,7 +58,7 @@
     "colProgram": "Program",
     "colStatus": "Status",
     "statusAvailable": "Available",
-    "statusFull": "Full",
+    "statusFull": "Busy",
     "statusClosed": "Closed",
     "empty": "Schedule coming soon."
   },
