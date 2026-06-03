@@ -6,6 +6,7 @@ import { INQUIRY_STATUSES, type InquiryStatus } from '@/lib/inquiries/types';
 
 const LABEL: Record<InquiryStatus, string> = {
   new: '신규',
+  tentative: '가예약',
   confirmed: '확정',
   done: '완료',
   canceled: '취소'
@@ -13,6 +14,7 @@ const LABEL: Record<InquiryStatus, string> = {
 
 const COLOR: Record<InquiryStatus, string> = {
   new: 'bg-brand-light text-brand-dark',
+  tentative: 'bg-amber-100 text-amber-700',
   confirmed: 'bg-blue-100 text-blue-700',
   done: 'bg-green-100 text-green-700',
   canceled: 'bg-gray-100 text-gray-500'

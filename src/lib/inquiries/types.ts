@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-export const INQUIRY_STATUSES = ['new', 'confirmed', 'done', 'canceled'] as const;
+// 신규(신청) → 가예약(운영자 잠정·조율 대상) → 확정 → 완료 / 취소
+export const INQUIRY_STATUSES = ['new', 'tentative', 'confirmed', 'done', 'canceled'] as const;
 export type InquiryStatus = (typeof INQUIRY_STATUSES)[number];
 
 /** 폼에서 받는 입력 (검증용). API 라우트와 store가 공유. */
