@@ -31,6 +31,11 @@ function weekStart(todayKey: string, offset: number): string {
 
 const WD = ['월', '화', '수', '목', '금', '토', '일'];
 
+/** 배정 시각 오름차순(이른 시간 먼저). 미배정은 맨 뒤. */
+function byScheduledTime(a: Inquiry, b: Inquiry): number {
+  return (a.scheduledTime ?? '99:99').localeCompare(b.scheduledTime ?? '99:99');
+}
+
 function Card({ q, prices }: { q: Inquiry; prices: TourPrices }) {
   const { accent, slug } = tourMeta(q.product);
   const rev = slug ? estimateRevenue(prices, slug, q.people) : null;
@@ -46,10 +51,15 @@ function Card({ q, prices }: { q: Inquiry; prices: TourPrices }) {
     >
       <div className="flex items-start justify-between gap-1.5">
         <p className="text-xs font-semibold leading-tight text-ink">{q.product || '투어 미정'}</p>
+        {q.scheduledTime && (
+          <span className="shrink-0 rounded-full bg-brand-light px-1.5 py-0.5 text-[11px] font-semibold text-brand-dark">
+            {q.scheduledTime}
+          </span>
+        )}
       </div>
       <p className="mt-1 text-[11px] text-muted">
         {q.people ? `${q.people}명` : '인원 미정'}
-        {q.time ? ` · ${q.time}` : ''}
+        {q.time ? ` · 희망 ${q.time}` : ''}
       </p>
       <p className="text-[11px] text-ink">{q.name}</p>
       {rev != null && <p className="mt-0.5 text-[11px] font-medium text-emerald-600">{WON(rev)} 예상</p>}
@@ -195,7 +205,10 @@ export default function WeekBoard({
                   {items.length === 0 ? (
                     <p className="py-4 text-center text-[11px] text-muted/60">—</p>
                   ) : (
-                    items.map((q) => <Card key={q.id} q={q} prices={prices} />)
+                    items
+                      .slice()
+                      .sort(byScheduledTime)
+                      .map((q) => <Card key={q.id} q={q} prices={prices} />)
                   )}
                 </div>
               </div>
