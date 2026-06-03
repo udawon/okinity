@@ -118,17 +118,17 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
           <table className="w-full min-w-[1000px] text-left text-sm">
             <thead className="border-b border-line text-muted">
               <tr>
-                <th className="px-4 py-3 font-medium">접수(JST)</th>
-                <th className="px-4 py-3 font-medium">이름</th>
-                <th className="px-4 py-3 font-medium">연락처</th>
-                <th className="px-4 py-3 font-medium">상품</th>
-                <th className="px-4 py-3 font-medium">희망일</th>
-                <th className="px-4 py-3 text-center font-medium">시간대</th>
-                <th className="px-4 py-3 text-center font-medium">인원</th>
-                <th className="px-4 py-3 font-medium">메시지</th>
-                <th className="px-4 py-3 font-medium">메모</th>
-                <th className="px-4 py-3 font-medium">상태</th>
-                <th className="px-4 py-3 font-medium text-right">관리</th>
+                <th className="whitespace-nowrap px-4 py-3 font-medium">접수(JST)</th>
+                <th className="whitespace-nowrap px-4 py-3 font-medium">이름</th>
+                <th className="whitespace-nowrap px-4 py-3 font-medium">연락처</th>
+                <th className="whitespace-nowrap px-4 py-3 font-medium">상품</th>
+                <th className="whitespace-nowrap px-4 py-3 font-medium">희망일</th>
+                <th className="whitespace-nowrap px-4 py-3 text-center font-medium">시간대</th>
+                <th className="whitespace-nowrap px-4 py-3 text-center font-medium">인원</th>
+                <th className="whitespace-nowrap px-4 py-3 font-medium">메시지</th>
+                <th className="whitespace-nowrap px-4 py-3 font-medium">메모</th>
+                <th className="whitespace-nowrap px-4 py-3 font-medium">상태</th>
+                <th className="whitespace-nowrap px-4 py-3 text-right font-medium">관리</th>
               </tr>
             </thead>
             <tbody>
