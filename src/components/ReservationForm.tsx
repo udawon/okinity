@@ -23,8 +23,8 @@ export default function ReservationForm({
 }: {
   lockedDateKey?: string;
   lockedDateLabel?: string;
-  /** 선택한 날짜에 이미 예정된 일정(정보 표시용). 하루 2회+ 투어가 가능하므로 추가 예약 안내. */
-  scheduled?: { program: string; status: string }[];
+  /** 선택한 날짜에 이미 예정된 투어(정보 표시용). badge는 '마감' 등 제약만 표기('예약 가능'은 생략). */
+  scheduled?: { program: string; badge?: string }[];
   /** 성공 후 동작(예: 플래너에서 날짜 선택 해제). 없으면 폼 내부에서 새 문의로 초기화. */
   onReset?: () => void;
 }) {
@@ -116,12 +116,17 @@ export default function ReservationForm({
           {scheduled && scheduled.length > 0 && (
             <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.04] p-3">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-white/45">
-                이 날 예정된 일정
+                이미 예정된 투어
               </p>
               <ul className="mt-1.5 space-y-1">
                 {scheduled.map((s, i) => (
-                  <li key={i} className="text-sm text-white/80">
-                    {s.program} <span className="text-white/40">· {s.status}</span>
+                  <li key={i} className="flex items-center gap-1.5 text-sm text-white/80">
+                    <span>{s.program}</span>
+                    {s.badge && (
+                      <span className="rounded-full bg-[#f2c879]/15 px-2 py-0.5 text-[11px] font-medium text-[#f2c879]">
+                        {s.badge}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>

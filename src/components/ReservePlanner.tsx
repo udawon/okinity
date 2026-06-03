@@ -36,10 +36,11 @@ export default function ReservePlanner({
       }).format(new Date(selectedKey))
     : '';
 
-  // 선택한 날짜에 이미 예정된 일정(있으면) → 폼에 컨텍스트로 전달
+  // 선택한 날짜에 이미 예정된 투어(있으면) → 폼에 컨텍스트로 전달.
+  // '예약 가능'은 혼란을 주므로 생략하고, '마감' 같은 제약만 뱃지로 표기.
   const scheduled = selected?.events.map((e) => ({
     program: e.program,
-    status: statusLabel[e.status]
+    badge: e.status === 'available' ? undefined : statusLabel[e.status]
   }));
 
   return (
