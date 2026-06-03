@@ -1,11 +1,10 @@
-import { getGallery, getSchedule, type GalleryItem, type ScheduleItem } from '@/lib/content';
+import { getGallery, type GalleryItem } from '@/lib/content';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { HERO_DEFAULTS } from '@/components/ocean-home-data';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import AdminShell from '@/components/admin/AdminShell';
 import HeroForm from '@/components/admin/HeroForm';
 import GalleryForm from '@/components/admin/GalleryForm';
-import ScheduleForm from '@/components/admin/ScheduleForm';
 import TourImagesForm from '@/components/admin/TourImagesForm';
 import SectionPreview from '@/components/admin/SectionPreview';
 import { type ReactNode } from 'react';
@@ -63,10 +62,6 @@ export default async function AdminContentPage() {
   const galleryDefaults: GalleryItem[] = Array.isArray(galleryOverrideItems)
     ? (galleryOverrideItems as GalleryItem[])
     : getGallery();
-  const scheduleOverrideItems = overrides[CONTENT_KEYS.schedule]?.items;
-  const scheduleDefaults: ScheduleItem[] = Array.isArray(scheduleOverrideItems)
-    ? (scheduleOverrideItems as ScheduleItem[])
-    : getSchedule();
   const tourImages = (overrides[CONTENT_KEYS.homeTours]?.images as Record<string, string>) ?? {};
 
   return (
@@ -106,14 +101,6 @@ export default async function AdminContentPage() {
           preview={<SectionPreview highlight="gallery" note="홈 갤러리 그리드 + /gallery 페이지." />}
         >
           <GalleryForm defaults={galleryDefaults} disabled={!enabled} />
-        </EditSection>
-
-        <EditSection
-          title="일정표"
-          desc="홈 하단 '일정 · 예약' 달력과 /일정표 페이지에 표시됩니다. 날짜·프로그램·상태를 추가/삭제하세요."
-          preview={<SectionPreview highlight="schedule" note="홈 맨 아래 예약 섹션 + /schedule 페이지." />}
-        >
-          <ScheduleForm defaults={scheduleDefaults} disabled={!enabled} />
         </EditSection>
       </div>
     </AdminShell>

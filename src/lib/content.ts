@@ -195,24 +195,28 @@ const ScheduleItemSchema = z.object({
 export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
 
 /**
- * 확정(confirmed)된 예약을 공개 일정표 항목으로 변환한다('예약됨' 표시).
- * 고객 정보는 제외하고 날짜·투어명만. 같은 날 같은 투어는 한 번만.
+ * 확정(confirmed)된 예약을 공개 일정표 항목으로 변환한다(고객 정보 제외).
+ * - 날짜에 확정 1건  → '예약됨'(투어명)
+ * - 날짜에 확정 2건+ → '예약 많음'(자동, "예약 N건")  ← 수동 지정 아님
  */
 export function confirmedBookingsToSchedule(
   bookings: { date?: string; product?: string; status: string }[]
 ): ScheduleItem[] {
-  const seen = new Set<string>();
-  const out: ScheduleItem[] = [];
+  const byDate = new Map<string, string[]>();
   for (const b of bookings) {
     if (b.status !== 'confirmed') continue;
     const date =
       typeof b.date === 'string' && /^\d{4}-\d{2}-\d{2}/.test(b.date) ? b.date.slice(0, 10) : null;
     if (!date) continue;
-    const program = (b.product || '예약').trim();
-    const key = `${date}|${program}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push({ date, program, status: 'booked' });
+    (byDate.get(date) ?? byDate.set(date, []).get(date)!).push((b.product || '예약').trim());
+  }
+  const out: ScheduleItem[] = [];
+  for (const [date, programs] of byDate) {
+    if (programs.length >= 2) {
+      out.push({ date, program: `예약 ${programs.length}건`, status: 'full' }); // 예약 많음(자동)
+    } else {
+      out.push({ date, program: programs[0], status: 'booked' }); // 예약됨
+    }
   }
   return out;
 }
