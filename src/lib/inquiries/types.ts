@@ -7,6 +7,8 @@ export type InquiryStatus = (typeof INQUIRY_STATUSES)[number];
 export const NewInquirySchema = z.object({
   product: z.string().max(100).optional(),
   date: z.string().max(40).optional(),
+  /** 희망 시간대(오전·오후·종일 등). 방문자 입력. */
+  time: z.string().max(40).optional(),
   people: z.coerce.number().int().min(1).max(50).optional(),
   name: z.string().min(1).max(100),
   contact: z.string().min(1).max(200),

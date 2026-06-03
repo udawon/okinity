@@ -47,6 +47,7 @@ function buildEmail(data: NewInquiry): Notif {
   const rows: [string, string][] = [
     ['상품', data.product ?? '-'],
     ['희망일', data.date ?? '-'],
+    ['희망 시간대', data.time ?? '-'],
     ['인원', data.people != null ? `${data.people}명` : '-'],
     ['성함', data.name],
     ['연락처', data.contact],

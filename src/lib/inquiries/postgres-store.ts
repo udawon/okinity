@@ -17,6 +17,7 @@ async function ensureTable(): Promise<void> {
       created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
       product     TEXT,
       date        TEXT,
+      time        TEXT,
       people      INTEGER,
       name        TEXT NOT NULL,
       contact     TEXT NOT NULL,
@@ -25,8 +26,9 @@ async function ensureTable(): Promise<void> {
       note        TEXT
     )
   `;
-  // 기존 테이블 호환: note 컬럼이 없으면 추가
+  // 기존 테이블 호환: 없으면 컬럼 추가
   await sql`ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS note TEXT`;
+  await sql`ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS time TEXT`;
   initialized = true;
 }
 
@@ -35,6 +37,7 @@ type Row = {
   created_at: string | Date;
   product: string | null;
   date: string | null;
+  time: string | null;
   people: number | null;
   name: string;
   contact: string;
@@ -49,6 +52,7 @@ function toInquiry(r: Row): Inquiry {
     createdAt: new Date(r.created_at).toISOString(),
     product: r.product ?? undefined,
     date: r.date ?? undefined,
+    time: r.time ?? undefined,
     people: r.people ?? undefined,
     name: r.name,
     contact: r.contact,
@@ -63,8 +67,8 @@ export const postgresStore: InquiryStore = {
     await ensureTable();
     const id = randomUUID();
     const { rows } = await sql<Row>`
-      INSERT INTO inquiries (id, product, date, people, name, contact, message, status)
-      VALUES (${id}, ${input.product ?? null}, ${input.date ?? null},
+      INSERT INTO inquiries (id, product, date, time, people, name, contact, message, status)
+      VALUES (${id}, ${input.product ?? null}, ${input.date ?? null}, ${input.time ?? null},
               ${input.people ?? null}, ${input.name}, ${input.contact},
               ${input.message ?? null}, 'new')
       RETURNING *

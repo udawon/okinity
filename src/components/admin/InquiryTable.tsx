@@ -105,7 +105,7 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
         </p>
       ) : (
         <div className="mt-4 overflow-x-auto rounded-card border border-line bg-surface">
-          <table className="w-full min-w-[900px] text-left text-sm">
+          <table className="w-full min-w-[1000px] text-left text-sm">
             <thead className="border-b border-line text-muted">
               <tr>
                 <th className="px-4 py-3 font-medium">접수(JST)</th>
@@ -113,6 +113,7 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
                 <th className="px-4 py-3 font-medium">연락처</th>
                 <th className="px-4 py-3 font-medium">상품</th>
                 <th className="px-4 py-3 font-medium">희망일</th>
+                <th className="px-4 py-3 font-medium">시간대</th>
                 <th className="px-4 py-3 font-medium">인원</th>
                 <th className="px-4 py-3 font-medium">메시지</th>
                 <th className="px-4 py-3 font-medium">메모</th>
@@ -133,6 +134,7 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
                   </td>
                   <td className="px-4 py-3 text-ink">{q.product ?? '-'}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink">{q.date ?? '-'}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-ink">{q.time ?? '-'}</td>
                   <td className="px-4 py-3 text-ink">{q.people ?? '-'}</td>
                   <td className="max-w-xs px-4 py-3 text-muted">{q.message ?? '-'}</td>
                   <td className="px-4 py-3">

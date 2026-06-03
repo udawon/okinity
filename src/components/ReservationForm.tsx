@@ -64,6 +64,7 @@ export default function ReservationForm({
         body: JSON.stringify({
           product,
           date,
+          time: fd.get('time'),
           people: fd.get('people'),
           name: fd.get('name'),
           contact: fd.get('contact'),
@@ -192,6 +193,20 @@ export default function ReservationForm({
               {t.name}
             </option>
           ))}
+        </select>
+      </div>
+
+      {/* 희망 시간대 */}
+      <div className="mt-4">
+        <label htmlFor="rf-time" className={labelCls}>
+          희망 시간대 (선택)
+        </label>
+        <select id="rf-time" name="time" defaultValue="" className={`mt-1.5 ${inputCls} [&>option]:text-ink`}>
+          <option value="">시간대 선택</option>
+          <option value="오전">오전</option>
+          <option value="오후">오후</option>
+          <option value="종일">종일</option>
+          <option value="시간 무관">시간 무관</option>
         </select>
       </div>
 

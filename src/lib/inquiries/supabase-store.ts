@@ -16,6 +16,7 @@ type Row = {
   created_at: string;
   product: string | null;
   date: string | null;
+  time: string | null;
   people: number | null;
   name: string;
   contact: string;
@@ -30,6 +31,7 @@ function toInquiry(r: Row): Inquiry {
     createdAt: new Date(r.created_at).toISOString(),
     product: r.product ?? undefined,
     date: r.date ?? undefined,
+    time: r.time ?? undefined,
     people: r.people ?? undefined,
     name: r.name,
     contact: r.contact,
@@ -53,6 +55,7 @@ export const supabaseStore: InquiryStore = {
         id: randomUUID(),
         product: input.product ?? null,
         date: input.date ?? null,
+        time: input.time ?? null,
         people: input.people ?? null,
         name: input.name,
         contact: input.contact,

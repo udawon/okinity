@@ -12,11 +12,13 @@ create table if not exists public.inquiries (
   contact     text not null,
   message     text,
   status      text not null default 'new',
-  note        text   -- 운영자 내부 메모(고객 비노출)
+  note        text,  -- 운영자 내부 메모(고객 비노출)
+  time        text   -- 방문자 희망 시간대(오전·오후·종일 등)
 );
 
--- 이미 테이블을 만든 경우(note 컬럼 추가): 아래 한 줄만 실행해도 된다.
+-- 이미 테이블을 만든 경우(컬럼 추가): 아래 두 줄만 실행해도 된다.
 alter table public.inquiries add column if not exists note text;
+alter table public.inquiries add column if not exists time text;
 
 -- 어드민 목록 정렬(최신순) 최적화
 create index if not exists inquiries_created_at_idx
