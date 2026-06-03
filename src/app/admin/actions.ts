@@ -66,6 +66,7 @@ export async function updateInquiryStatus(
   const store = await getInquiryStore();
   await store.updateStatus(id, status as InquiryStatus);
   revalidatePath('/admin');
+  revalidatePath('/admin/board');
 }
 
 export async function updateInquiryNote(id: string, note: string): Promise<void> {
@@ -74,6 +75,7 @@ export async function updateInquiryNote(id: string, note: string): Promise<void>
   const store = await getInquiryStore();
   await store.updateNote(id, note);
   revalidatePath('/admin');
+  revalidatePath('/admin/board');
 }
 
 export async function deleteInquiry(id: string): Promise<void> {
@@ -82,4 +84,5 @@ export async function deleteInquiry(id: string): Promise<void> {
   const store = await getInquiryStore();
   await store.delete(id);
   revalidatePath('/admin');
+  revalidatePath('/admin/board');
 }
