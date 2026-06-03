@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { getSchedule, type ScheduleItem } from '@/lib/content';
+import { getSchedule, confirmedBookingsToSchedule, type ScheduleItem } from '@/lib/content';
+import { getInquiryStore } from '@/lib/inquiries';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems, publishedSorted, BLOG_CAROUSEL_LIMIT } from '@/lib/blog';
 import OceanHome from '@/components/OceanHome';
@@ -30,18 +31,22 @@ export default async function HomePage({
     BLOG_CAROUSEL_LIMIT
   );
 
-  // 일정표 — schedule 오버라이드(items) 우선, 없으면 content/schedule.json
+  // 일정표 — 어드민 항목(휴무·고정일정) + 확정된 실제 예약을 병합
   const scheduleOverride = overrides[CONTENT_KEYS.schedule]?.items;
-  const scheduleItems: ScheduleItem[] = Array.isArray(scheduleOverride)
-    ? (scheduleOverride as ScheduleItem[]).slice().sort((a, b) => a.date.localeCompare(b.date))
+  const adminItems: ScheduleItem[] = Array.isArray(scheduleOverride)
+    ? (scheduleOverride as ScheduleItem[])
     : getSchedule();
+  const store = await getInquiryStore();
+  const bookingItems = confirmedBookingsToSchedule(await store.list());
+  const scheduleItems = [...adminItems, ...bookingItems].sort((a, b) => a.date.localeCompare(b.date));
 
   const schedule = {
     items: scheduleItems,
     statusLabel: {
       available: tSchedule('statusAvailable'),
       full: tSchedule('statusFull'),
-      closed: tSchedule('statusClosed')
+      closed: tSchedule('statusClosed'),
+      booked: tSchedule('statusBooked')
     },
     emptyLabel: tSchedule('empty')
   };

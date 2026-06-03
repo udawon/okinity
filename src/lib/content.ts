@@ -189,9 +189,33 @@ export function getGallery(): GalleryItem[] {
 const ScheduleItemSchema = z.object({
   date: z.string(), // ISO 또는 표시용 문자열
   program: z.string(),
-  status: z.enum(['available', 'full', 'closed']).default('available')
+  // available 예약가능 · full 예약많음 · closed 휴무 · booked 확정예약(시스템 자동, 공개 표시)
+  status: z.enum(['available', 'full', 'closed', 'booked']).default('available')
 });
 export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
+
+/**
+ * 확정(confirmed)된 예약을 공개 일정표 항목으로 변환한다('예약됨' 표시).
+ * 고객 정보는 제외하고 날짜·투어명만. 같은 날 같은 투어는 한 번만.
+ */
+export function confirmedBookingsToSchedule(
+  bookings: { date?: string; product?: string; status: string }[]
+): ScheduleItem[] {
+  const seen = new Set<string>();
+  const out: ScheduleItem[] = [];
+  for (const b of bookings) {
+    if (b.status !== 'confirmed') continue;
+    const date =
+      typeof b.date === 'string' && /^\d{4}-\d{2}-\d{2}/.test(b.date) ? b.date.slice(0, 10) : null;
+    if (!date) continue;
+    const program = (b.product || '예약').trim();
+    const key = `${date}|${program}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ date, program, status: 'booked' });
+  }
+  return out;
+}
 
 export function getSchedule(): ScheduleItem[] {
   const file = path.join(CONTENT_ROOT, 'schedule.json');

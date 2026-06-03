@@ -60,6 +60,7 @@
     "statusAvailable": "Available",
     "statusFull": "Busy",
     "statusClosed": "Closed",
+    "statusBooked": "Booked",
     "empty": "Schedule coming soon."
   },
   "gallery": {

@@ -60,6 +60,7 @@
     "statusAvailable": "予約可能",
     "statusFull": "残りわずか",
     "statusClosed": "休業",
+    "statusBooked": "予約済み",
     "empty": "スケジュールは近日公開します。"
   },
   "gallery": {

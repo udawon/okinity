@@ -40,7 +40,7 @@ export default function ReservePlanner({
   // '예약 가능'은 혼란을 주므로 생략하고, '마감' 같은 제약만 뱃지로 표기.
   const scheduled = selected?.events.map((e) => ({
     program: e.program,
-    badge: e.status === 'available' ? undefined : statusLabel[e.status]
+    badge: e.status === 'full' ? statusLabel.full : undefined
   }));
 
   return (

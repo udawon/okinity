@@ -60,6 +60,7 @@
     "statusAvailable": "예약 가능",
     "statusFull": "예약 많음",
     "statusClosed": "휴무",
+    "statusBooked": "예약됨",
     "empty": "곧 일정이 등록됩니다."
   },
   "gallery": {

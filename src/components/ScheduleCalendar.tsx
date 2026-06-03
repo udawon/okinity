@@ -8,7 +8,8 @@ type Status = ScheduleItem['status'];
 const STATUS: Record<Status, { text: string; dot: string }> = {
   available: { text: 'text-[#5fd6e2]', dot: 'bg-[#5fd6e2]' },
   full: { text: 'text-[#f2c879]', dot: 'bg-[#f2c879]' },
-  closed: { text: 'text-white/40 line-through', dot: 'bg-white/30' }
+  closed: { text: 'text-white/40 line-through', dot: 'bg-white/30' },
+  booked: { text: 'text-[#86efac]', dot: 'bg-[#4ade80]' }
 };
 
 // 2024-01-07은 일요일 → 요일 헤더(로케일별)를 일요일 시작으로 생성

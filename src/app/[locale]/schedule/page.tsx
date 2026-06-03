@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
-import { getSchedule, type ScheduleItem } from '@/lib/content';
+import { getSchedule, confirmedBookingsToSchedule, type ScheduleItem } from '@/lib/content';
+import { getInquiryStore } from '@/lib/inquiries';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import Container from '@/components/Container';
 import ScheduleCalendar from '@/components/ScheduleCalendar';
@@ -30,17 +31,21 @@ export default async function SchedulePage({
   const t = await getTranslations('schedule');
   const tNav = await getTranslations('nav');
 
-  // 어드민 오버라이드(schedule:{ items }) 우선, 없으면 content/schedule.json 기본값.
+  // 어드민 항목(휴무·고정일정) + 확정된 실제 예약을 병합.
   const override = await getSiteContent(CONTENT_KEYS.schedule);
   const overrideItems = override?.items;
-  const items: ScheduleItem[] = Array.isArray(overrideItems)
-    ? (overrideItems as ScheduleItem[]).slice().sort((a, b) => a.date.localeCompare(b.date))
+  const adminItems: ScheduleItem[] = Array.isArray(overrideItems)
+    ? (overrideItems as ScheduleItem[])
     : getSchedule();
+  const store = await getInquiryStore();
+  const bookingItems = confirmedBookingsToSchedule(await store.list());
+  const items = [...adminItems, ...bookingItems].sort((a, b) => a.date.localeCompare(b.date));
 
   const statusLabel: Record<ScheduleItem['status'], string> = {
     available: t('statusAvailable'),
     full: t('statusFull'),
-    closed: t('statusClosed')
+    closed: t('statusClosed'),
+    booked: t('statusBooked')
   };
 
   return (
