@@ -1,9 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import StatusControl from './StatusControl';
 import EditInquiryButton from './EditInquiryButton';
 import DayTimeline from './DayTimeline';
+import { updateInquiry } from '@/app/admin/actions';
 import { estimateRevenue, tourMeta, type TourPrices } from '@/lib/tour-pricing';
 import type { Inquiry, InquiryStatus } from '@/lib/inquiries/types';
 
@@ -34,7 +36,12 @@ function Card({ q, prices }: { q: Inquiry; prices: TourPrices }) {
   const rev = slug ? estimateRevenue(prices, slug, q.people) : null;
   return (
     <div
-      className="rounded-lg border border-line bg-surface p-2.5 shadow-sm"
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.setData('text/plain', q.id);
+        e.dataTransfer.effectAllowed = 'move';
+      }}
+      className="cursor-grab rounded-lg border border-line bg-surface p-2.5 shadow-sm active:cursor-grabbing"
       style={{ borderLeft: `3px solid ${accent}` }}
     >
       <div className="flex items-start justify-between gap-1.5">
@@ -65,6 +72,31 @@ export default function WeekBoard({
 }) {
   const [offset, setOffset] = useState(0);
   const [openDay, setOpenDay] = useState<string | null>(null);
+  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
+  const [, startMove] = useTransition();
+  const router = useRouter();
+
+  // 카드를 다른 날짜 칸으로 드롭 → 예약 날짜 변경(다른 필드는 유지)
+  function moveToDate(id: string, date: string) {
+    const q = inquiries.find((x) => x.id === id);
+    if (!q || q.date === date) return;
+    startMove(async () => {
+      try {
+        await updateInquiry(id, {
+          product: q.product,
+          date,
+          time: q.time,
+          people: q.people,
+          name: q.name,
+          contact: q.contact,
+          message: q.message
+        });
+        router.refresh();
+      } catch {
+        alert('날짜 변경에 실패했습니다.');
+      }
+    });
+  }
 
   // 날짜(YYYY-MM-DD)별 그룹
   const byDate = useMemo(() => {
@@ -127,7 +159,24 @@ export default function WeekBoard({
             const items = byDate.get(key) ?? [];
             const isToday = key === todayKey;
             return (
-              <div key={key} className="rounded-card border border-line bg-bg/40">
+              <div
+                key={key}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = 'move';
+                  if (dragOverKey !== key) setDragOverKey(key);
+                }}
+                onDragLeave={() => setDragOverKey((k) => (k === key ? null : k))}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragOverKey(null);
+                  const id = e.dataTransfer.getData('text/plain');
+                  if (id) moveToDate(id, key);
+                }}
+                className={`rounded-card border bg-bg/40 transition-colors ${
+                  dragOverKey === key ? 'border-brand bg-brand-light/60 ring-2 ring-brand/40' : 'border-line'
+                }`}
+              >
                 <button
                   type="button"
                   onClick={() => setOpenDay(key)}
