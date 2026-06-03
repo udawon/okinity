@@ -165,7 +165,8 @@ export default function ScheduleCalendar({
             </div>
           );
 
-          const base = `min-h-[72px] p-1.5 text-left sm:min-h-[96px] sm:p-2 ${
+          // 모든 칸을 상단 정렬(flex-col) — button/div 혼용 시 세로 정렬이 달라지는 문제 방지.
+          const base = `flex min-h-[72px] flex-col p-1.5 text-left sm:min-h-[96px] sm:p-2 ${
             evs.length ? 'bg-[#0e2c3a]/80' : 'bg-[#06151d]/70'
           }`;
 

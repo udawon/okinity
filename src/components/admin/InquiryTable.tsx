@@ -7,15 +7,24 @@ import EditInquiryButton from './EditInquiryButton';
 import MemoCell from './MemoCell';
 import type { Inquiry, InquiryStatus } from '@/lib/inquiries/types';
 
-/** 접수 시각은 운영지(오키나와) 기준 JST로 고정 표기 → 서버/클라 일치 + 현지 정확. */
-function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleString('ko-KR', {
+/** 접수 시각(오키나와 JST) → 날짜 YYYY.MM.DD + 시간 HH:MM(24h) 두 줄. */
+function fmtReceived(iso: string): { date: string; time: string } {
+  const d = new Date(iso);
+  const date = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Tokyo',
+    year: 'numeric',
     month: '2-digit',
-    day: '2-digit',
+    day: '2-digit'
+  })
+    .format(d)
+    .replace(/-/g, '.'); // YYYY.MM.DD
+  const time = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Tokyo',
     hour: '2-digit',
-    minute: '2-digit'
-  });
+    minute: '2-digit',
+    hour12: false
+  }).format(d); // HH:MM (24h)
+  return { date, time };
 }
 
 const FILTERS: { key: 'all' | InquiryStatus; label: string }[] = [
@@ -114,8 +123,8 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
                 <th className="px-4 py-3 font-medium">연락처</th>
                 <th className="px-4 py-3 font-medium">상품</th>
                 <th className="px-4 py-3 font-medium">희망일</th>
-                <th className="px-4 py-3 font-medium">시간대</th>
-                <th className="px-4 py-3 font-medium">인원</th>
+                <th className="px-4 py-3 text-center font-medium">시간대</th>
+                <th className="px-4 py-3 text-center font-medium">인원</th>
                 <th className="px-4 py-3 font-medium">메시지</th>
                 <th className="px-4 py-3 font-medium">메모</th>
                 <th className="px-4 py-3 font-medium">상태</th>
@@ -128,16 +137,23 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
                   key={q.id}
                   className="border-b border-line align-top transition-colors last:border-0 hover:bg-bg/60"
                 >
-                  <td className="whitespace-nowrap px-4 py-3 text-muted">{fmtDate(q.createdAt)}</td>
-                  <td className="px-4 py-3 font-medium text-ink">{q.name}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-muted">
+                    <div className="text-ink">{fmtReceived(q.createdAt).date}</div>
+                    <div className="text-xs">{fmtReceived(q.createdAt).time}</div>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 font-medium text-ink">{q.name}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink">
                     <ContactLink contact={q.contact} />
                   </td>
-                  <td className="px-4 py-3 text-ink">{q.product ?? '-'}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-ink">{q.product ?? '-'}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink">{q.date ?? '-'}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-ink">{q.time ?? '-'}</td>
-                  <td className="px-4 py-3 text-ink">{q.people ?? '-'}</td>
-                  <td className="max-w-xs px-4 py-3 text-muted">{q.message ?? '-'}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-center text-ink">{q.time ?? '-'}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-center text-ink">
+                    {q.people ?? '-'}
+                  </td>
+                  <td className="min-w-[14rem] max-w-md whitespace-normal px-4 py-3 text-muted">
+                    {q.message ?? '-'}
+                  </td>
                   <td className="px-4 py-3">
                     <MemoCell id={q.id} note={q.note} />
                   </td>
