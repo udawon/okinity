@@ -1,6 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { getSchedule, confirmedBookingsToSchedule, type ScheduleItem } from '@/lib/content';
-import { getInquiryStore } from '@/lib/inquiries';
+import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems, publishedSorted, BLOG_CAROUSEL_LIMIT } from '@/lib/blog';
 import OceanHome from '@/components/OceanHome';
@@ -31,14 +30,13 @@ export default async function HomePage({
     BLOG_CAROUSEL_LIMIT
   );
 
-  // 일정표 — 어드민 항목(휴무·고정일정) + 확정된 실제 예약을 병합
+  // 일정표 — 어드민이 지정한 일정/휴무만(확정 예약은 공개 일정표에 연동하지 않음).
   const scheduleOverride = overrides[CONTENT_KEYS.schedule]?.items;
-  const adminItems: ScheduleItem[] = Array.isArray(scheduleOverride)
-    ? (scheduleOverride as ScheduleItem[])
-    : getSchedule();
-  const store = await getInquiryStore();
-  const bookingItems = confirmedBookingsToSchedule(await store.list());
-  const scheduleItems = [...adminItems, ...bookingItems].sort((a, b) => a.date.localeCompare(b.date));
+  const scheduleItems: ScheduleItem[] = (
+    Array.isArray(scheduleOverride) ? (scheduleOverride as ScheduleItem[]) : getSchedule()
+  )
+    .slice()
+    .sort((a, b) => a.date.localeCompare(b.date));
 
   const schedule = {
     items: scheduleItems,

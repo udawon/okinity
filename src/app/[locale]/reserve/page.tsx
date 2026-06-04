@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { getSchedule, confirmedBookingsToSchedule, type ScheduleItem } from '@/lib/content';
-import { getInquiryStore } from '@/lib/inquiries';
+import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import Container from '@/components/Container';
 import ReservePlanner from '@/components/ReservePlanner';
@@ -26,15 +25,14 @@ export default async function ReservePage({
   setRequestLocale(locale);
   const t = await getTranslations('schedule');
 
-  // 어드민 항목(휴무·고정일정) + 확정된 실제 예약을 병합 (홈 예약 섹션과 동일)
+  // 어드민이 지정한 일정/휴무만(확정 예약은 공개 일정표에 연동하지 않음).
   const override = await getSiteContent(CONTENT_KEYS.schedule);
   const overrideItems = (override as { items?: unknown } | null)?.items;
-  const adminItems: ScheduleItem[] = Array.isArray(overrideItems)
-    ? (overrideItems as ScheduleItem[])
-    : getSchedule();
-  const store = await getInquiryStore();
-  const bookingItems = confirmedBookingsToSchedule(await store.list());
-  const items = [...adminItems, ...bookingItems].sort((a, b) => a.date.localeCompare(b.date));
+  const items: ScheduleItem[] = (
+    Array.isArray(overrideItems) ? (overrideItems as ScheduleItem[]) : getSchedule()
+  )
+    .slice()
+    .sort((a, b) => a.date.localeCompare(b.date));
 
   const statusLabel: Record<ScheduleItem['status'], string> = {
     available: t('statusAvailable'),

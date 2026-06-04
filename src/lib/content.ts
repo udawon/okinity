@@ -198,30 +198,7 @@ const ScheduleItemSchema = z.object({
 });
 export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
 
-/**
- * 확정(confirmed)된 예약을 공개 일정표 항목으로 변환한다(고객 정보 제외).
- * 건마다 한 줄(대분류만). 색은 그날 확정 건수로 자동 결정:
- *   1건  → 'booked'(터콰이즈) · 2건+ → 'full'(베이지) — 집계하지 않고 색만 변경.
- */
-export function confirmedBookingsToSchedule(
-  bookings: { date?: string; product?: string; status: string }[]
-): ScheduleItem[] {
-  const counts = new Map<string, number>();
-  const valid: { date: string; product?: string }[] = [];
-  for (const b of bookings) {
-    if (b.status !== 'confirmed') continue;
-    const date =
-      typeof b.date === 'string' && /^\d{4}-\d{2}-\d{2}/.test(b.date) ? b.date.slice(0, 10) : null;
-    if (!date) continue;
-    counts.set(date, (counts.get(date) ?? 0) + 1);
-    valid.push({ date, product: b.product });
-  }
-  return valid.map((b) => ({
-    date: b.date,
-    program: (b.product || '예약').split(' · ')[0].trim() || '예약', // 대분류만
-    status: (counts.get(b.date) ?? 0) >= 2 ? ('full' as const) : ('booked' as const)
-  }));
-}
+// (확정 예약은 공개 일정표에 연동하지 않음 — 운영자는 어드민 운영 보드/예약 관리에서만 본다.)
 
 export function getSchedule(): ScheduleItem[] {
   const file = path.join(CONTENT_ROOT, 'schedule.json');
