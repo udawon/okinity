@@ -3,11 +3,11 @@
 import { useRef, useState, useEffect } from 'react';
 import {
   motion,
-  useReducedMotion,
   useScroll,
   useTransform,
   useMotionValue
 } from 'framer-motion';
+import { useStableReducedMotion } from '@/hooks/useStableReducedMotion';
 import { Link } from '@/i18n/routing';
 import { type BlogPost } from '@/lib/blog';
 import { type ScheduleItem } from '@/lib/content';
@@ -87,7 +87,7 @@ function R({
   style?: React.CSSProperties;
   as?: 'div' | 'li' | 'h2' | 'p' | 'span';
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useStableReducedMotion();
   const Tag = motion[as] as typeof motion.div;
   return (
     <Tag
@@ -108,7 +108,7 @@ function R({
    고정(fixed) 레이어. 상속된 OceanBackground(-z-10) 위, 본문 아래.
    ──────────────────────────────────────────────────────────── */
 function CinematicBackground() {
-  const reduce = useReducedMotion();
+  const reduce = useStableReducedMotion();
   // 스크롤 진행도를 직접 계산(scrollY ÷ 최대스크롤, 0~1 clamp) → 단조 증가 보장.
   // (framer useScroll()이 본 레이아웃에서 비단조로 동작 — 최하단에서 progress가 0으로 되돌아가
   //  배경이 다시 밝아지는 버그가 있어, 신뢰 가능한 자체 계산으로 대체.)
@@ -197,7 +197,7 @@ const PARTICLES = Array.from({ length: 16 }, (_, i) => {
   return { left, size, dur, delay, op, drift, bottom: (i * 37) % 90 };
 });
 function Particles() {
-  const reduce = useReducedMotion();
+  const reduce = useStableReducedMotion();
   if (reduce) return null;
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: -4 }} aria-hidden>
@@ -252,7 +252,7 @@ function Hero({
   media?: { url?: string; type?: string };
   text?: { eyebrow?: string; title?: string; subtitle?: string };
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useStableReducedMotion();
   // 어드민 오버라이드(hero 키)의 배경 영상/이미지. 없으면 기본 노을 영상.
   const heroUrl = media?.url?.trim() || '/videos/surface.mp4';
   const heroIsVideo = media?.url?.trim() ? media.type === 'video' : true;
@@ -471,7 +471,7 @@ function ActivityCard({ a, image }: { a: Activity; image: string }) {
 }
 
 function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string> }) {
-  const reduce = useReducedMotion();
+  const reduce = useStableReducedMotion();
   const scrollerRef = useRef<HTMLDivElement>(null);
   // 스크롤 가능 여부 + 시작/끝 위치(양옆 화살표 표시·비활성용)
   const [scrollable, setScrollable] = useState(false);

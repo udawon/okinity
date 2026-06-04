@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { useReducedMotion } from 'framer-motion';
+import { useStableReducedMotion } from '@/hooks/useStableReducedMotion';
 
 export type OceanVideos = {
   surface?: string | null;
@@ -47,7 +47,7 @@ const CAUSTICS_SVG =
 
 /** 서브 페이지 정적 배경 — 깊은 바다 그라데이션 + 빛기둥 + 물결 코스틱 + 떠오르는 공기방울. */
 function OceanAmbient() {
-  const reduce = useReducedMotion();
+  const reduce = useStableReducedMotion();
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden bg-[#06151d]" aria-hidden>
       {/* 깊은 바다 그라데이션 */}
