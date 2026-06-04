@@ -7,11 +7,20 @@ import type { ScheduleItem } from '@/lib/content';
 type Status = ScheduleItem['status'];
 type Item = { date: string; endDate?: string; program: string; status: Status };
 
+// 예약 가능=기본값, 예약 많음=확정 2건+ 자동 → 수동 옵션은 휴무·오전 가능·오후 가능만.
 const STATUS_OPTS: { value: Status; label: string }[] = [
-  { value: 'available', label: '예약 가능' },
-  { value: 'full', label: '예약 많음' },
-  { value: 'closed', label: '휴무' }
+  { value: 'closed', label: '휴무' },
+  { value: 'morning', label: '오전 가능' },
+  { value: 'afternoon', label: '오후 가능' }
 ];
+const STATUS_LABEL: Record<Status, string> = {
+  available: '예약 가능',
+  full: '예약 많음',
+  closed: '휴무',
+  booked: '예약됨',
+  morning: '오전 가능',
+  afternoon: '오후 가능'
+};
 
 const inputCls =
   'rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted';
@@ -32,14 +41,15 @@ export default function ScheduleForm({
     setItems((arr) => arr.map((it, idx) => (idx === i ? { ...it, ...p } : it)));
   const remove = (i: number) => setItems((arr) => arr.filter((_, idx) => idx !== i));
   const add = () =>
-    setItems((arr) => [...arr, { date: '', program: '', status: 'available' }]);
+    setItems((arr) => [...arr, { date: '', program: '', status: 'closed' }]);
 
   async function save() {
     setSaving(true);
     setMsg('');
-    // 날짜 필수. 휴무는 프로그램명 없이도 저장(자동 '휴무'). 그 외는 프로그램명 필요.
+    // 날짜 필수. 휴무·오전/오후 가능은 프로그램명 없이도 저장(라벨 자동).
+    const noProgram = (s: Status) => s === 'closed' || s === 'morning' || s === 'afternoon';
     const clean = items
-      .filter((it) => it.date && (it.program.trim() || it.status === 'closed'))
+      .filter((it) => it.date && (it.program.trim() || noProgram(it.status)))
       .map((it) => ({
         date: it.date,
         // 종료일이 시작일보다 뒤일 때만 기간으로 저장
@@ -97,6 +107,10 @@ export default function ScheduleForm({
               disabled={disabled}
               className={`${inputCls} w-32`}
             >
+              {/* 기존 항목 상태(예약가능/예약많음 등)가 옵션에 없으면 보존용으로 추가 */}
+              {!STATUS_OPTS.some((o) => o.value === it.status) && (
+                <option value={it.status}>{STATUS_LABEL[it.status]}</option>
+              )}
               {STATUS_OPTS.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}

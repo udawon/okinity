@@ -190,30 +190,37 @@ const ScheduleItemSchema = z.object({
   date: z.string(), // 시작일(ISO YYYY-MM-DD) 또는 표시용 문자열
   endDate: z.string().optional(), // 종료일(기간 지정 시). 없으면 단일 날짜.
   program: z.string(),
-  // available 예약가능 · full 예약많음 · closed 휴무 · booked 확정예약(시스템 자동, 공개 표시)
-  status: z.enum(['available', 'full', 'closed', 'booked']).default('available')
+  // available 예약가능(기본) · full 예약많음 · closed 휴무 · booked 확정예약(1건)
+  // morning 오전만 가능 · afternoon 오후만 가능 (운영자 지정 — 시간대 제한)
+  status: z
+    .enum(['available', 'full', 'closed', 'booked', 'morning', 'afternoon'])
+    .default('available')
 });
 export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
 
 /**
  * 확정(confirmed)된 예약을 공개 일정표 항목으로 변환한다(고객 정보 제외).
- * 예약 건마다 한 줄씩 '예약됨'으로 노출하고, 세부 프로그램은 빼고 투어 종류(대분류)만 표시.
- * (2건이면 2줄, 3건이면 3줄 — 집계하지 않음.)
+ * 건마다 한 줄(대분류만). 색은 그날 확정 건수로 자동 결정:
+ *   1건  → 'booked'(터콰이즈) · 2건+ → 'full'(베이지) — 집계하지 않고 색만 변경.
  */
 export function confirmedBookingsToSchedule(
   bookings: { date?: string; product?: string; status: string }[]
 ): ScheduleItem[] {
-  const out: ScheduleItem[] = [];
+  const counts = new Map<string, number>();
+  const valid: { date: string; product?: string }[] = [];
   for (const b of bookings) {
     if (b.status !== 'confirmed') continue;
     const date =
       typeof b.date === 'string' && /^\d{4}-\d{2}-\d{2}/.test(b.date) ? b.date.slice(0, 10) : null;
     if (!date) continue;
-    const product = (b.product || '예약').trim();
-    const category = product.split(' · ')[0].trim() || '예약'; // 대분류만
-    out.push({ date, program: category, status: 'booked' });
+    counts.set(date, (counts.get(date) ?? 0) + 1);
+    valid.push({ date, product: b.product });
   }
-  return out;
+  return valid.map((b) => ({
+    date: b.date,
+    program: (b.product || '예약').split(' · ')[0].trim() || '예약', // 대분류만
+    status: (counts.get(b.date) ?? 0) >= 2 ? ('full' as const) : ('booked' as const)
+  }));
 }
 
 export function getSchedule(): ScheduleItem[] {

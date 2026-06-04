@@ -61,6 +61,8 @@
     "statusFull": "残りわずか",
     "statusClosed": "休業",
     "statusBooked": "予約済み",
+    "statusMorning": "午前のみ",
+    "statusAfternoon": "午後のみ",
     "empty": "スケジュールは近日公開します。"
   },
   "gallery": {

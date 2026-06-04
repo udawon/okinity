@@ -46,7 +46,9 @@ export default async function HomePage({
       available: tSchedule('statusAvailable'),
       full: tSchedule('statusFull'),
       closed: tSchedule('statusClosed'),
-      booked: tSchedule('statusBooked')
+      booked: tSchedule('statusBooked'),
+      morning: tSchedule('statusMorning'),
+      afternoon: tSchedule('statusAfternoon')
     },
     emptyLabel: tSchedule('empty')
   };

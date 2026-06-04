@@ -40,7 +40,9 @@ export default async function ReservePage({
     available: t('statusAvailable'),
     full: t('statusFull'),
     closed: t('statusClosed'),
-    booked: t('statusBooked')
+    booked: t('statusBooked'),
+    morning: t('statusMorning'),
+    afternoon: t('statusAfternoon')
   };
 
   return (

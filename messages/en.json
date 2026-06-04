@@ -61,6 +61,8 @@
     "statusFull": "Busy",
     "statusClosed": "Closed",
     "statusBooked": "Booked",
+    "statusMorning": "Morning only",
+    "statusAfternoon": "Afternoon only",
     "empty": "Schedule coming soon."
   },
   "gallery": {

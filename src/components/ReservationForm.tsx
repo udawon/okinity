@@ -20,12 +20,15 @@ export default function ReservationForm({
   lockedDateKey,
   lockedDateLabel,
   scheduled,
+  timeRestriction,
   onReset
 }: {
   lockedDateKey?: string;
   lockedDateLabel?: string;
   /** 선택한 날짜에 이미 예정된 투어(정보 표시용). badge는 '마감' 등 제약만 표기('예약 가능'은 생략). */
   scheduled?: { program: string; badge?: string }[];
+  /** 운영자 지정 시간대 제한 — 'morning'이면 오전·시간 무관만, 'afternoon'이면 오후·시간 무관만. */
+  timeRestriction?: 'morning' | 'afternoon';
   /** 성공 후 동작(예: 플래너에서 날짜 선택 해제). 없으면 폼 내부에서 새 문의로 초기화. */
   onReset?: () => void;
 }) {
@@ -218,18 +221,31 @@ export default function ReservationForm({
         </select>
       </div>
 
-      {/* 희망 시간대 */}
+      {/* 희망 시간대 — 운영자 지정(오전만/오후만)이 있으면 옵션 제한 */}
       <div className="mt-4">
         <label htmlFor="rf-time" className={labelCls}>
           희망 시간대 (선택)
         </label>
         <select id="rf-time" name="time" defaultValue="" className={`mt-1.5 ${inputCls} [&>option]:text-ink`}>
           <option value="">시간대 선택</option>
-          <option value="오전">오전</option>
-          <option value="오후">오후</option>
-          <option value="종일">종일</option>
+          {(timeRestriction === 'afternoon' ? [] : ['오전']).map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+          {(timeRestriction === 'morning' ? [] : ['오후']).map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+          {!timeRestriction && <option value="종일">종일</option>}
           <option value="시간 무관">시간 무관</option>
         </select>
+        {timeRestriction && (
+          <p className="mt-1 text-[11px] text-[#5fd6e2]">
+            이 날짜는 {timeRestriction === 'morning' ? '오전' : '오후'}만 운영합니다.
+          </p>
+        )}
       </div>
 
       {/* 인원 */}

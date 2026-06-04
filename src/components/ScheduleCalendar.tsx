@@ -8,10 +8,19 @@ type Status = ScheduleItem['status'];
 
 const STATUS: Record<Status, { text: string; dot: string }> = {
   available: { text: 'text-[#5fd6e2]', dot: 'bg-[#5fd6e2]' },
-  full: { text: 'text-[#f2c879]', dot: 'bg-[#f2c879]' },
+  booked: { text: 'text-[#5fd6e2]', dot: 'bg-[#5fd6e2]' }, // 확정 1건 — 터콰이즈
+  full: { text: 'text-[#f2c879]', dot: 'bg-[#f2c879]' }, // 예약많음/확정 2건+ — 베이지
   closed: { text: 'text-rose-200', dot: 'bg-rose-300/80' },
-  booked: { text: 'text-[#86efac]', dot: 'bg-[#4ade80]' }
+  morning: { text: 'text-sky-300', dot: 'bg-sky-300' }, // 오전만 가능
+  afternoon: { text: 'text-violet-300', dot: 'bg-violet-300' } // 오후만 가능
 };
+
+/** 셀에 표시할 텍스트 — morning/afternoon은 안내 문구로 자동 표기. */
+function eventLabel(e: { status: Status; program: string }): string {
+  if (e.status === 'morning') return '오전만 가능';
+  if (e.status === 'afternoon') return '오후만 가능';
+  return e.program;
+}
 
 // 2024-01-07은 일요일 → 요일 헤더(로케일별)를 일요일 시작으로 생성
 const weekdayLabels = (locale: string) =>
@@ -182,9 +191,9 @@ export default function ScheduleCalendar({
                   <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS[e.status].dot}`} />
                   <span
                     className={`truncate text-[10px] leading-tight sm:text-[11px] ${STATUS[e.status].text}`}
-                    title={e.program}
+                    title={eventLabel(e)}
                   >
-                    {e.program}
+                    {eventLabel(e)}
                   </span>
                 </div>
               ))}
@@ -269,7 +278,7 @@ export default function ScheduleCalendar({
               <li key={i} className="flex items-center justify-between gap-4 py-3 text-sm">
                 <span className="w-40 shrink-0 text-white/55">{label}</span>
                 <span className="flex-1 text-white/90">
-                  {e.status === 'closed' ? '휴무' : e.program}
+                  {e.status === 'closed' ? '휴무' : eventLabel(e)}
                 </span>
                 <span className={`shrink-0 font-medium ${STATUS[e.status].text}`}>
                   {statusLabel[e.status]}

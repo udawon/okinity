@@ -61,6 +61,8 @@
     "statusFull": "예약 많음",
     "statusClosed": "휴무",
     "statusBooked": "예약됨",
+    "statusMorning": "오전만 가능",
+    "statusAfternoon": "오후만 가능",
     "empty": "곧 일정이 등록됩니다."
   },
   "gallery": {
