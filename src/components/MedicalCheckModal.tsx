@@ -72,12 +72,21 @@ export default function MedicalCheckModal({
   const [confirmed, setConfirmed] = useState<Set<number>>(new Set());
 
   const toggleOpen = (i: number) => setOpenIndex((cur) => (cur === i ? null : i));
-  const toggleConfirm = (i: number) =>
-    setConfirmed((s) => {
-      const n = new Set(s);
-      n.has(i) ? n.delete(i) : n.add(i);
-      return n;
-    });
+
+  // '해당 없음' 체크 시: 그룹을 확인 처리하고, 현재 아코디언을 닫은 뒤 다음 미확인 그룹을
+  // 자동으로 펼친다(자연스러운 순차 진행). 체크 해제 시에는 전진하지 않고 펼침을 유지(수정 의도).
+  const toggleConfirm = (i: number) => {
+    const checking = !confirmed.has(i);
+    const next = new Set(confirmed);
+    checking ? next.add(i) : next.delete(i);
+    setConfirmed(next);
+    if (!checking) return;
+    // i 이후의 미확인 그룹을 우선 탐색, 없으면 처음부터 i 이전까지 탐색. 모두 확인됐으면 닫음(null).
+    let target: number | null = null;
+    for (let k = i + 1; k < TOTAL; k++) if (!next.has(k)) { target = k; break; }
+    if (target === null) for (let k = 0; k < i; k++) if (!next.has(k)) { target = k; break; }
+    setOpenIndex(target);
+  };
 
   const allConfirmed = confirmed.size === TOTAL;
   const pct = Math.round((confirmed.size / TOTAL) * 100);
