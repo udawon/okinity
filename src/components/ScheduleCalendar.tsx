@@ -67,14 +67,16 @@ export default function ScheduleCalendar({
     return s;
   }, [byDate]);
 
-  const prevKey = (key: string) => {
+  const shiftKey = (key: string, delta: number) => {
     const [yy, mm, dd] = key.split('-').map(Number);
     const dt = new Date(yy, mm - 1, dd);
-    dt.setDate(dt.getDate() - 1);
+    dt.setDate(dt.getDate() + delta);
     return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(
       dt.getDate()
     ).padStart(2, '0')}`;
   };
+  const prevKey = (key: string) => shiftKey(key, -1);
+  const nextKey = (key: string) => shiftKey(key, 1);
 
   // 초기 월 = 가장 이른 일정의 월(없으면 오늘)
   const initial = useMemo(() => {
@@ -165,8 +167,14 @@ export default function ScheduleCalendar({
           // 휴무(closed) 또는 과거만 차단. 프로그램(예약가능/마감)이 있어도 다른 투어 예약 여지가 있으므로 선택 가능.
           const hasClosed = evs.some((e) => e.status === 'closed');
           const canBook = selectable && !hasClosed && key >= todayKey;
-          // 연속 휴무: 구간 시작(전날이 휴무가 아님)에만 '휴무' 배지, 나머지 날은 배경 톤으로만 이어 보이게.
+          // 연속 휴무: 구간 전체를 가로지르는 막대로 표시. 라벨은 구간 시작에만, 막대는 이어짐.
           const isClosedRunStart = hasClosed && !closedSet.has(prevKey(key));
+          const isClosedRunEnd = hasClosed && !closedSet.has(nextKey(key));
+          const col = i % 7; // 0=일 … 6=토 — 주 경계에서도 모서리 둥글게
+          const roundL = isClosedRunStart || col === 0;
+          const roundR = isClosedRunEnd || col === 6;
+          const closedRound =
+            roundL && roundR ? 'rounded-md' : roundL ? 'rounded-l-md' : roundR ? 'rounded-r-md' : '';
           const nonClosed = evs.filter((e) => e.status !== 'closed');
 
           const dayNum = (
@@ -179,12 +187,15 @@ export default function ScheduleCalendar({
             </span>
           );
 
-          const eventList = (isClosedRunStart || nonClosed.length > 0) && (
+          const eventList = (hasClosed || nonClosed.length > 0) && (
             <div className="mt-1 space-y-1">
-              {isClosedRunStart && (
-                <span className="inline-flex w-fit max-w-full items-center gap-1 truncate rounded-md border border-rose-300/40 bg-rose-400/15 px-1.5 py-0.5 text-[10px] font-bold text-rose-100 sm:text-[11px]">
-                  🚫 휴무
-                </span>
+              {hasClosed && (
+                // 셀 좌우 패딩을 음수마진으로 뚫어 칸 끝까지 → 연속 휴무가 막대로 이어져 보임
+                <div
+                  className={`-mx-1.5 truncate bg-rose-400/20 px-1.5 py-0.5 text-[10px] font-bold leading-tight text-rose-100 sm:-mx-2 sm:text-[11px] ${closedRound}`}
+                >
+                  {isClosedRunStart ? '🚫 휴무' : ' '}
+                </div>
               )}
               {nonClosed.map((e, j) => (
                 <div key={j} className="flex items-center gap-1">
