@@ -77,8 +77,11 @@ export default function ReservePlanner({
               </div>
               <p className="mt-5 font-serif text-xl text-white">날짜를 선택하세요</p>
               <p className="mt-2 max-w-[16rem] text-sm leading-relaxed text-white/60">
-                왼쪽 달력에서 <span className="text-[#5fd6e2]">휴무를 제외한 날짜</span>를 누르면
-                여기에서 바로 예약을 시작할 수 있어요.
+                {/* 레이아웃: 모바일은 달력이 위, lg+는 왼쪽에 배치되므로 안내 방향을 맞춘다 */}
+                <span className="lg:hidden">위쪽</span>
+                <span className="hidden lg:inline">왼쪽</span> 달력에서{' '}
+                <span className="text-[#5fd6e2]">휴무를 제외한 날짜</span>를 누르면 여기에서 바로
+                예약을 시작할 수 있어요.
               </p>
             </div>
           ) : (

@@ -318,7 +318,7 @@ export default function ReservationForm({
       )}
 
       <p className="mt-3 text-center text-xs text-white/45">
-        예약 전 상담은 무료 · 당일 취소 수수료 없음
+        예약 전 상담은 무료 · 예약 당일 취소 수수료 없음
       </p>
 
       {medOpen && (
