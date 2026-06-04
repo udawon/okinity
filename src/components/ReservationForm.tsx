@@ -11,10 +11,10 @@ const labelCls = 'block text-xs font-medium uppercase tracking-wider text-white/
 type SubmitState = 'idle' | 'submitting' | 'success' | 'error';
 
 /**
- * 공통 예약 문의 폼 — 홈 예약 플래너와 /contact가 동일하게 사용(동기화).
+ * 공통 예약 문의 폼 — /reserve의 예약 플래너(ReservePlanner)가 사용.
  * 투어를 대분류(ACTIVITIES.title) → 중분류(tours[].name)로 선택한다.
  * - lockedDateKey 지정: 캘린더에서 고른 날짜 고정(날짜 입력칸 숨김)
- * - 미지정: 날짜 직접 선택(선택 입력) — /contact 용
+ * - 미지정: 날짜 직접 선택(선택 입력) 모드
  */
 export default function ReservationForm({
   lockedDateKey,

@@ -9,7 +9,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/about',
     '/reserve',
     '/gallery',
-    '/contact',
     '/blog',
     '/notice',
     ...TOUR_CATALOG.map((t) => `/tours/${t.slug}`)
