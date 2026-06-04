@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Link } from '@/i18n/routing';
 import ScheduleCalendar from './ScheduleCalendar';
 import ReservationForm from './ReservationForm';
 import type { ScheduleItem } from '@/lib/content';
@@ -91,14 +90,6 @@ export default function ReservePlanner({
             />
           )}
         </div>
-
-        <p className="mt-3 text-center text-xs text-white/50">
-          날짜가 정해지지 않았다면{' '}
-          <Link href="/contact" className="text-[#5fd6e2] underline-offset-2 hover:underline">
-            일반 문의
-          </Link>
-          로도 보낼 수 있어요.
-        </p>
       </div>
     </div>
   );

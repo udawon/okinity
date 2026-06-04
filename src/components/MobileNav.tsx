@@ -107,7 +107,7 @@ export default function MobileNav({ current }: { current: Locale }) {
             )}
 
             <Link
-              href="/contact"
+              href="/reserve"
               onClick={close}
               className="border-b border-white/10 py-3 transition-colors hover:text-white last:border-0"
             >

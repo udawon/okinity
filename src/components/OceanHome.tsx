@@ -356,7 +356,7 @@ function Hero({
 
         <R delay={0.3} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
-            href="/contact"
+            href="/reserve"
             className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 px-8 py-4 text-sm font-bold text-[#06202a] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-[transform,box-shadow,background-color] duration-200 hover:bg-amber-300 hover:shadow-[0_10px_38px_rgba(246,166,35,0.5)] active:scale-[0.97] sm:w-auto"
           >
             투어 예약하기
