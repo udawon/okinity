@@ -55,7 +55,6 @@ export default async function ReservePage({
             items={items}
             locale={locale}
             statusLabel={statusLabel}
-            emptyLabel={t('empty')}
           />
         </div>
       </Container>

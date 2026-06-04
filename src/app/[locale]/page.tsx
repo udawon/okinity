@@ -47,8 +47,7 @@ export default async function HomePage({
       booked: tSchedule('statusBooked'),
       morning: tSchedule('statusMorning'),
       afternoon: tSchedule('statusAfternoon')
-    },
-    emptyLabel: tSchedule('empty')
+    }
   };
 
   // 어드민 편집 가능한 미디어(배경영상·투어 카드·갤러리). 비우면 기본값 사용.

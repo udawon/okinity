@@ -34,7 +34,6 @@ export default function ScheduleCalendar({
   items,
   locale,
   statusLabel,
-  emptyLabel,
   selectable = false,
   selectedKey = null,
   onSelectDate
@@ -42,7 +41,6 @@ export default function ScheduleCalendar({
   items: ScheduleItem[];
   locale: string;
   statusLabel: Record<Status, string>;
-  emptyLabel: string;
   /** true면 예약가능 날짜를 클릭할 수 있다(예약 통합용). 미지정 시 읽기전용(기존 동작). */
   selectable?: boolean;
   /** 현재 선택된 날짜 키(YYYY-MM-DD). */
@@ -114,13 +112,6 @@ export default function ScheduleCalendar({
     const d = new Date(y, m + delta, 1);
     setYM({ y: d.getFullYear(), m: d.getMonth() });
   };
-
-  // 해당 월의 이벤트 리스트 — 원본 항목 기준(기간 항목은 한 번만, 구간 표기). 정렬: 시작일.
-  const monthPrefix = ymKey(y, m);
-  const monthEvents = items
-    .filter((it) => scheduleItemDates(it).some((d) => d.startsWith(monthPrefix)))
-    .slice()
-    .sort((a, b) => a.date.localeCompare(b.date));
 
   const navBtn =
     'flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/80 transition-colors hover:border-white/40 hover:text-white';
@@ -254,9 +245,10 @@ export default function ScheduleCalendar({
         })}
       </div>
 
-      {/* 범례 */}
+      {/* 범례 — 공개 캘린더에 실제로 나타나는 상태만(휴무·오전 가능·오후 가능).
+          예약가능(기본값)·예약됨·예약많음(확정 예약 연동 해제)은 표시되지 않으므로 제외. */}
       <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55">
-        {(Object.keys(STATUS) as Status[]).map((s) => (
+        {(['closed', 'morning', 'afternoon'] as Status[]).map((s) => (
           <span key={s} className="inline-flex items-center gap-1.5">
             <span className={`h-2 w-2 rounded-full ${STATUS[s].dot}`} />
             {statusLabel[s]}
@@ -266,39 +258,6 @@ export default function ScheduleCalendar({
           <span className="text-white/45">· 휴무를 제외한 날짜를 누르면 예약 문의를 시작할 수 있어요</span>
         )}
       </div>
-
-      {/* 해당 월 일정 리스트 (모바일 가독성 보강) */}
-      {monthEvents.length === 0 ? (
-        <p className="mt-8 text-sm text-white/50">{emptyLabel}</p>
-      ) : (
-        <ul className="mt-8 divide-y divide-white/10 border-t border-white/10">
-          {monthEvents.map((e, i) => {
-            const fmt = (key: string) =>
-              new Intl.DateTimeFormat(locale, {
-                month: 'short',
-                day: 'numeric',
-                weekday: 'short'
-              }).format(new Date(key));
-            const start = e.date.slice(0, 10);
-            const end =
-              e.endDate && /^\d{4}-\d{2}-\d{2}/.test(e.endDate) && e.endDate.slice(0, 10) > start
-                ? e.endDate.slice(0, 10)
-                : null;
-            const label = end ? `${fmt(start)} ~ ${fmt(end)}` : fmt(start);
-            return (
-              <li key={i} className="flex items-center justify-between gap-4 py-3 text-sm">
-                <span className="w-40 shrink-0 text-white/55">{label}</span>
-                <span className="flex-1 text-white/90">
-                  {e.status === 'closed' ? '휴무' : eventLabel(e)}
-                </span>
-                <span className={`shrink-0 font-medium ${STATUS[e.status].text}`}>
-                  {statusLabel[e.status]}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      )}
     </div>
   );
 }

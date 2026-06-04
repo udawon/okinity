@@ -16,13 +16,11 @@ type Status = ScheduleItem['status'];
 export default function ReservePlanner({
   items,
   locale,
-  statusLabel,
-  emptyLabel
+  statusLabel
 }: {
   items: ScheduleItem[];
   locale: string;
   statusLabel: Record<Status, string>;
-  emptyLabel: string;
 }) {
   const [selected, setSelected] = useState<{ key: string; events: ScheduleItem[] } | null>(null);
   const selectedKey = selected?.key ?? null;
@@ -63,7 +61,6 @@ export default function ReservePlanner({
           items={items}
           locale={locale}
           statusLabel={statusLabel}
-          emptyLabel={emptyLabel}
           selectable
           selectedKey={selectedKey}
           onSelectDate={(key, events) => setSelected({ key, events })}

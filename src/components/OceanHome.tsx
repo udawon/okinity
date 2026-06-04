@@ -25,7 +25,6 @@ import {
 type ScheduleData = {
   items: ScheduleItem[];
   statusLabel: Record<ScheduleItem['status'], string>;
-  emptyLabel: string;
 };
 
 /* 길게 감속하는 시네마틱 ease-out(quint). 사이트 Reveal과 동일 톤. */
@@ -813,7 +812,6 @@ function ReserveSection({ schedule, locale }: { schedule: ScheduleData; locale: 
             items={schedule.items}
             locale={locale}
             statusLabel={schedule.statusLabel}
-            emptyLabel={schedule.emptyLabel}
           />
         </R>
       </div>
