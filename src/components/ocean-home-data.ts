@@ -27,7 +27,6 @@ export type Activity = {
   desc: string;
   /** 하위 투어 메뉴 (실제 예약 상품). 각 항목은 /tours/{slug} 상세 페이지로 연결. */
   tours: TourRef[];
-  meta: { label: string; value: string }[];
   image: string;
   /** 카드 글로우/포인트 색 */
   accent: string;
@@ -46,11 +45,6 @@ export const ACTIVITIES: Activity[] = [
       { slug: 'boat-snorkeling', name: '보트 스노클링' },
       { slug: 'beach-snorkeling', name: '스노클링' }
     ],
-    meta: [
-      { label: '수심', value: '0–3m' },
-      { label: '소요', value: '2–3시간' },
-      { label: '대상', value: '입문 · 가족' }
-    ],
     image: '/images/ph-2.svg',
     accent: '#5fd6e2'
   },
@@ -65,11 +59,6 @@ export const ACTIVITIES: Activity[] = [
       { slug: 'blue-cave-dive', name: '푸른동굴 보트 체험다이빙' },
       { slug: 'kerama-dive', name: '케라마 보트 체험다이빙' },
       { slug: 'fun-dive', name: '펀다이빙' }
-    ],
-    meta: [
-      { label: '수심', value: '5–18m' },
-      { label: '소요', value: '반일 · 종일' },
-      { label: '대상', value: '입문~상급' }
     ],
     image: '/images/ph-1.svg',
     accent: '#22d3ee'
@@ -87,11 +76,6 @@ export const ACTIVITIES: Activity[] = [
       { slug: 'owaow-course', name: 'OW+AOW 연속교육 코스' },
       { slug: 'specialty-course', name: '스페셜티 라이센스 코스' }
     ],
-    meta: [
-      { label: '기간', value: '2–4일' },
-      { label: '인증', value: '국제 PADI' },
-      { label: '대상', value: '입문~전문' }
-    ],
     image: '/images/ph-4.svg',
     accent: '#38bdf8'
   },
@@ -107,11 +91,6 @@ export const ACTIVITIES: Activity[] = [
       { slug: 'fishing-5species-6h', name: '6시간 5종낚시' },
       { slug: 'overnight-fishing', name: '1박2일 종일낚시' },
       { slug: 'biggame-trolling-8h', name: '8시간 빅게임 트롤링' }
-    ],
-    meta: [
-      { label: '시간', value: '4시간~1박2일' },
-      { label: '포함', value: '장비 · 미끼' },
-      { label: '대상', value: '누구나' }
     ],
     image: '/images/ph-3.svg',
     accent: '#f6a623'

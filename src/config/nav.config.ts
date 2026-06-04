@@ -36,8 +36,7 @@ export const NAV: NavItem[] = [
   },
   {
     key: 'diving',
-    href: '/diving',
-    hub: '/diving',
+    href: '/tours/blue-cave-dive',
     children: [
       { tKey: 'tours.diving.cave', href: '/tours/blue-cave-dive' },
       { tKey: 'tours.diving.kerama', href: '/tours/kerama-dive' },
@@ -46,8 +45,7 @@ export const NAV: NavItem[] = [
   },
   {
     key: 'padi',
-    href: '/padi',
-    hub: '/padi',
+    href: '/tours/ow-course',
     children: [
       { tKey: 'tours.padi.ow', href: '/tours/ow-course' },
       { tKey: 'tours.padi.aow', href: '/tours/aow-course' },
