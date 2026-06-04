@@ -7,8 +7,8 @@ import { scheduleItemDates } from '@/lib/schedule-range';
 type Status = ScheduleItem['status'];
 
 const STATUS: Record<Status, { text: string; dot: string }> = {
-  available: { text: 'text-[#5fd6e2]', dot: 'bg-[#5fd6e2]' },
-  booked: { text: 'text-[#5fd6e2]', dot: 'bg-[#5fd6e2]' }, // 확정 1건 — 터콰이즈
+  available: { text: 'text-[#5fc6ef]', dot: 'bg-[#5fc6ef]' },
+  booked: { text: 'text-[#5fc6ef]', dot: 'bg-[#5fc6ef]' }, // 확정 1건 — 터콰이즈
   full: { text: 'text-[#f2c879]', dot: 'bg-[#f2c879]' }, // 예약많음/확정 2건+ — 베이지
   closed: { text: 'text-rose-200', dot: 'bg-rose-300/80' },
   morning: { text: 'text-sky-300', dot: 'bg-sky-300' }, // 오전만 가능
@@ -149,7 +149,7 @@ export default function ScheduleCalendar({
       <div className="grid grid-cols-7 gap-px overflow-hidden rounded-card border border-white/10 bg-white/10">
         {cells.map((day, i) => {
           if (day === null) {
-            return <div key={i} className="min-h-[72px] bg-[#06151d]/70 sm:min-h-[96px]" />;
+            return <div key={i} className="min-h-[72px] bg-[#061522]/70 sm:min-h-[96px]" />;
           }
           const key = dateKey(day);
           const evs = byDate.get(key) ?? [];
@@ -205,7 +205,7 @@ export default function ScheduleCalendar({
           // 모든 칸을 상단 정렬(flex-col) — button/div 혼용 시 세로 정렬이 달라지는 문제 방지.
           // 휴무는 셀 배경도 붉은 톤으로 구분해 한눈에 보이게.
           const base = `flex min-h-[72px] flex-col p-1.5 text-left sm:min-h-[96px] sm:p-2 ${
-            hasClosed ? 'bg-rose-950/30' : evs.length ? 'bg-[#0e2c3a]/80' : 'bg-[#06151d]/70'
+            hasClosed ? 'bg-rose-950/30' : evs.length ? 'bg-[#0e2c46]/80' : 'bg-[#061522]/70'
           }`;
 
           // 예약 가능(휴무·과거 제외) → 클릭. 빈 날짜는 '+예약' 힌트, 프로그램 날짜는 일정 표시 + 호버 강조.
@@ -216,15 +216,15 @@ export default function ScheduleCalendar({
                 type="button"
                 onClick={() => pick(key, evs)}
                 aria-pressed={isSelected}
-                className={`group ${base} w-full cursor-pointer transition-colors hover:bg-[#15506a]/70 ${
-                  isSelected ? 'bg-[#15506a]/60 ring-2 ring-inset ring-[#5fd6e2]' : ''
+                className={`group ${base} w-full cursor-pointer transition-colors hover:bg-[#155084]/70 ${
+                  isSelected ? 'bg-[#155084]/60 ring-2 ring-inset ring-[#5fc6ef]' : ''
                 }`}
               >
                 {dayNum}
                 {eventList}
                 {evs.length === 0 && (
                   <span
-                    className={`mt-2 block text-[10px] font-medium text-[#5fd6e2] transition-opacity ${
+                    className={`mt-2 block text-[10px] font-medium text-[#5fc6ef] transition-opacity ${
                       isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                     }`}
                   >

@@ -142,14 +142,14 @@ function CinematicBackground() {
   return (
     <div className="pointer-events-none fixed inset-0" style={{ zIndex: -5 }} aria-hidden>
       {/* 베이스(항상 깔리는 색 — 심해 대신 밝은 바다 틸) */}
-      <div className="absolute inset-0 bg-[#0e5a6b]" />
+      <div className="absolute inset-0 bg-[#0e5a90]" />
       {/* 수면 — 햇살 비치는 밝은 터콰이즈 */}
       <motion.div
         className="absolute inset-0"
         style={{
           opacity: reduce ? 0.6 : surfaceOpacity,
           background:
-            'radial-gradient(125% 85% at 50% -12%, #6fdcea 0%, #38b6cb 28%, #1f97ac 50%, #15808f 72%, #106575 100%)'
+            'radial-gradient(125% 85% at 50% -12%, #6fcef5 0%, #3aa6e0 28%, #1f86c2 50%, #1572b0 72%, #1065a0 100%)'
         }}
       />
       {/* 중층 — 맑은 청록 */}
@@ -158,7 +158,7 @@ function CinematicBackground() {
         style={{
           opacity: reduce ? 0.55 : midOpacity,
           background:
-            'radial-gradient(125% 95% at 50% 25%, #0d5667 0%, #0b4a5b 42%, #093f4d 72%, #083845 100%)'
+            'radial-gradient(125% 95% at 50% 25%, #0d5688 0%, #0b4a78 42%, #093f62 72%, #083a58 100%)'
         }}
       />
       {/* 심해 — 깊고 어두운 청록(대비 확보) */}
@@ -167,7 +167,7 @@ function CinematicBackground() {
         style={{
           opacity: reduce ? 0 : deepOpacity,
           background:
-            'radial-gradient(100% 100% at 50% 60%, #093f4d 0%, #072f3b 55%, #05222c 100%)'
+            'radial-gradient(100% 100% at 50% 60%, #093f62 0%, #07304a 55%, #052230 100%)'
         }}
       />
       {/* 코스틱(수면 굴절 무늬) */}
@@ -308,7 +308,7 @@ function Hero({
         />
       )}
       {/* 가독성 스크림 — 영상 색을 가리지 않도록 상단·중앙은 투명, 하단만 어둡게(텍스트 대비 유지) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#04202b]/85" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#04202f]/85" />
       {/* 텍스트 영역 국소 스크림 — 영상 색(하늘·바다)은 가장자리에 남기고, 글자 뒤(중앙)만 충분히 어둡게(부제 AA 대비 확보) */}
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(82%_56%_at_50%_52%,rgba(2,16,26,0.84)_0%,rgba(2,16,26,0.5)_46%,rgba(2,16,26,0.12)_70%,transparent_84%)]"
@@ -356,7 +356,7 @@ function Hero({
         <R delay={0.3} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             href="/reserve"
-            className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 px-8 py-4 text-sm font-bold text-[#06202a] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-[transform,box-shadow,background-color] duration-200 hover:bg-amber-300 hover:shadow-[0_10px_38px_rgba(246,166,35,0.5)] active:scale-[0.97] sm:w-auto"
+            className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 px-8 py-4 text-sm font-bold text-[#06202f] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-[transform,box-shadow,background-color] duration-200 hover:bg-amber-300 hover:shadow-[0_10px_38px_rgba(246,166,35,0.5)] active:scale-[0.97] sm:w-auto"
           >
             투어 예약하기
             <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -414,7 +414,7 @@ function ActivityCard({ a, image }: { a: Activity; image: string }) {
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#02101a]/75 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#02101e]/75 via-transparent to-transparent" />
         <span
           className="absolute left-4 top-4 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider"
           style={{ backgroundColor: `${a.accent}26`, color: a.accent }}
@@ -515,7 +515,7 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
   // 모바일·태블릿(터치)은 화살표를 숨기고 'peek(옆 카드 살짝 노출) + 스와이프'로 좌우 탐색을 유도한다.
   // (모바일에서 화살표를 카드 위에 얹으면 어느 높이든 본문 텍스트를 가리므로 근본적으로 제거.)
   const arrowCls =
-    'absolute lg:top-1/2 z-10 hidden lg:grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/25 bg-[#02101a]/60 text-white shadow-[0_8px_28px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-[#02101a]/85 disabled:pointer-events-none disabled:opacity-0 sm:h-14 sm:w-14';
+    'absolute lg:top-1/2 z-10 hidden lg:grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/25 bg-[#02101e]/60 text-white shadow-[0_8px_28px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-white/50 hover:bg-[#02101e]/85 disabled:pointer-events-none disabled:opacity-0 sm:h-14 sm:w-14';
 
   return (
     <section id="activities" className="relative scroll-mt-24 py-24 sm:py-32">
@@ -705,7 +705,7 @@ function GallerySection({ images }: { images?: string[] }) {
                   className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                   aria-hidden
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#02101a]/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#02101e]/40 to-transparent" />
               </div>
             </R>
           ))}

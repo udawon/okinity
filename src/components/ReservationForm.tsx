@@ -5,7 +5,7 @@ import { ACTIVITIES } from './ocean-home-data';
 import MedicalCheckModal from './MedicalCheckModal';
 
 const inputCls =
-  'w-full rounded-button border border-white/15 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-[#5fd6e2] focus:outline-none focus:ring-2 focus:ring-[#5fd6e2]/25';
+  'w-full rounded-button border border-white/15 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-[#5fc6ef] focus:outline-none focus:ring-2 focus:ring-[#5fc6ef]/25';
 const labelCls = 'block text-xs font-medium uppercase tracking-wider text-white/55';
 
 type SubmitState = 'idle' | 'submitting' | 'success' | 'error';
@@ -113,7 +113,7 @@ export default function ReservationForm({
   if (state === 'success' && done) {
     return (
       <div className="flex flex-col items-center px-6 py-14 text-center">
-        <div className="grid h-14 w-14 place-items-center rounded-full border border-[#5fd6e2]/40 bg-[#5fd6e2]/15 text-2xl">
+        <div className="grid h-14 w-14 place-items-center rounded-full border border-[#5fc6ef]/40 bg-[#5fc6ef]/15 text-2xl">
           ✓
         </div>
         <p className="mt-5 font-serif text-xl text-white">문의가 접수되었어요</p>
@@ -142,7 +142,7 @@ export default function ReservationForm({
       {/* 날짜 — 고정(캘린더) 또는 직접 선택 */}
       {lockedDateKey ? (
         <div className="border-b border-white/10 pb-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5fd6e2]">Reserve</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5fc6ef]">Reserve</p>
           <p className="mt-1.5 font-serif text-2xl leading-tight text-white">{lockedDateLabel}</p>
           {scheduled && scheduled.length > 0 && (
             <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.04] p-3">
@@ -249,7 +249,7 @@ export default function ReservationForm({
           <option value="시간 무관">시간 무관</option>
         </select>
         {timeRestriction && (
-          <p className="mt-1 text-[11px] text-[#5fd6e2]">
+          <p className="mt-1 text-[11px] text-[#5fc6ef]">
             이 날짜는 {timeRestriction === 'morning' ? '오전' : '오후'}만 운영합니다.
           </p>
         )}
@@ -296,7 +296,7 @@ export default function ReservationForm({
       <button
         type="submit"
         disabled={state === 'submitting'}
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 px-6 py-3.5 text-sm font-bold text-[#06202a] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-[transform,box-shadow,background-color] duration-200 hover:bg-amber-300 hover:shadow-[0_12px_42px_rgba(246,166,35,0.5)] active:scale-[0.98] disabled:opacity-60"
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 px-6 py-3.5 text-sm font-bold text-[#06202f] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-[transform,box-shadow,background-color] duration-200 hover:bg-amber-300 hover:shadow-[0_12px_42px_rgba(246,166,35,0.5)] active:scale-[0.98] disabled:opacity-60"
       >
         {state === 'submitting'
           ? '보내는 중…'

@@ -23,7 +23,7 @@ export default function HeaderShell({ children }: { children: ReactNode }) {
     <header
       className={`sticky top-0 z-40 transition-[background-color,border-color,backdrop-filter] duration-500 ${
         scrolled
-          ? 'border-b border-white/10 bg-[#06151d]/60 backdrop-blur-md'
+          ? 'border-b border-white/10 bg-[#061522]/60 backdrop-blur-md'
           : 'border-b border-transparent bg-gradient-to-b from-black/35 to-transparent'
       }`}
     >

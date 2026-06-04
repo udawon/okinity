@@ -71,7 +71,7 @@ function buildEmail(data: NewInquiry): Notif {
   const html = `
   <div style="background:#f1f5f9;padding:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
     <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e2e8f0">
-      <div style="background:#02101a;padding:18px 24px">
+      <div style="background:#02101e;padding:18px 24px">
         <p style="margin:0;color:#7dd3fc;font-size:12px;letter-spacing:2px">OKINITY · 새 예약 문의</p>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:14px">${trs}</table>

@@ -80,7 +80,7 @@ function NavDropdown({ item }: { item: NavItem }) {
           onKeyDown={onMenuKeyDown}
           className="absolute left-0 top-full min-w-[15rem] pt-3"
         >
-          <div className="overflow-hidden rounded-xl border border-white/10 bg-[#06151d]/95 py-2 shadow-[0_16px_40px_rgba(0,0,0,0.45)] backdrop-blur-md">
+          <div className="overflow-hidden rounded-xl border border-white/10 bg-[#061522]/95 py-2 shadow-[0_16px_40px_rgba(0,0,0,0.45)] backdrop-blur-md">
             {item.children!.map((leaf) => (
               <Link
                 key={leaf.tKey}

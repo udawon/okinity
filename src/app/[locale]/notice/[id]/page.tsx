@@ -53,9 +53,9 @@ export default async function NoticePostPage({
         </Link>
 
         <header className="mt-6">
-          <div className="flex items-center gap-2 text-sm text-[#5fd6e2]">
+          <div className="flex items-center gap-2 text-sm text-[#5fc6ef]">
             {post.pinned && (
-              <span className="rounded-full bg-[#5fd6e2]/15 px-2 py-0.5 text-xs font-semibold">
+              <span className="rounded-full bg-[#5fc6ef]/15 px-2 py-0.5 text-xs font-semibold">
                 고정
               </span>
             )}

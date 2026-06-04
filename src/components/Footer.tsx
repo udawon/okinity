@@ -22,7 +22,7 @@ export default async function Footer() {
             {t('rights', { year: new Date().getFullYear() })}
           </p>
           {site.padiAffiliated && (
-            <p className="mt-3 text-xs font-semibold uppercase tracking-[0.15em] text-[#5fd6e2]">
+            <p className="mt-3 text-xs font-semibold uppercase tracking-[0.15em] text-[#5fc6ef]">
               PADI Dive Center
             </p>
           )}

@@ -53,7 +53,7 @@ export default function MobileNav({ current }: { current: Locale }) {
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 top-16 max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-white/10 bg-[#06151d]/95 backdrop-blur-md sm:top-[111px]">
+        <div className="absolute left-0 right-0 top-16 max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-white/10 bg-[#061522]/95 backdrop-blur-md sm:top-[111px]">
           <nav className="flex flex-col px-5 py-4 text-sm font-medium text-white/80" aria-label="주요 메뉴">
             {NAV.map((item) =>
               item.children ? (

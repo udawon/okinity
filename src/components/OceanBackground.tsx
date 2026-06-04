@@ -49,13 +49,13 @@ const CAUSTICS_SVG =
 function OceanAmbient() {
   const reduce = useStableReducedMotion();
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden bg-[#06151d]" aria-hidden>
+    <div className="fixed inset-0 -z-10 overflow-hidden bg-[#061522]" aria-hidden>
       {/* 깊은 바다 그라데이션 */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(120% 100% at 50% 28%, #0b4658 0%, #063040 52%, #03161e 100%)'
+            'radial-gradient(120% 100% at 50% 28%, #0b4670 0%, #06304e 52%, #031622 100%)'
         }}
       />
       {/* 수중 광선(빛기둥) */}
@@ -145,7 +145,7 @@ export default function OceanBackground({ videos }: { videos?: OceanVideos }) {
   const layers = [videos?.surface, videos?.mid, videos?.under, videos?.deep];
 
   return (
-    <div className="fixed inset-0 -z-10 bg-[#06151d]" aria-hidden>
+    <div className="fixed inset-0 -z-10 bg-[#061522]" aria-hidden>
       {layers.map((src, i) =>
         src ? (
           <video

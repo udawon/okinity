@@ -56,7 +56,7 @@ export default function ReservePlanner({
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(330px,400px)]">
       {/* 좌: 일정표 (빈 날짜 선택 가능) */}
-      <div className="rounded-card border border-white/10 bg-[#06151d]/60 p-5 backdrop-blur-md sm:p-7">
+      <div className="rounded-card border border-white/10 bg-[#061522]/60 p-5 backdrop-blur-md sm:p-7">
         <ScheduleCalendar
           items={items}
           locale={locale}
@@ -69,10 +69,10 @@ export default function ReservePlanner({
 
       {/* 우: 예약 패널 */}
       <div className="lg:sticky lg:top-24 lg:self-start">
-        <div className="overflow-hidden rounded-card border border-white/10 bg-gradient-to-b from-[#0e3848]/85 to-[#06151d]/85 shadow-[0_18px_50px_rgba(0,0,0,0.4)] backdrop-blur-md">
+        <div className="overflow-hidden rounded-card border border-white/10 bg-gradient-to-b from-[#0e3858]/85 to-[#061522]/85 shadow-[0_18px_50px_rgba(0,0,0,0.4)] backdrop-blur-md">
           {!selectedKey ? (
             <div className="flex flex-col items-center px-6 py-14 text-center">
-              <div className="grid h-14 w-14 place-items-center rounded-full border border-[#5fd6e2]/30 bg-[#5fd6e2]/10 text-2xl">
+              <div className="grid h-14 w-14 place-items-center rounded-full border border-[#5fc6ef]/30 bg-[#5fc6ef]/10 text-2xl">
                 🗓️
               </div>
               <p className="mt-5 font-serif text-xl text-white">날짜를 선택하세요</p>
@@ -80,7 +80,7 @@ export default function ReservePlanner({
                 {/* 레이아웃: 모바일은 달력이 위, lg+는 왼쪽에 배치되므로 안내 방향을 맞춘다 */}
                 <span className="lg:hidden">위쪽</span>
                 <span className="hidden lg:inline">왼쪽</span> 달력에서{' '}
-                <span className="text-[#5fd6e2]">휴무를 제외한 날짜</span>를 누르면 여기에서 바로
+                <span className="text-[#5fc6ef]">휴무를 제외한 날짜</span>를 누르면 여기에서 바로
                 예약을 시작할 수 있어요.
               </p>
             </div>

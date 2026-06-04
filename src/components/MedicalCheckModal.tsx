@@ -93,11 +93,11 @@ export default function MedicalCheckModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-stretch justify-center overflow-y-auto bg-black/60 sm:items-center sm:p-4">
-      <div className="flex h-dvh w-full max-w-lg flex-col border-white/10 bg-[#06151d] sm:h-auto sm:max-h-[90vh] sm:rounded-card sm:border">
+      <div className="flex h-dvh w-full max-w-lg flex-col border-white/10 bg-[#061522] sm:h-auto sm:max-h-[90vh] sm:rounded-card sm:border">
         {/* 헤더 */}
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#5fd6e2]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#5fc6ef]">
               Safety Check
             </p>
             <h2 className="font-serif text-xl text-white">메디컬 체크</h2>
@@ -137,7 +137,7 @@ export default function MedicalCheckModal({
                 <div
                   key={gi}
                   className={`overflow-hidden rounded-lg border ${
-                    conf ? 'border-[#5fd6e2]/40' : 'border-white/10'
+                    conf ? 'border-[#5fc6ef]/40' : 'border-white/10'
                   }`}
                 >
                   {/* 아코디언 헤더 */}
@@ -150,7 +150,7 @@ export default function MedicalCheckModal({
                     <span className="flex items-center gap-2">
                       <span
                         className={`grid h-5 w-5 shrink-0 place-items-center rounded-full text-[11px] font-bold ${
-                          conf ? 'bg-[#5fd6e2] text-[#06202a]' : 'bg-white/10 text-white/50'
+                          conf ? 'bg-[#5fc6ef] text-[#06202f]' : 'bg-white/10 text-white/50'
                         }`}
                       >
                         {conf ? '✓' : gi + 1}
@@ -160,7 +160,7 @@ export default function MedicalCheckModal({
                     </span>
                     <span className="flex items-center gap-2">
                       {conf && (
-                        <span className="rounded-full bg-[#5fd6e2]/15 px-2 py-0.5 text-[11px] font-medium text-[#5fd6e2]">
+                        <span className="rounded-full bg-[#5fc6ef]/15 px-2 py-0.5 text-[11px] font-medium text-[#5fc6ef]">
                           확인됨
                         </span>
                       )}
@@ -190,13 +190,13 @@ export default function MedicalCheckModal({
                         aria-pressed={conf}
                         className={`mt-3 flex w-full items-center gap-2.5 rounded-lg border p-3 text-left transition-colors ${
                           conf
-                            ? 'border-[#5fd6e2]/50 bg-[#5fd6e2]/10'
+                            ? 'border-[#5fc6ef]/50 bg-[#5fc6ef]/10'
                             : 'border-white/15 bg-white/[0.03] hover:bg-white/[0.06]'
                         }`}
                       >
                         <span
                           className={`grid h-5 w-5 shrink-0 place-items-center rounded text-[12px] font-bold ${
-                            conf ? 'bg-[#5fd6e2] text-[#06202a]' : 'border border-white/30 text-transparent'
+                            conf ? 'bg-[#5fc6ef] text-[#06202f]' : 'border border-white/30 text-transparent'
                           }`}
                         >
                           ✓
@@ -223,7 +223,7 @@ export default function MedicalCheckModal({
           </div>
           <div className="mb-3 h-1.5 overflow-hidden rounded-full bg-white/10">
             <div
-              className="h-full rounded-full bg-[#5fd6e2] transition-all duration-200"
+              className="h-full rounded-full bg-[#5fc6ef] transition-all duration-200"
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -239,7 +239,7 @@ export default function MedicalCheckModal({
               type="button"
               onClick={onConfirm}
               disabled={!allConfirmed || submitting}
-              className="flex-1 rounded-full bg-amber-400 px-6 py-3 text-sm font-bold text-[#06202a] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-colors hover:bg-amber-300 disabled:opacity-40 disabled:shadow-none"
+              className="flex-1 rounded-full bg-amber-400 px-6 py-3 text-sm font-bold text-[#06202f] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-colors hover:bg-amber-300 disabled:opacity-40 disabled:shadow-none"
             >
               {submitting ? '보내는 중…' : '예약 문의 보내기'}
             </button>

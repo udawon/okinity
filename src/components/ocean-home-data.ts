@@ -42,7 +42,7 @@ export const ACTIVITIES: Activity[] = [
     desc: '구명조끼와 가이드가 늘 함께해 아이도 어르신도 안심. 푸른동굴의 신비한 빛과 산호초, 열대어를 수면에서 만나는 가장 쉬운 바다 체험입니다.',
     tours: [{ slug: 'blue-cave-snorkeling', name: '푸른동굴 스노클링' }],
     image: '/images/ph-2.svg',
-    accent: '#5fd6e2'
+    accent: '#5fc6ef'
   },
   {
     id: 'diving',
@@ -57,7 +57,7 @@ export const ACTIVITIES: Activity[] = [
       { slug: 'fun-dive', name: '펀다이빙' }
     ],
     image: '/images/ph-1.svg',
-    accent: '#22d3ee'
+    accent: '#29b6f6'
   },
   {
     id: 'padi',

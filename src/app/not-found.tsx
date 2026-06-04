@@ -21,7 +21,7 @@ export default function GlobalNotFound() {
       >
         <h1 style={{ fontSize: '3rem', fontWeight: 800 }}>404</h1>
         <p style={{ color: '#64748b' }}>Page not found</p>
-        <Link href="/ko" style={{ color: '#0b7c8a', fontWeight: 600 }}>
+        <Link href="/ko" style={{ color: '#0b6ca8', fontWeight: 600 }}>
           OKINITY
         </Link>
       </body>

@@ -81,7 +81,7 @@ html {
 .text-ocean {
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40'%3E%3Cpath d='M0 22 Q20 10 40 22 T80 22' fill='none' stroke='%23ffffff' stroke-opacity='0.55' stroke-width='3'/%3E%3Cpath d='M0 33 Q20 23 40 33 T80 33' fill='none' stroke='%23eafdff' stroke-opacity='0.4' stroke-width='2'/%3E%3C/svg%3E"),
-    linear-gradient(90deg, #1f8294 0%, #5fd6e2 30%, #e6fbff 50%, #5fd6e2 70%, #1f8294 100%);
+    linear-gradient(90deg, #1f72b0 0%, #5fc6ef 30%, #eaf6ff 50%, #5fc6ef 70%, #1f72b0 100%);
   background-size:
     80px 40px,
     200% 100%;

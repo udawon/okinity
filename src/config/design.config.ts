@@ -11,23 +11,23 @@ export const design = {
   colors: {
     // 1차 액션 = 오션 틸 (트로피컬 바다)
     brand: {
-      DEFAULT: '#0f9aa3',
-      dark: '#0b767d',
-      light: '#e4f4f5',
+      DEFAULT: '#0c8bd0',
+      dark: '#086aa8',
+      light: '#e3f1fb',
       contrast: '#ffffff'
     },
     // 따뜻한 모래/골드 보조 강조 (희소하게)
     accent: {
       DEFAULT: '#cf9a55',
       dark: '#9a6f33',
-      light: '#f7ecdb'
+      light: '#e6f1fb'
     },
     ink: '#2b2a26', // 본문/제목 (따뜻한 진회색)
     muted: '#6b6760', // 보조 텍스트
-    line: '#e7e0d3', // 모래빛 보더
+    line: '#d8e6f3', // 모래빛 보더
     surface: '#ffffff', // 카드 (흰색, 그림자로 부양)
-    bg: '#f5efe4', // 페이지 배경 (모래/크림)
-    panel: '#eeded2' // 카드 텍스트 영역 (핑크베이지, 배경과 구분 — 레퍼런스 Must-Do 톤)
+    bg: '#eef4fb', // 페이지 배경 (모래/크림)
+    panel: '#d9e7f4' // 카드 텍스트 영역 (핑크베이지, 배경과 구분 — 레퍼런스 Must-Do 톤)
   },
   // 둥근 모서리 (리조트 톤). 버튼은 알약형.
   radius: {

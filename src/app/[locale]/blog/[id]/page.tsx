@@ -50,7 +50,7 @@ export default async function BlogPostPage({
 
         <header className="mt-6">
           {post.date && (
-            <p className="text-sm tracking-wide text-[#5fd6e2]">{formatDate(post.date, locale)}</p>
+            <p className="text-sm tracking-wide text-[#5fc6ef]">{formatDate(post.date, locale)}</p>
           )}
           <h1 className="mt-2 font-serif text-3xl leading-tight text-white sm:text-4xl">
             {post.title || '(제목 없음)'}

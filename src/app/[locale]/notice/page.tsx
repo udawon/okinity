@@ -54,15 +54,15 @@ export default async function NoticeListPage({
                   href={`/notice/${p.id}`}
                   className="group block py-6 transition-colors hover:bg-white/[0.02]"
                 >
-                  <div className="flex items-center gap-2 text-sm text-[#5fd6e2]">
+                  <div className="flex items-center gap-2 text-sm text-[#5fc6ef]">
                     {p.pinned && (
-                      <span className="rounded-full bg-[#5fd6e2]/15 px-2 py-0.5 text-xs font-semibold">
+                      <span className="rounded-full bg-[#5fc6ef]/15 px-2 py-0.5 text-xs font-semibold">
                         고정
                       </span>
                     )}
                     <span>{formatDate(p.date, locale)}</span>
                   </div>
-                  <h2 className="mt-1.5 font-serif text-xl text-white transition-colors group-hover:text-[#9fe8f0] sm:text-2xl">
+                  <h2 className="mt-1.5 font-serif text-xl text-white transition-colors group-hover:text-[#a6e0fb] sm:text-2xl">
                     {p.title || '(제목 없음)'}
                   </h2>
                   {excerptOf(p) && (
