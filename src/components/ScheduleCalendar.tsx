@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import type { ScheduleItem } from '@/lib/content';
+import { scheduleItemDates } from '@/lib/schedule-range';
 
 type Status = ScheduleItem['status'];
 
@@ -39,16 +40,32 @@ export default function ScheduleCalendar({
   selectedKey?: string | null;
   onSelectDate?: (key: string, events: ScheduleItem[]) => void;
 }) {
-  // 날짜별 이벤트 맵 (ISO 'YYYY-MM-DD' 기준). 표시용 문자열만 있는 항목은 캘린더에서 제외.
+  // 날짜별 이벤트 맵 — 기간 항목(endDate)은 모든 날짜로 전개. 표시용 문자열만 있는 항목은 제외.
   const byDate = useMemo(() => {
     const map = new Map<string, ScheduleItem[]>();
     for (const it of items) {
-      if (!/^\d{4}-\d{2}-\d{2}/.test(it.date)) continue;
-      const key = it.date.slice(0, 10);
-      (map.get(key) ?? map.set(key, []).get(key)!).push(it);
+      for (const key of scheduleItemDates(it)) {
+        (map.get(key) ?? map.set(key, []).get(key)!).push(it);
+      }
     }
     return map;
   }, [items]);
+
+  // 휴무 날짜 집합 — 연속 휴무 표시(연속 구간 시작에만 라벨)용.
+  const closedSet = useMemo(() => {
+    const s = new Set<string>();
+    for (const [k, evs] of byDate) if (evs.some((e) => e.status === 'closed')) s.add(k);
+    return s;
+  }, [byDate]);
+
+  const prevKey = (key: string) => {
+    const [yy, mm, dd] = key.split('-').map(Number);
+    const dt = new Date(yy, mm - 1, dd);
+    dt.setDate(dt.getDate() - 1);
+    return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(
+      dt.getDate()
+    ).padStart(2, '0')}`;
+  };
 
   // 초기 월 = 가장 이른 일정의 월(없으면 오늘)
   const initial = useMemo(() => {
@@ -87,11 +104,12 @@ export default function ScheduleCalendar({
     setYM({ y: d.getFullYear(), m: d.getMonth() });
   };
 
-  // 해당 월의 이벤트 리스트(정렬)
-  const monthEvents = [...byDate.entries()]
-    .filter(([k]) => k.startsWith(ymKey(y, m)))
-    .sort(([a], [b]) => a.localeCompare(b))
-    .flatMap(([k, evs]) => evs.map((e) => ({ key: k, ...e })));
+  // 해당 월의 이벤트 리스트 — 원본 항목 기준(기간 항목은 한 번만, 구간 표기). 정렬: 시작일.
+  const monthPrefix = ymKey(y, m);
+  const monthEvents = items
+    .filter((it) => scheduleItemDates(it).some((d) => d.startsWith(monthPrefix)))
+    .slice()
+    .sort((a, b) => a.date.localeCompare(b.date));
 
   const navBtn =
     'flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/80 transition-colors hover:border-white/40 hover:text-white';
@@ -138,6 +156,9 @@ export default function ScheduleCalendar({
           // 휴무(closed) 또는 과거만 차단. 프로그램(예약가능/마감)이 있어도 다른 투어 예약 여지가 있으므로 선택 가능.
           const hasClosed = evs.some((e) => e.status === 'closed');
           const canBook = selectable && !hasClosed && key >= todayKey;
+          // 연속 휴무: 구간 시작(전날이 휴무가 아님)에만 '휴무' 배지, 나머지 날은 배경 톤으로만 이어 보이게.
+          const isClosedRunStart = hasClosed && !closedSet.has(prevKey(key));
+          const nonClosed = evs.filter((e) => e.status !== 'closed');
 
           const dayNum = (
             <span
@@ -149,29 +170,24 @@ export default function ScheduleCalendar({
             </span>
           );
 
-          const eventList = evs.length > 0 && (
+          const eventList = (isClosedRunStart || nonClosed.length > 0) && (
             <div className="mt-1 space-y-1">
-              {evs.map((e, j) =>
-                e.status === 'closed' ? (
-                  // 휴무 — 취소줄 대신 눈에 띄는 배지로 명확히 표시
-                  <span
-                    key={j}
-                    className="inline-flex w-fit max-w-full items-center gap-1 truncate rounded-md border border-rose-300/40 bg-rose-400/15 px-1.5 py-0.5 text-[10px] font-bold text-rose-100 sm:text-[11px]"
-                  >
-                    🚫 휴무
-                  </span>
-                ) : (
-                  <div key={j} className="flex items-center gap-1">
-                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS[e.status].dot}`} />
-                    <span
-                      className={`truncate text-[10px] leading-tight sm:text-[11px] ${STATUS[e.status].text}`}
-                      title={e.program}
-                    >
-                      {e.program}
-                    </span>
-                  </div>
-                )
+              {isClosedRunStart && (
+                <span className="inline-flex w-fit max-w-full items-center gap-1 truncate rounded-md border border-rose-300/40 bg-rose-400/15 px-1.5 py-0.5 text-[10px] font-bold text-rose-100 sm:text-[11px]">
+                  🚫 휴무
+                </span>
               )}
+              {nonClosed.map((e, j) => (
+                <div key={j} className="flex items-center gap-1">
+                  <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS[e.status].dot}`} />
+                  <span
+                    className={`truncate text-[10px] leading-tight sm:text-[11px] ${STATUS[e.status].text}`}
+                    title={e.program}
+                  >
+                    {e.program}
+                  </span>
+                </div>
+              ))}
             </div>
           );
 
@@ -237,15 +253,21 @@ export default function ScheduleCalendar({
       ) : (
         <ul className="mt-8 divide-y divide-white/10 border-t border-white/10">
           {monthEvents.map((e, i) => {
-            const d = new Date(e.key);
-            const label = new Intl.DateTimeFormat(locale, {
-              month: 'short',
-              day: 'numeric',
-              weekday: 'short'
-            }).format(d);
+            const fmt = (key: string) =>
+              new Intl.DateTimeFormat(locale, {
+                month: 'short',
+                day: 'numeric',
+                weekday: 'short'
+              }).format(new Date(key));
+            const start = e.date.slice(0, 10);
+            const end =
+              e.endDate && /^\d{4}-\d{2}-\d{2}/.test(e.endDate) && e.endDate.slice(0, 10) > start
+                ? e.endDate.slice(0, 10)
+                : null;
+            const label = end ? `${fmt(start)} ~ ${fmt(end)}` : fmt(start);
             return (
               <li key={i} className="flex items-center justify-between gap-4 py-3 text-sm">
-                <span className="w-28 shrink-0 text-white/55">{label}</span>
+                <span className="w-40 shrink-0 text-white/55">{label}</span>
                 <span className="flex-1 text-white/90">
                   {e.status === 'closed' ? '휴무' : e.program}
                 </span>

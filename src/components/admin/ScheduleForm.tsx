@@ -5,7 +5,7 @@ import { saveContent } from '@/app/admin/content-actions';
 import type { ScheduleItem } from '@/lib/content';
 
 type Status = ScheduleItem['status'];
-type Item = { date: string; program: string; status: Status };
+type Item = { date: string; endDate?: string; program: string; status: Status };
 
 const STATUS_OPTS: { value: Status; label: string }[] = [
   { value: 'available', label: '예약 가능' },
@@ -40,7 +40,13 @@ export default function ScheduleForm({
     // 날짜 필수. 휴무는 프로그램명 없이도 저장(자동 '휴무'). 그 외는 프로그램명 필요.
     const clean = items
       .filter((it) => it.date && (it.program.trim() || it.status === 'closed'))
-      .map((it) => ({ ...it, program: it.program.trim() || (it.status === 'closed' ? '휴무' : '') }))
+      .map((it) => ({
+        date: it.date,
+        // 종료일이 시작일보다 뒤일 때만 기간으로 저장
+        endDate: it.endDate && it.endDate > it.date ? it.endDate : undefined,
+        program: it.program.trim() || (it.status === 'closed' ? '휴무' : ''),
+        status: it.status
+      }))
       .sort((a, b) => a.date.localeCompare(b.date));
     const res = await saveContent('schedule', { items: clean });
     setSaving(false);
@@ -61,10 +67,22 @@ export default function ScheduleForm({
           >
             <input
               type="date"
+              aria-label="시작일"
               value={it.date.slice(0, 10)}
               onChange={(e) => patch(i, { date: e.target.value })}
               disabled={disabled}
-              className={`${inputCls} w-40`}
+              className={`${inputCls} w-36`}
+            />
+            <span className="text-sm text-muted">~</span>
+            <input
+              type="date"
+              aria-label="종료일(선택)"
+              min={it.date.slice(0, 10) || undefined}
+              value={it.endDate?.slice(0, 10) ?? ''}
+              onChange={(e) => patch(i, { endDate: e.target.value })}
+              disabled={disabled}
+              className={`${inputCls} w-36`}
+              title="기간 휴무 등은 종료일을 지정하세요(단일 날짜는 비워두세요)"
             />
             <input
               value={it.program}

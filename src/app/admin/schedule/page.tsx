@@ -17,9 +17,9 @@ export default async function AdminSchedulePage() {
   return (
     <AdminShell title="일정·휴무">
       <p className="mb-4 text-sm text-muted">
-        <strong>휴무일</strong>·예약가능·예약많음을 직접 지정합니다. 홈 하단 달력과 <code>/일정표</code>{' '}
-        페이지에 반영됩니다. <strong>확정 예약 2건 이상</strong>인 날은 자동으로 “예약 많음”으로
-        표시됩니다(여기서 지정 불필요).
+        <strong>휴무일</strong> 등을 지정합니다. <strong>시작일~종료일</strong>로 기간 지정 가능(단일
+        날짜는 종료일 비움). 예약 페이지 달력에 반영되며, 기간 휴무는 <strong>이어진 형태</strong>로
+        표시됩니다. 확정 예약 2건 이상인 날은 자동으로 “예약 많음”으로 표시됩니다.
       </p>
       <ScheduleForm defaults={defaults} disabled={!enabled} />
     </AdminShell>

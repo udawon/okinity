@@ -2,6 +2,7 @@ import { getInquiryStore } from '@/lib/inquiries';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { parseTourPrices } from '@/lib/tour-pricing';
+import { closedDateSet } from '@/lib/schedule-range';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import AdminShell from '@/components/admin/AdminShell';
 import MonthBoard from '@/components/admin/MonthBoard';
@@ -21,9 +22,7 @@ export default async function AdminBoardPage() {
       ? ((schedVal as { items: ScheduleItem[] }).items)
       : getSchedule()
   ) as ScheduleItem[];
-  const closedDates = schedItems
-    .filter((s) => s.status === 'closed' && /^\d{4}-\d{2}-\d{2}/.test(s.date))
-    .map((s) => s.date.slice(0, 10));
+  const closedDates = [...closedDateSet(schedItems)]; // 기간 휴무는 모든 날짜로 전개
 
   // 오늘(오키나와 JST) 기준 — 서버/클라 동일 문자열 보장
   const todayKey = new Intl.DateTimeFormat('en-CA', {

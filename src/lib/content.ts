@@ -187,7 +187,8 @@ export function getGallery(): GalleryItem[] {
 // content/schedule.json (로케일 공유). status로 상태 표시.
 
 const ScheduleItemSchema = z.object({
-  date: z.string(), // ISO 또는 표시용 문자열
+  date: z.string(), // 시작일(ISO YYYY-MM-DD) 또는 표시용 문자열
+  endDate: z.string().optional(), // 종료일(기간 지정 시). 없으면 단일 날짜.
   program: z.string(),
   // available 예약가능 · full 예약많음 · closed 휴무 · booked 확정예약(시스템 자동, 공개 표시)
   status: z.enum(['available', 'full', 'closed', 'booked']).default('available')
