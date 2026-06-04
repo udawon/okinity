@@ -26,13 +26,10 @@ export type NavItem = {
 export const NAV: NavItem[] = [
   { key: 'about', href: '/about', groupEnd: true },
   {
+    // 스노클링은 현재 단일 투어지만, 향후 상품 추가 예정이라 드롭다운 구조를 유지한다.
     key: 'snorkeling',
     href: '/tours/blue-cave-snorkeling',
-    children: [
-      { tKey: 'tours.snorkeling.cave', href: '/tours/blue-cave-snorkeling' },
-      { tKey: 'tours.snorkeling.boat', href: '/tours/boat-snorkeling' },
-      { tKey: 'tours.snorkeling.beach', href: '/tours/beach-snorkeling' }
-    ]
+    children: [{ tKey: 'tours.snorkeling.cave', href: '/tours/blue-cave-snorkeling' }]
   },
   {
     key: 'diving',

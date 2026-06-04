@@ -40,11 +40,7 @@ export const ACTIVITIES: Activity[] = [
     title: '스노클링',
     tagline: '온 가족이 함께, 수면 위 산호 정원',
     desc: '구명조끼와 가이드가 늘 함께해 아이도 어르신도 안심. 푸른동굴의 신비한 빛과 산호초, 열대어를 수면에서 만나는 가장 쉬운 바다 체험입니다.',
-    tours: [
-      { slug: 'blue-cave-snorkeling', name: '푸른동굴 스노클링' },
-      { slug: 'boat-snorkeling', name: '보트 스노클링' },
-      { slug: 'beach-snorkeling', name: '스노클링' }
-    ],
+    tours: [{ slug: 'blue-cave-snorkeling', name: '푸른동굴 스노클링' }],
     image: '/images/ph-2.svg',
     accent: '#5fd6e2'
   },
