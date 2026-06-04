@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ScheduleCalendar from './ScheduleCalendar';
 import ReservationForm from './ReservationForm';
 import type { ScheduleItem } from '@/lib/content';
@@ -25,6 +26,10 @@ export default function ReservePlanner({
 }) {
   const [selected, setSelected] = useState<{ key: string; events: ScheduleItem[] } | null>(null);
   const selectedKey = selected?.key ?? null;
+
+  // 투어 상세 '예약 문의하기'에서 넘어온 슬러그(?tour=) → 폼 대분류·중분류 사전 선택.
+  const searchParams = useSearchParams();
+  const initialSlug = searchParams.get('tour') ?? undefined;
 
   const dateLong = selectedKey
     ? new Intl.DateTimeFormat(locale, {
@@ -86,6 +91,7 @@ export default function ReservePlanner({
               lockedDateLabel={dateLong}
               scheduled={scheduled}
               timeRestriction={timeRestriction}
+              initialSlug={initialSlug}
               onReset={() => setSelected(null)}
             />
           )}

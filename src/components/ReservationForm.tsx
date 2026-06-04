@@ -21,6 +21,7 @@ export default function ReservationForm({
   lockedDateLabel,
   scheduled,
   timeRestriction,
+  initialSlug,
   onReset
 }: {
   lockedDateKey?: string;
@@ -29,11 +30,17 @@ export default function ReservationForm({
   scheduled?: { program: string; badge?: string }[];
   /** 운영자 지정 시간대 제한 — 'morning'이면 오전·시간 무관만, 'afternoon'이면 오후·시간 무관만. */
   timeRestriction?: 'morning' | 'afternoon';
+  /** 투어 상세에서 넘어온 슬러그 — 대분류·중분류를 사전 선택(없거나 매칭 실패 시 빈 값). */
+  initialSlug?: string;
   /** 성공 후 동작(예: 플래너에서 날짜 선택 해제). 없으면 폼 내부에서 새 문의로 초기화. */
   onReset?: () => void;
 }) {
-  const [catId, setCatId] = useState('');
-  const [slug, setSlug] = useState('');
+  // 슬러그가 속한 대분류를 찾아 초기 선택값으로 사용(매칭 실패 시 빈 폼).
+  const presetCat = initialSlug
+    ? ACTIVITIES.find((a) => a.tours.some((t) => t.slug === initialSlug))
+    : undefined;
+  const [catId, setCatId] = useState(presetCat?.id ?? '');
+  const [slug, setSlug] = useState(presetCat ? (initialSlug as string) : '');
   const [state, setState] = useState<SubmitState>('idle');
   const [done, setDone] = useState<{ product: string; dateLabel: string } | null>(null);
   const [medOpen, setMedOpen] = useState(false);
