@@ -67,15 +67,11 @@ export default function MedicalCheckModal({
   onConfirm: () => void;
   submitting: boolean;
 }) {
-  const [openSet, setOpenSet] = useState<Set<number>>(new Set());
+  // 한 번에 하나만 열림(다른 영역은 자동으로 닫혀 집중 유도).
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [confirmed, setConfirmed] = useState<Set<number>>(new Set());
 
-  const toggleOpen = (i: number) =>
-    setOpenSet((s) => {
-      const n = new Set(s);
-      n.has(i) ? n.delete(i) : n.add(i);
-      return n;
-    });
+  const toggleOpen = (i: number) => setOpenIndex((cur) => (cur === i ? null : i));
   const toggleConfirm = (i: number) =>
     setConfirmed((s) => {
       const n = new Set(s);
@@ -126,7 +122,7 @@ export default function MedicalCheckModal({
 
           <div className="mt-4 space-y-2">
             {GROUPS.map((g, gi) => {
-              const open = openSet.has(gi);
+              const open = openIndex === gi;
               const conf = confirmed.has(gi);
               return (
                 <div
