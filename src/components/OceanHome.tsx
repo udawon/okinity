@@ -257,19 +257,16 @@ function Hero({
   const heroUrl = media?.url?.trim() || '/videos/surface.mp4';
   const heroIsVideo = media?.url?.trim() ? media.type === 'video' : true;
   const videoRef = useRef<HTMLVideoElement>(null);
-  // SSR·첫 클라이언트 렌더는 항상 영상으로 그려 하이드레이션 미스매치를 막고,
-  // 마운트 후에만 reduced-motion이면 포스터로 교체한다.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const showPoster = heroIsVideo && mounted && reduce;
-  // iOS Safari 자동재생 보장: 리액트는 SSR HTML에 muted 속성을 누락시켜(알려진 이슈)
-  // 모바일에서 자동재생이 차단된다. 하이드레이션 후 muted를 강제하고 play()를 직접 호출한다.
+  // 모바일 자동재생 보장: 리액트는 SSR HTML에 muted 속성을 누락시켜(알려진 이슈)
+  // iOS/안드로이드에서 자동재생이 차단된다. 하이드레이션 후 muted를 강제하고 play()를 직접 호출한다.
+  // 히어로 배경 영상은 무음·장식용 루프라 reduced-motion(애니메이션 제거)에서도 재생한다.
+  // 모션 저감은 아래 스크롤 패럴랙스(contentY·contentOpacity)에만 적용한다.
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
     el.muted = true;
     el.play().catch(() => {});
-  }, [heroUrl, heroIsVideo, showPoster]);
+  }, [heroUrl, heroIsVideo]);
   // 텍스트도 어드민 오버라이드 → 비어 있으면 기본값. 제목/부제는 \n 으로 여러 줄.
   const eyebrow = text?.eyebrow?.trim() || HERO_DEFAULTS.eyebrow;
   const titleLines = (text?.title?.trim() || HERO_DEFAULTS.title).split('\n');
@@ -287,43 +284,30 @@ function Hero({
       ref={ref}
       className="relative -mt-16 flex min-h-[100svh] items-center justify-center overflow-hidden sm:-mt-[111px]"
     >
-      {/* 히어로 배경 — 어드민 편집(hero 키). 영상은 원본 색 그대로. reduced-motion 시 영상은 포스터로 대체. */}
-      {heroIsVideo
-        ? showPoster
-          ? (
-              // prefers-reduced-motion(마운트 후): 모션 대신 정지 포스터 표시(빈 화면 방지)
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src="/images/hero-placeholder.svg"
-                alt=""
-                className="absolute inset-0 h-full w-full object-cover"
-                aria-hidden
-              />
-            )
-          : (
-              <video
-                key={heroUrl}
-                ref={videoRef}
-                src={heroUrl}
-                className="absolute inset-0 h-full w-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                poster="/images/hero-placeholder.svg"
-                aria-hidden
-              />
-            )
-        : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={heroUrl}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
-              aria-hidden
-            />
-          )}
+      {/* 히어로 배경 — 어드민 편집(hero 키). 영상은 원본 색 그대로. reduced-motion에서도 재생. */}
+      {heroIsVideo ? (
+        <video
+          key={heroUrl}
+          ref={videoRef}
+          src={heroUrl}
+          className="absolute inset-0 h-full w-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          poster="/images/hero-placeholder.svg"
+          aria-hidden
+        />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={heroUrl}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          aria-hidden
+        />
+      )}
       {/* 가독성 스크림 — 영상 색을 가리지 않도록 상단·중앙은 투명, 하단만 어둡게(텍스트 대비 유지) */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#04202b]/85" />
       {/* 텍스트 영역 국소 스크림 — 영상 색(하늘·바다)은 가장자리에 남기고, 글자 뒤(중앙)만 충분히 어둡게(부제 AA 대비 확보) */}
@@ -420,7 +404,7 @@ function Hero({
    ──────────────────────────────────────────────────────────── */
 function ActivityCard({ a, image }: { a: Activity; image: string }) {
   return (
-    <article className="group flex w-[80vw] max-w-[400px] shrink-0 snap-start flex-col overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.04] shadow-[0_16px_36px_-18px_rgba(0,0,0,0.5)] transition-colors hover:border-white/20 sm:w-[400px]">
+    <article className="group flex w-[80vw] max-w-[400px] shrink-0 snap-start snap-always flex-col overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.04] shadow-[0_16px_36px_-18px_rgba(0,0,0,0.5)] transition-colors hover:border-white/20 sm:w-[400px]">
       {/* 이미지 */}
       <div className="relative aspect-[16/11] w-full overflow-hidden">
         <img
