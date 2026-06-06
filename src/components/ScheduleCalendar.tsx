@@ -245,10 +245,10 @@ export default function ScheduleCalendar({
         })}
       </div>
 
-      {/* 범례 — 공개 캘린더에 실제로 나타나는 상태만(휴무·오전 가능·오후 가능).
-          예약가능(기본값)·예약됨·예약많음(확정 예약 연동 해제)은 표시되지 않으므로 제외. */}
+      {/* 범례 — 캘린더 셀에 실제로 렌더되는 상태를 모두 설명한다.
+          예약가능·예약많음 일정도 색 점+라벨로 표시되므로 범례에 포함(범례-데이터 일치). */}
       <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55">
-        {(['closed', 'morning', 'afternoon'] as Status[]).map((s) => (
+        {(['available', 'full', 'closed', 'morning', 'afternoon'] as Status[]).map((s) => (
           <span key={s} className="inline-flex items-center gap-1.5">
             <span className={`h-2 w-2 rounded-full ${STATUS[s].dot}`} />
             {statusLabel[s]}

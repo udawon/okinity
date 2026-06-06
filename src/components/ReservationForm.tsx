@@ -260,7 +260,7 @@ export default function ReservationForm({
         <label htmlFor="rf-people" className={labelCls}>
           인원
         </label>
-        <input id="rf-people" name="people" type="number" min={1} defaultValue={2} className={`mt-1.5 ${inputCls}`} />
+        <input id="rf-people" name="people" type="number" min={1} max={50} defaultValue={2} className={`mt-1.5 ${inputCls}`} />
       </div>
 
       {/* 이름 */}

@@ -15,7 +15,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const entry = getTourCatalogEntry(slug);
-  return { title: entry ? `${entry.name} — OKINITY` : 'OKINITY' };
+  // title 템플릿('%s | OKINITY')이 자동으로 브랜드를 붙인다 → 여기서 다시 붙이면 'OKINITY | OKINITY' 중복.
+  // 카탈로그에 없으면(404) title을 비워 부모 기본값을 상속.
+  return entry ? { title: entry.name } : {};
 }
 
 export default async function TourDetailPage({
@@ -33,7 +35,9 @@ export default async function TourDetailPage({
   const detail = parseTourDetail(value);
   const showDetail = detail.published;
   const included = splitLines(detail.included);
-  const hubHref = entry.categoryId === 'diving' || entry.categoryId === 'padi' ? `/${entry.categoryId}` : '/';
+  // 카테고리 허브 페이지가 없으므로(diving·padi는 대표 투어로 redirect) 모든 투어가
+  // 홈의 액티비티 섹션으로 일관되게 복귀한다. (이전: 카테고리별로 행선지가 제각각이었음)
+  const hubHref = '/#activities';
 
   const meta = [
     detail.duration && { label: '소요', value: detail.duration },
