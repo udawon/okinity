@@ -460,7 +460,7 @@ function ActivityCard({ a, image, copy }: { a: Activity; image: string; copy?: T
       <div className="flex flex-1 flex-col p-6">
         <h3 className="text-balance font-serif text-2xl text-white">{categoryName}</h3>
         <p className="mt-1.5 text-sm font-medium text-white/70">{tagline}</p>
-        <p className="mt-3 line-clamp-3 whitespace-pre-line text-sm leading-relaxed text-white/65">{desc}</p>
+        <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-white/65">{desc}</p>
 
         {/* 하위 투어 */}
         <p className="mb-1 mt-5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-white/65">
