@@ -14,7 +14,7 @@ export const site = {
     // 대표 수신 이메일(푸터 노출 + 문의 알림 수신 기본값). 자체 도메인 확보 시 도메인 메일로 교체.
     email: 'okinity8@gmail.com',
     // 카카오톡 채널 URL (예: http://pf.kakao.com/_xxxxxx). 비우면 푸터에서 숨김.
-    kakaoChannel: '',
+    kakaoChannel: 'http://pf.kakao.com/_GLkxlX',
     // LINE URL (예: https://lin.ee/xxxxxx 또는 https://line.me/ti/p/@xxxx). 비우면 푸터에서 숨김.
     line: ''
   },
