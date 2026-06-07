@@ -14,8 +14,8 @@ const TABS: Tab[] = [
   { href: '/admin/content', label: '콘텐츠 편집', group: 'content' },
   { href: '/admin/about', label: '소개', group: 'content' },
   { href: '/admin/tours', label: '투어 상세', group: 'content' },
-  { href: '/admin/blog', label: '블로그', group: 'content' },
-  { href: '/admin/notice', label: '공지사항', group: 'content' }
+  { href: '/admin/notice', label: '공지사항', group: 'content' },
+  { href: '/admin/blog', label: '블로그', group: 'content' }
 ];
 
 /** 어드민 상단 탭. 일정 관리 ↔ 콘텐츠 그룹을 구분선으로 묶는다. (/admin 은 [locale] 밖이라 next/link) */
