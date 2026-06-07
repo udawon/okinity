@@ -61,7 +61,7 @@ export default async function NoticePostPage({
             )}
             {post.date && <span>{formatDate(post.date, locale)}</span>}
           </div>
-          <h1 className="mt-2 font-serif text-3xl leading-tight text-white sm:text-4xl">
+          <h1 className="mt-2 text-balance font-serif text-3xl leading-tight text-white sm:text-4xl">
             {post.title || '(제목 없음)'}
           </h1>
         </header>

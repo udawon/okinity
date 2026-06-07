@@ -450,7 +450,7 @@ function ActivityCard({ a, image, copy }: { a: Activity; image: string; copy?: T
 
       {/* 본문 */}
       <div className="flex flex-1 flex-col p-6">
-        <h3 className="font-serif text-2xl text-white">{categoryName}</h3>
+        <h3 className="text-balance font-serif text-2xl text-white">{categoryName}</h3>
         <p className="mt-1.5 text-sm font-medium text-white/70">{tagline}</p>
         <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/65">{desc}</p>
 
@@ -551,11 +551,11 @@ function ActivitiesSection({
             What We Offer
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
+            <h2 className="mt-3 text-balance whitespace-pre-line font-serif text-4xl text-white sm:text-5xl">
               {copy?.sectionTitle?.trim() || t('activitiesTitle')}
             </h2>
           </R>
-          <R delay={0.12} className="mt-4 text-white/65">
+          <R delay={0.12} className="mt-4 whitespace-pre-line text-pretty text-white/65">
             {copy?.sectionIntro?.trim() || t('activitiesIntro')}
           </R>
         </div>
@@ -624,7 +624,7 @@ function AssuranceSection({ data }: { data?: HomeAssurances }) {
             Why OKINITY
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
+            <h2 className="mt-3 text-balance whitespace-pre-line font-serif text-4xl text-white sm:text-5xl">
               {data?.sectionTitle?.trim() || t('assuranceTitle')}
             </h2>
           </R>
@@ -639,7 +639,7 @@ function AssuranceSection({ data }: { data?: HomeAssurances }) {
                   <span className="grid h-12 w-12 place-items-center rounded-xl bg-cyan-300/10 text-cyan-200 transition-colors duration-300 group-hover:bg-cyan-300/20">
                     <Icon className="h-6 w-6" />
                   </span>
-                  <h3 className="mt-5 text-base font-semibold text-white">
+                  <h3 className="mt-5 text-balance text-base font-semibold text-white">
                     {ov?.title?.trim() || t(`assurance${i + 1}Title`)}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-white/60">
@@ -672,7 +672,7 @@ function BlogSection({ posts, locale }: { posts: BlogPost[]; locale: string }) {
             Journal
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">{tBlog('sectionTitle')}</h2>
+            <h2 className="mt-3 text-balance font-serif text-4xl text-white sm:text-5xl">{tBlog('sectionTitle')}</h2>
           </R>
           <R delay={0.12} className="mt-4 text-white/65">
             {tBlog('sectionIntro')}
@@ -732,7 +732,7 @@ function GallerySection({ images }: { images?: string[] }) {
             Gallery
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">{t('galleryTitle')}</h2>
+            <h2 className="mt-3 text-balance font-serif text-4xl text-white sm:text-5xl">{t('galleryTitle')}</h2>
           </R>
         </div>
 
@@ -793,7 +793,7 @@ function Testimonials({ data }: { data?: HomeTestimonials }) {
             Guest Stories
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
+            <h2 className="mt-3 text-balance whitespace-pre-line font-serif text-4xl text-white sm:text-5xl">
               {data?.sectionTitle?.trim() || t('testimonialsTitle')}
             </h2>
           </R>
@@ -857,7 +857,7 @@ function ReserveSection({ schedule, locale }: { schedule: ScheduleData; locale: 
             Reserve
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl leading-tight text-white sm:text-5xl">
+            <h2 className="mt-3 text-balance font-serif text-4xl leading-tight text-white sm:text-5xl">
               {t('reserveTitle')}
             </h2>
           </R>

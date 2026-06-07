@@ -59,23 +59,29 @@ export default function TourCopyForm({
     <div className="space-y-4">
       <div className="grid gap-2 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-ink">섹션 제목 (선택)</label>
-          <input
+          <label className="block text-sm font-medium text-ink">
+            섹션 제목 (선택) <span className="font-normal text-muted">· Enter로 줄바꿈</span>
+          </label>
+          <textarea
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="비우면 기본: 네 가지 방법으로 만나는 바다"
             disabled={disabled}
-            className={`mt-1 ${inputCls}`}
+            rows={2}
+            className={`mt-1 ${textareaCls}`}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-ink">섹션 소개 (선택)</label>
-          <input
+          <label className="block text-sm font-medium text-ink">
+            섹션 소개 (선택) <span className="font-normal text-muted">· Enter로 줄바꿈</span>
+          </label>
+          <textarea
             value={intro}
             onChange={(e) => setIntro(e.target.value)}
             placeholder="비우면 기본 소개 문구"
             disabled={disabled}
-            className={`mt-1 ${inputCls}`}
+            rows={2}
+            className={`mt-1 ${textareaCls}`}
           />
         </div>
       </div>
