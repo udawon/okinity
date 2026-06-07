@@ -231,7 +231,8 @@
     "successBody": "We'll reply within 24 hours with a tailored plan and quote.",
     "successAnotherDate": "View another date",
     "successNew": "Write a new inquiry",
-    "dateTbd": "Date TBD"
+    "dateTbd": "Date TBD",
+    "menuCtaSub": "Pick a date and inquire instantly"
   },
   "tourDetail": {
     "durationLabel": "Duration",

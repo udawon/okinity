@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { routing } from '@/i18n/routing';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems, publishedSorted, BLOG_CAROUSEL_LIMIT } from '@/lib/blog';
@@ -64,13 +65,15 @@ export default async function HomePage({
       ? (tourImagesOv as Record<string, string>)
       : undefined;
 
+  // 어드민 hero 텍스트 오버라이드는 한국어로 입력된 운영자 콘텐츠라 기본 로케일(ko)에서만 적용.
+  // en/ja는 i18n 번역 기본값(ocean 네임스페이스)을 쓴다(어드민 다국어 입력은 후속 과제).
+  // 배경 영상/이미지(media.hero)는 텍스트가 아니므로 전 로케일 공통 적용.
+  const isDefaultLocale = locale === routing.defaultLocale;
   const media = {
     hero: heroOv?.mediaUrl?.trim() ? { url: heroOv.mediaUrl, type: heroOv.mediaType } : undefined,
-    heroText: {
-      eyebrow: heroOv?.eyebrow,
-      title: heroOv?.title,
-      subtitle: heroOv?.subtitle
-    },
+    heroText: isDefaultLocale
+      ? { eyebrow: heroOv?.eyebrow, title: heroOv?.title, subtitle: heroOv?.subtitle }
+      : undefined,
     gallery: galleryImages,
     tours: tourImages
   };

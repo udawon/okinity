@@ -231,7 +231,8 @@
     "successBody": "24時間以内にプランとお見積もりをお送りします。",
     "successAnotherDate": "別の日付を見る",
     "successNew": "新しい問い合わせを作成",
-    "dateTbd": "日付未定"
+    "dateTbd": "日付未定",
+    "menuCtaSub": "希望日を選んですぐ予約"
   },
   "tourDetail": {
     "durationLabel": "所要",

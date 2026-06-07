@@ -31,8 +31,27 @@ function Caret({ open }: { open: boolean }) {
   );
 }
 
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="4.5" width="18" height="16" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M3 9h18M8 3v3M16 3v3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="m8.5 14 2.2 2.2L15.5 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ArrowRight({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export default function MobileNav({ current }: { current: Locale }) {
   const t = useTranslations('nav');
+  const tr = useTranslations('reservation');
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const close = () => {
@@ -55,6 +74,24 @@ export default function MobileNav({ current }: { current: Locale }) {
       {open && (
         <div className="absolute left-0 right-0 top-16 max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-white/10 bg-[#061522]/95 backdrop-blur-md sm:top-[111px]">
           <nav className="flex flex-col px-5 py-4 text-sm font-medium text-white/80" aria-label="주요 메뉴">
+            {/* 핵심 전환 CTA — 메뉴를 열면 가장 먼저 보이도록 최상단에 강조 배치 */}
+            <Link
+              href="/reserve"
+              onClick={close}
+              className="group mb-4 flex items-center gap-3 rounded-2xl bg-amber-400 px-4 py-3.5 text-[#06202f] shadow-[0_10px_28px_rgba(246,166,35,0.4)] transition-[transform,background-color] duration-200 hover:bg-amber-300 active:scale-[0.98]"
+            >
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#06202f]/10">
+                <CalendarIcon className="h-5 w-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[15px] font-extrabold leading-tight">{t('contact')}</span>
+                <span className="mt-0.5 block text-[12px] font-medium leading-tight text-[#06202f]/70">
+                  {tr('menuCtaSub')}
+                </span>
+              </span>
+              <ArrowRight className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Link>
+
             {NAV.map((item) =>
               item.children ? (
                 <div key={item.key} className="border-b border-white/10">
@@ -105,14 +142,6 @@ export default function MobileNav({ current }: { current: Locale }) {
                 </Link>
               )
             )}
-
-            <Link
-              href="/reserve"
-              onClick={close}
-              className="border-b border-white/10 py-3 transition-colors hover:text-white last:border-0"
-            >
-              {t('contact')}
-            </Link>
 
             <div className="pt-4">
               <LocaleSwitcher current={current} />
