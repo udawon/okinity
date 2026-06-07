@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { saveContent } from '@/app/admin/content-actions';
 import { HOME_CONTENT_KEYS, type TourCardCopy } from '@/lib/home-content';
+import { useSaveStatus, SaveStatusBadge } from './save-status';
 
 const inputCls =
   'w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted disabled:opacity-50';
@@ -31,7 +32,7 @@ export default function TourCopyForm({
   const [title, setTitle] = useState(defaultTitle ?? '');
   const [intro, setIntro] = useState(defaultIntro ?? '');
   const [cards, setCards] = useState<Record<string, TourCardCopy>>(defaults);
-  const [msg, setMsg] = useState('');
+  const { status, show } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   const patch = (id: string, p: Partial<TourCardCopy>) =>
@@ -39,7 +40,6 @@ export default function TourCopyForm({
 
   async function save() {
     setSaving(true);
-    setMsg('');
     const cleaned: Record<string, TourCardCopy> = {};
     for (const { id } of categories) {
       const c = cards[id];
@@ -51,7 +51,8 @@ export default function TourCopyForm({
       cards: cleaned
     });
     setSaving(false);
-    setMsg(res.ok ? '저장되었습니다.' : (res.error ?? '저장 실패'));
+    if (res.ok) show('저장되었습니다.');
+    else show(res.error ?? '저장 실패', 'err');
   }
 
   return (
@@ -121,7 +122,7 @@ export default function TourCopyForm({
         >
           {saving ? '저장 중…' : '투어 카드 텍스트 저장'}
         </button>
-        {msg && <span className="text-sm text-muted">{msg}</span>}
+        <SaveStatusBadge status={status} />
       </div>
       <p className="text-xs text-muted">빈 칸은 기본 문구가 사용됩니다. (en/日은 번역본 표시)</p>
     </div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { saveTour } from '@/app/admin/tour-actions';
 import { type TourDetail } from '@/lib/tour';
 import MediaInput from './MediaInput';
+import { useSaveStatus, SaveStatusBadge } from './save-status';
 
 const labelCls = 'block text-sm font-medium text-ink';
 const inputCls =
@@ -29,11 +30,10 @@ export default function TourEditor({
   const [included, setIncluded] = useState(detail.included);
   const [body, setBody] = useState(detail.body);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState('');
+  const { status, show } = useSaveStatus();
 
   async function save() {
     setSaving(true);
-    setMsg('');
     const res = await saveTour(slug, {
       published,
       summary,
@@ -44,9 +44,9 @@ export default function TourEditor({
       body
     });
     setSaving(false);
-    if (res.error) setMsg(res.error);
+    if (res.error) show(res.error, 'err');
     else {
-      setMsg('저장되었습니다.');
+      show('저장되었습니다.');
       router.refresh();
     }
   }
@@ -161,7 +161,7 @@ export default function TourEditor({
         >
           {saving ? '저장 중…' : '투어 상세 저장'}
         </button>
-        {msg && <span className="text-sm text-muted">{msg}</span>}
+        <SaveStatusBadge status={status} />
       </div>
     </div>
   );

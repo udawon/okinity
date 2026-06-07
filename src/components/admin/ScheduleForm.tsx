@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { saveContent } from '@/app/admin/content-actions';
 import type { ScheduleItem } from '@/lib/content';
+import { useSaveStatus, SaveStatusBadge } from './save-status';
 
 type Status = ScheduleItem['status'];
 type Item = { date: string; endDate?: string; program: string; status: Status };
@@ -34,7 +35,7 @@ export default function ScheduleForm({
   disabled?: boolean;
 }) {
   const [items, setItems] = useState<Item[]>(defaults);
-  const [msg, setMsg] = useState('');
+  const { status, show } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   const patch = (i: number, p: Partial<Item>) =>
@@ -45,7 +46,6 @@ export default function ScheduleForm({
 
   async function save() {
     setSaving(true);
-    setMsg('');
     // 날짜 필수. 휴무·오전/오후 가능은 프로그램명 없이도 저장(라벨 자동).
     const noProgram = (s: Status) => s === 'closed' || s === 'morning' || s === 'afternoon';
     const clean = items
@@ -60,7 +60,8 @@ export default function ScheduleForm({
       .sort((a, b) => a.date.localeCompare(b.date));
     const res = await saveContent('schedule', { items: clean });
     setSaving(false);
-    setMsg(res.ok ? `저장되었습니다 (${clean.length}건).` : (res.error ?? '저장 실패'));
+    if (res.ok) show(`저장되었습니다 (${clean.length}건).`);
+    else show(res.error ?? '저장 실패', 'err');
   }
 
   return (
@@ -146,7 +147,7 @@ export default function ScheduleForm({
         >
           {saving ? '저장 중…' : '일정표 저장'}
         </button>
-        {msg && <span className="text-sm text-muted">{msg}</span>}
+        <SaveStatusBadge status={status} />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from 'react';
 import { saveTourPrices } from '@/app/admin/pricing-actions';
 import { TOUR_CATALOG } from '@/lib/tour';
 import type { TourPrices } from '@/lib/tour-pricing';
+import { useSaveStatus, SaveStatusBadge } from './save-status';
 
 /**
  * 투어별 기준 단가 입력 — 운영 보드 예상매출(단가×인원)용. 어드민 전용, 고객 비노출.
@@ -21,7 +22,7 @@ export default function TourPricingForm({
     return o;
   });
   const [pending, start] = useTransition();
-  const [saved, setSaved] = useState(false);
+  const { status, show } = useSaveStatus();
 
   // 카테고리별 그룹
   const groups = useMemo(() => {
@@ -43,10 +44,9 @@ export default function TourPricingForm({
       }
       try {
         await saveTourPrices(out);
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2000);
+        show('저장되었습니다.');
       } catch {
-        alert('단가 저장에 실패했습니다.');
+        show('단가 저장에 실패했습니다.', 'err');
       }
     });
   }
@@ -100,7 +100,7 @@ export default function TourPricingForm({
         >
           {pending ? '저장 중…' : '단가 저장'}
         </button>
-        {saved && <span className="text-sm text-green-600">저장되었습니다.</span>}
+        <SaveStatusBadge status={status} />
       </div>
     </div>
   );

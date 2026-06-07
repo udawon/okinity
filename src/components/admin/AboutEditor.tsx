@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSaveStatus, SaveStatusBadge } from './save-status';
 import { useRouter } from 'next/navigation';
 import { saveAbout } from '@/app/admin/about-actions';
 import { type AboutContent, type Strength } from '@/lib/about';
@@ -33,7 +34,7 @@ export default function AboutEditor({
   const [instructorCerts, setInstructorCerts] = useState(defaults.instructorCerts);
   const [instructorBody, setInstructorBody] = useState(defaults.instructorBody);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState('');
+  const { status, show } = useSaveStatus();
 
   const setStrength = (i: number, key: keyof Strength, v: string) =>
     setStrengths((arr) => arr.map((s, j) => (j === i ? { ...s, [key]: v } : s)));
@@ -42,7 +43,6 @@ export default function AboutEditor({
 
   async function save() {
     setSaving(true);
-    setMsg('');
     const res = await saveAbout({
       eyebrow,
       title,
@@ -57,9 +57,9 @@ export default function AboutEditor({
       instructorBody
     });
     setSaving(false);
-    if (res.error) setMsg(res.error);
+    if (res.error) show(res.error, 'err');
     else {
-      setMsg('저장되었습니다.');
+      show('저장되었습니다.');
       router.refresh();
     }
   }
@@ -264,7 +264,7 @@ export default function AboutEditor({
         >
           {saving ? '저장 중…' : '소개 저장'}
         </button>
-        {msg && <span className="text-sm text-muted">{msg}</span>}
+        <SaveStatusBadge status={status} />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSaveStatus, SaveStatusBadge } from './save-status';
 import { useRouter } from 'next/navigation';
 import { saveBlogPost } from '@/app/admin/blog-actions';
 import { type BlogPost, type BlogBlock } from '@/lib/blog';
@@ -20,7 +21,7 @@ export default function BlogEditor({
 }) {
   const router = useRouter();
   const [post, setPost] = useState<BlogPost>(initial);
-  const [msg, setMsg] = useState('');
+  const { status, show } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   const set = (p: Partial<BlogPost>) => setPost((cur) => ({ ...cur, ...p }));
@@ -42,12 +43,11 @@ export default function BlogEditor({
 
   async function save() {
     setSaving(true);
-    setMsg('');
     const res = await saveBlogPost(post);
     setSaving(false);
-    if (res.error) setMsg(res.error);
+    if (res.error) show(res.error, 'err');
     else {
-      setMsg('저장되었습니다.');
+      show('저장되었습니다.');
       router.refresh();
     }
   }
@@ -188,7 +188,7 @@ export default function BlogEditor({
         >
           {saving ? '저장 중…' : '글 저장'}
         </button>
-        {msg && <span className="text-sm text-muted">{msg}</span>}
+        <SaveStatusBadge status={status} />
       </div>
     </div>
   );
