@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import ScheduleCalendar from './ScheduleCalendar';
 import ReservationForm from './ReservationForm';
 import type { ScheduleItem } from '@/lib/content';
@@ -22,6 +23,7 @@ export default function ReservePlanner({
   locale: string;
   statusLabel: Record<Status, string>;
 }) {
+  const t = useTranslations('reservation');
   const [selected, setSelected] = useState<{ key: string; events: ScheduleItem[] } | null>(null);
   const selectedKey = selected?.key ?? null;
 
@@ -75,13 +77,11 @@ export default function ReservePlanner({
               <div className="grid h-14 w-14 place-items-center rounded-full border border-[#5fc6ef]/30 bg-[#5fc6ef]/10 text-2xl">
                 🗓️
               </div>
-              <p className="mt-5 font-serif text-xl text-white">날짜를 선택하세요</p>
+              <p className="mt-5 font-serif text-xl text-white">{t('pickPromptTitle')}</p>
               <p className="mt-2 max-w-[16rem] text-sm leading-relaxed text-white/60">
                 {/* 레이아웃: 모바일은 달력이 위, lg+는 왼쪽에 배치되므로 안내 방향을 맞춘다 */}
-                <span className="lg:hidden">위쪽</span>
-                <span className="hidden lg:inline">왼쪽</span> 달력에서{' '}
-                <span className="text-[#5fc6ef]">휴무를 제외한 날짜</span>를 누르면 여기에서 바로
-                예약을 시작할 수 있어요.
+                <span className="lg:hidden">{t('pickHint', { where: t('pickHintAbove') })}</span>
+                <span className="hidden lg:inline">{t('pickHint', { where: t('pickHintLeft') })}</span>
               </p>
             </div>
           ) : (

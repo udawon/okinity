@@ -35,6 +35,25 @@ export function getTourCatalogEntry(slug: string): TourCatalogEntry | undefined 
 }
 
 /**
+ * slug → nav 네임스페이스 번역 키(표시명). 카탈로그 한국어명(canonical, 운영자/문의용)과 별개로
+ * 고객 화면의 다국어 투어명 표시에 사용한다. (예약 폼 옵션·투어 상세 헤더 공용)
+ */
+export const TOUR_NAME_NAV_KEY: Record<string, string> = {
+  'blue-cave-snorkeling': 'tours.snorkeling.cave',
+  'blue-cave-dive': 'tours.diving.cave',
+  'kerama-dive': 'tours.diving.kerama',
+  'fun-dive': 'tours.diving.fun',
+  'ow-course': 'tours.padi.ow',
+  'aow-course': 'tours.padi.aow',
+  'owaow-course': 'tours.padi.owaow',
+  'specialty-course': 'tours.padi.specialty',
+  'trial-fishing-4h': 'tours.fishing.trial4',
+  'fishing-5species-6h': 'tours.fishing.five6',
+  'overnight-fishing': 'tours.fishing.overnight',
+  'biggame-trolling-8h': 'tours.fishing.biggame8'
+};
+
+/**
  * 어드민이 등록하는 상세 콘텐츠. site_content `tour:{slug}` 의 value.
  * published=false 면 상세 본문은 비공개(페이지는 기본 정보 + 예약 문의만 노출).
  */

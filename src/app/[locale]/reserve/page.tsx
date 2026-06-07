@@ -12,8 +12,9 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
-  await params;
-  return { title: '예약', description: '원하는 날짜를 선택해 바로 예약 문의를 보내세요.' };
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'reservation' });
+  return { title: t('metaTitle'), description: t('metaDescription') };
 }
 
 export default async function ReservePage({
@@ -24,6 +25,7 @@ export default async function ReservePage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('schedule');
+  const tr = await getTranslations('reservation');
 
   // 어드민이 지정한 일정/휴무만(확정 예약은 공개 일정표에 연동하지 않음).
   const override = await getSiteContent(CONTENT_KEYS.schedule);
@@ -46,10 +48,8 @@ export default async function ReservePage({
   return (
     <section className="py-12 sm:py-16">
       <Container className="max-w-container">
-        <h1 className="font-serif text-3xl font-normal text-white sm:text-4xl">예약</h1>
-        <p className="mt-2 text-white/70">
-          달력에서 원하는 날짜를 선택해 바로 예약 문의를 보내세요. 휴무를 제외한 날짜는 모두 가능합니다.
-        </p>
+        <h1 className="font-serif text-3xl font-normal text-white sm:text-4xl">{tr('heading')}</h1>
+        <p className="mt-2 text-white/70">{tr('intro')}</p>
         <div className="mt-8">
           <ReservePlanner
             items={items}
