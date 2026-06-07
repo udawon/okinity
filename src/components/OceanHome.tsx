@@ -12,6 +12,12 @@ import { useStableReducedMotion } from '@/hooks/useStableReducedMotion';
 import { Link } from '@/i18n/routing';
 import { TOUR_NAME_NAV_KEY } from '@/lib/tour';
 import { type BlogPost } from '@/lib/blog';
+import type {
+  HomeTestimonials,
+  HomeAssurances,
+  HomeTourCopy,
+  TourCardCopy
+} from '@/lib/home-content';
 import { type ScheduleItem } from '@/lib/content';
 import BlogCard from '@/components/BlogCard';
 import ReservePlanner from '@/components/ReservePlanner';
@@ -248,10 +254,12 @@ function WaveDivider({ flip = false, className = '' }: { flip?: boolean; classNa
    ──────────────────────────────────────────────────────────── */
 function Hero({
   media,
-  text
+  text,
+  extra
 }: {
   media?: { url?: string; type?: string };
   text?: { eyebrow?: string; title?: string; subtitle?: string };
+  extra?: { badges?: string[]; ctaReserve?: string; ctaExplore?: string };
 }) {
   const t = useTranslations('ocean');
   const reduce = useStableReducedMotion();
@@ -363,20 +371,20 @@ function Hero({
             href="/reserve"
             className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 px-8 py-4 text-sm font-bold text-[#06202f] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-[transform,box-shadow,background-color] duration-200 hover:bg-amber-300 hover:shadow-[0_10px_38px_rgba(246,166,35,0.5)] active:scale-[0.97] sm:w-auto"
           >
-            {t('ctaReserve')}
+            {extra?.ctaReserve?.trim() || t('ctaReserve')}
             <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
           <a
             href="#activities"
             className="inline-flex w-full items-center justify-center rounded-full border border-white/25 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-colors duration-200 hover:border-white/50 hover:bg-white/10 sm:w-auto"
           >
-            {t('ctaExplore')}
+            {extra?.ctaExplore?.trim() || t('ctaExplore')}
           </a>
         </R>
 
         {/* 신뢰 배지 */}
         <R delay={0.4} className="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-white/65">
-          {[t('badge1'), t('badge2'), t('badge3')].map((b, i) => (
+          {(extra?.badges?.length ? extra.badges : [t('badge1'), t('badge2'), t('badge3')]).map((b, i) => (
             <span key={b} className="inline-flex items-center gap-2">
               {i > 0 && <span className="h-1 w-1 rounded-full bg-white/30" />}
               {b}
@@ -406,10 +414,13 @@ function Hero({
 /* ────────────────────────────────────────────────────────────
    ACTIVITY — 다이빙 / PADI / 낚시 / 스노클링 (가로 캐러셀, 좌우 스와이프)
    ──────────────────────────────────────────────────────────── */
-function ActivityCard({ a, image }: { a: Activity; image: string }) {
+function ActivityCard({ a, image, copy }: { a: Activity; image: string; copy?: TourCardCopy }) {
   const t = useTranslations('ocean');
   const tNav = useTranslations('nav');
-  const categoryName = tNav(a.id); // 카테고리 표시명(로케일별)
+  // 카테고리 표시명·태그라인·설명: 어드민 오버라이드 우선, 없으면 i18n/nav 기본값.
+  const categoryName = copy?.title?.trim() || tNav(a.id);
+  const tagline = copy?.tagline?.trim() || t(`tagline.${a.id}`);
+  const desc = copy?.desc?.trim() || t(`desc.${a.id}`);
   return (
     <article className="group flex w-[80vw] max-w-[400px] shrink-0 snap-start snap-always flex-col overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.04] shadow-[0_16px_36px_-18px_rgba(0,0,0,0.5)] transition-colors hover:border-white/20 sm:w-[400px]">
       {/* 이미지 */}
@@ -440,8 +451,8 @@ function ActivityCard({ a, image }: { a: Activity; image: string }) {
       {/* 본문 */}
       <div className="flex flex-1 flex-col p-6">
         <h3 className="font-serif text-2xl text-white">{categoryName}</h3>
-        <p className="mt-1.5 text-sm font-medium text-white/70">{t(`tagline.${a.id}`)}</p>
-        <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/65">{t(`desc.${a.id}`)}</p>
+        <p className="mt-1.5 text-sm font-medium text-white/70">{tagline}</p>
+        <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/65">{desc}</p>
 
         {/* 하위 투어 */}
         <p className="mb-1 mt-5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-white/65">
@@ -477,7 +488,13 @@ function ActivityCard({ a, image }: { a: Activity; image: string }) {
   );
 }
 
-function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string> }) {
+function ActivitiesSection({
+  tourImages,
+  copy
+}: {
+  tourImages?: Record<string, string>;
+  copy?: HomeTourCopy;
+}) {
   const t = useTranslations('ocean');
   const reduce = useStableReducedMotion();
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -534,10 +551,12 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
             What We Offer
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">{t('activitiesTitle')}</h2>
+            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
+              {copy?.sectionTitle?.trim() || t('activitiesTitle')}
+            </h2>
           </R>
           <R delay={0.12} className="mt-4 text-white/65">
-            {t('activitiesIntro')}
+            {copy?.sectionIntro?.trim() || t('activitiesIntro')}
           </R>
         </div>
       </div>
@@ -555,7 +574,12 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
           className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-5 overflow-x-auto scroll-px-6 px-6 pb-3 lg:scroll-px-0 lg:px-0"
         >
           {ACTIVITIES.map((a) => (
-            <ActivityCard key={a.id} a={a} image={tourImages?.[a.id]?.trim() || a.image} />
+            <ActivityCard
+              key={a.id}
+              a={a}
+              image={tourImages?.[a.id]?.trim() || a.image}
+              copy={copy?.cards?.[a.id]}
+            />
           ))}
         </div>
 
@@ -589,7 +613,7 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
 /* ────────────────────────────────────────────────────────────
    ASSURANCE — 왜 우리인가
    ──────────────────────────────────────────────────────────── */
-function AssuranceSection() {
+function AssuranceSection({ data }: { data?: HomeAssurances }) {
   const t = useTranslations('ocean');
   return (
     <section className="relative py-24 sm:py-28">
@@ -600,20 +624,27 @@ function AssuranceSection() {
             Why OKINITY
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">{t('assuranceTitle')}</h2>
+            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
+              {data?.sectionTitle?.trim() || t('assuranceTitle')}
+            </h2>
           </R>
         </div>
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {ASSURANCES.map((a, i) => {
             const Icon = ASSURANCE_ICONS[i] ?? Shield;
+            const ov = data?.items?.[i];
             return (
               <R key={a.title} delay={i * 0.08}>
                 <div className="group h-full rounded-2xl border border-white/10 bg-white/[0.04] p-6 transition-colors duration-300 hover:border-cyan-300/40 hover:bg-white/[0.07]">
                   <span className="grid h-12 w-12 place-items-center rounded-xl bg-cyan-300/10 text-cyan-200 transition-colors duration-300 group-hover:bg-cyan-300/20">
                     <Icon className="h-6 w-6" />
                   </span>
-                  <h3 className="mt-5 text-base font-semibold text-white">{t(`assurance${i + 1}Title`)}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/60">{t(`assurance${i + 1}Desc`)}</p>
+                  <h3 className="mt-5 text-base font-semibold text-white">
+                    {ov?.title?.trim() || t(`assurance${i + 1}Title`)}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/60">
+                    {ov?.desc?.trim() || t(`assurance${i + 1}Desc`)}
+                  </p>
                 </div>
               </R>
             );
@@ -741,8 +772,19 @@ function GallerySection({ images }: { images?: string[] }) {
 /* ────────────────────────────────────────────────────────────
    TESTIMONIALS
    ──────────────────────────────────────────────────────────── */
-function Testimonials() {
+function Testimonials({ data }: { data?: HomeTestimonials }) {
   const t = useTranslations('ocean');
+  // 어드민 오버라이드(내용 있는 항목)가 있으면 그것을, 없으면 i18n 샘플 후기를 렌더.
+  const ovItems = (data?.items ?? []).filter((it) => it.quote?.trim() || it.name?.trim());
+  const list =
+    ovItems.length > 0
+      ? ovItems.map((it) => ({ name: it.name, city: it.city, tour: it.tour, quote: it.quote }))
+      : TESTIMONIALS.map((item, i) => ({
+          name: item.name,
+          city: t(`t${i + 1}City`),
+          tour: t(`t${i + 1}Tour`),
+          quote: t(`t${i + 1}Quote`)
+        }));
   return (
     <section className="relative py-24 sm:py-28">
       <div className="mx-auto max-w-container px-6">
@@ -751,13 +793,15 @@ function Testimonials() {
             Guest Stories
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">{t('testimonialsTitle')}</h2>
+            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
+              {data?.sectionTitle?.trim() || t('testimonialsTitle')}
+            </h2>
           </R>
         </div>
 
         <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {TESTIMONIALS.map((item, i) => (
-            <R key={item.name} delay={i * 0.1}>
+          {list.map((item, i) => (
+            <R key={i} delay={i * 0.1}>
               <figure className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.04] p-7">
                 <div className="flex gap-0.5 text-amber-300" aria-label={t('ratingAria')}>
                   {Array.from({ length: 5 }).map((_, s) => (
@@ -765,7 +809,7 @@ function Testimonials() {
                   ))}
                 </div>
                 <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-white/80">
-                  “{t(`t${i + 1}Quote`)}”
+                  “{item.quote}”
                 </blockquote>
                 <figcaption className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
                   <span
@@ -776,9 +820,10 @@ function Testimonials() {
                   </span>
                   <span className="text-sm">
                     <span className="block font-semibold text-white">
-                      {item.name} · {t(`t${i + 1}City`)}
+                      {item.name}
+                      {item.city ? ` · ${item.city}` : ''}
                     </span>
-                    <span className="text-white/65">{t(`t${i + 1}Tour`)}</span>
+                    <span className="text-white/65">{item.tour}</span>
                   </span>
                 </figcaption>
               </figure>
@@ -848,29 +893,39 @@ export type HomeMedia = {
   gallery?: string[];
 };
 
+/** 홈 섹션 텍스트 어드민 오버라이드(기본 로케일에만 적용). 비면 i18n 기본값 사용. */
+export type HomeContent = {
+  heroExtra?: { badges?: string[]; ctaReserve?: string; ctaExplore?: string };
+  tours?: HomeTourCopy;
+  assurances?: HomeAssurances;
+  testimonials?: HomeTestimonials;
+};
+
 export default function OceanHome({
   posts,
   locale,
   schedule,
-  media
+  media,
+  content
 }: {
   posts: BlogPost[];
   locale: string;
   schedule: ScheduleData;
   media?: HomeMedia;
+  content?: HomeContent;
 }) {
   return (
     <div className="relative text-white">
       <CinematicBackground />
       <Particles />
 
-      <Hero media={media?.hero} text={media?.heroText} />
+      <Hero media={media?.hero} text={media?.heroText} extra={content?.heroExtra} />
       <WaveDivider />
-      <ActivitiesSection tourImages={media?.tours} />
-      <AssuranceSection />
+      <ActivitiesSection tourImages={media?.tours} copy={content?.tours} />
+      <AssuranceSection data={content?.assurances} />
       <BlogSection posts={posts} locale={locale} />
       <GallerySection images={media?.gallery} />
-      <Testimonials />
+      <Testimonials data={content?.testimonials} />
       <WaveDivider flip />
       <ReserveSection schedule={schedule} locale={locale} />
     </div>
