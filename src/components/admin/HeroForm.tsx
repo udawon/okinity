@@ -16,9 +16,36 @@ type HeroDefaults = {
   badge3?: string;
   ctaReserve?: string;
   ctaExplore?: string;
+  hideEyebrow?: boolean;
+  hideSubtitle?: boolean;
+  hideBadges?: boolean;
 };
 
 const labelCls = 'block text-sm font-medium text-ink';
+
+/** 영역 표시/숨김 체크박스. 체크=표시(name=on). 끄면 해당 Hero 블록을 전 언어에서 숨김. */
+function ShowToggle({
+  name,
+  defaultShown,
+  disabled
+}: {
+  name: string;
+  defaultShown: boolean;
+  disabled?: boolean;
+}) {
+  return (
+    <label className="flex shrink-0 items-center gap-1.5 text-sm font-normal text-muted">
+      <input
+        type="checkbox"
+        name={name}
+        defaultChecked={defaultShown}
+        disabled={disabled}
+        className="h-4 w-4 accent-brand"
+      />
+      표시
+    </label>
+  );
+}
 const inputCls =
   'mt-1 w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted';
 
@@ -44,7 +71,11 @@ export default function HeroForm({
       badge2: String(formData.get('badge2') ?? ''),
       badge3: String(formData.get('badge3') ?? ''),
       ctaReserve: String(formData.get('ctaReserve') ?? ''),
-      ctaExplore: String(formData.get('ctaExplore') ?? '')
+      ctaExplore: String(formData.get('ctaExplore') ?? ''),
+      // 체크박스 미체크 = 숨김. (체크 시 값 'on')
+      hideEyebrow: formData.get('showEyebrow') !== 'on',
+      hideSubtitle: formData.get('showSubtitle') !== 'on',
+      hideBadges: formData.get('showBadges') !== 'on'
     });
     setSaving(false);
     if (res.ok) show('저장되었습니다.');
@@ -78,9 +109,12 @@ export default function HeroForm({
       </div>
 
       <div>
-        <label className={labelCls} htmlFor="hero-eyebrow">
-          작은 라벨 (eyebrow)
-        </label>
+        <div className="flex items-center justify-between">
+          <label className={labelCls} htmlFor="hero-eyebrow">
+            작은 라벨 (eyebrow)
+          </label>
+          <ShowToggle name="showEyebrow" defaultShown={!defaults.hideEyebrow} disabled={disabled} />
+        </div>
         <input
           id="hero-eyebrow"
           name="eyebrow"
@@ -110,9 +144,12 @@ export default function HeroForm({
       </div>
 
       <div>
-        <label className={labelCls} htmlFor="hero-subtitle">
-          부제
-        </label>
+        <div className="flex items-center justify-between">
+          <label className={labelCls} htmlFor="hero-subtitle">
+            부제
+          </label>
+          <ShowToggle name="showSubtitle" defaultShown={!defaults.hideSubtitle} disabled={disabled} />
+        </div>
         <p className="mb-1 mt-0.5 text-xs text-muted">줄바꿈(Enter) 가능.</p>
         <textarea
           id="hero-subtitle"
@@ -147,7 +184,10 @@ export default function HeroForm({
       </div>
 
       <div>
-        <label className={labelCls}>신뢰 배지 (최대 3개)</label>
+        <div className="flex items-center justify-between">
+          <label className={labelCls}>신뢰 배지 (최대 3개)</label>
+          <ShowToggle name="showBadges" defaultShown={!defaults.hideBadges} disabled={disabled} />
+        </div>
         <p className="mb-1 mt-0.5 text-xs text-muted">하단 작은 배지 문구. 비우면 기본값.</p>
         <div className="grid gap-2 sm:grid-cols-3">
           <input

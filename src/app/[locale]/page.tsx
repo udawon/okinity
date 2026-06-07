@@ -72,6 +72,9 @@ export default async function HomePage({
         badge3?: string;
         ctaReserve?: string;
         ctaExplore?: string;
+        hideEyebrow?: boolean;
+        hideSubtitle?: boolean;
+        hideBadges?: boolean;
       }
     | undefined;
   const galleryItems = overrides[CONTENT_KEYS.gallery]?.items;
@@ -97,6 +100,12 @@ export default async function HomePage({
     heroText: isDefaultLocale
       ? { eyebrow: heroOv?.eyebrow, title: heroOv?.title, subtitle: heroOv?.subtitle }
       : undefined,
+    // 표시/숨김은 구조적 결정이라 전 로케일 공통 적용(배경 미디어와 동일).
+    heroHide: {
+      eyebrow: !!heroOv?.hideEyebrow,
+      subtitle: !!heroOv?.hideSubtitle,
+      badges: !!heroOv?.hideBadges
+    },
     gallery: galleryImages,
     tours: tourImages
   };
