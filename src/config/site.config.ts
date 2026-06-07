@@ -4,14 +4,15 @@
  */
 export const site = {
   name: 'OKINITY',
-  // 공유·SEO 기본값 (OG 태그). 배포 시 NEXT_PUBLIC_SITE_URL 환경변수로 도메인 지정.
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://okinity.vercel.app',
+  // 공유·SEO 기본값 (OG 태그). 대표 도메인 okinity.com.
+  // Vercel의 NEXT_PUBLIC_SITE_URL 환경변수가 있으면 그 값이 우선(환경별 override용).
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://okinity.com',
   // 공유 미리보기 이미지. 실제 출시 전 1200×630 PNG로 교체 권장(크롤러 호환).
   defaultOgImage: '/images/placeholder.svg',
   // 연락 채널 — 폼 외 직접 연락 경로
   contact: {
-    // 자체 도메인 확보 시 도메인 메일로 교체. 현재는 수신 가능한 Gmail.
-    email: 'gapd20@gmail.com',
+    // 대표 수신 이메일(푸터 노출 + 문의 알림 수신 기본값). 자체 도메인 확보 시 도메인 메일로 교체.
+    email: 'okinity8@gmail.com',
     kakaoOpenChat: '', // 예: https://open.kakao.com/o/xxxx (비우면 카카오 밴드가 예약 폼으로 연결)
     instagram: '' // 예: https://instagram.com/ponyokinawa
   },

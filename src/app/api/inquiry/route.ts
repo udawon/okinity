@@ -9,7 +9,7 @@ import { getInquiryStore, NewInquirySchema, type NewInquiry } from '@/lib/inquir
  * 2) 강사 이메일 알림(best-effort). 이메일 실패해도 문의는 이미 저장됨 → ok 반환.
  *    (설계 검토에서 지적된 부분-실패 정책: 저장 성공이 곧 접수 성공.)
  *
- * 저장소: POSTGRES_URL 있으면 Postgres, 없으면 JSON 파일(로컬). src/lib/inquiries 참조.
+ * 저장소(우선순위): Supabase(기본) → Postgres → JSON 파일(로컬 전용·휘발). src/lib/inquiries 참조.
  * 보안: 허니팟(company 필드) + IP 기준 단순 rate-limit.
  *   ⚠ in-memory rate-limit은 단일 인스턴스 가정. 서버리스/다중 인스턴스에서는
  *     Upstash 등 외부 저장소로 교체 필요.
