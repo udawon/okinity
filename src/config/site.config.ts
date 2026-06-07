@@ -16,7 +16,7 @@ export const site = {
     // 카카오톡 채널 URL (예: http://pf.kakao.com/_xxxxxx). 비우면 푸터에서 숨김.
     kakaoChannel: 'http://pf.kakao.com/_GLkxlX',
     // LINE URL (예: https://lin.ee/xxxxxx 또는 https://line.me/ti/p/@xxxx). 비우면 푸터에서 숨김.
-    line: ''
+    line: 'https://lin.ee/vdxgimQ'
   },
   // 푸터 주소·연락처 (일본 본사)
   address: {
