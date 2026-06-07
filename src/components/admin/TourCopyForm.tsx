@@ -8,7 +8,7 @@ const inputCls =
   'w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted disabled:opacity-50';
 // 장문(여러 줄)은 알약형이 아닌 카드형 라운드 + 넉넉한 줄간격/높이.
 const textareaCls =
-  'w-full rounded-card border border-line bg-surface px-3 py-2.5 text-sm leading-relaxed text-ink placeholder:text-muted disabled:opacity-50';
+  'w-full resize-y rounded-card border border-line bg-surface px-3 py-2.5 text-sm leading-relaxed text-ink placeholder:text-muted disabled:opacity-50';
 
 /**
  * 투어 카드 텍스트 편집 — 섹션 제목·소개 + 카테고리별(스노클링·다이빙·PADI·낚시) 제목·태그라인·설명.

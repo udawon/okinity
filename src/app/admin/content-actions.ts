@@ -40,9 +40,10 @@ export async function uploadMediaAction(
   if (!(file instanceof File) || file.size === 0) {
     return { error: '파일을 선택하세요.' };
   }
-  // 50MB 상한 (동영상 고려). Supabase 무료 티어/요금 보호.
-  if (file.size > 50 * 1024 * 1024) {
-    return { error: '파일이 너무 큽니다(최대 50MB).' };
+  // 업로드 상한 — next.config serverActions.bodySizeLimit(12mb)와 정합.
+  // 이미지는 클라이언트에서 WebP로 자동 압축되어 보통 1MB 미만. 큰 동영상은 URL 직접 입력 권장.
+  if (file.size > 12 * 1024 * 1024) {
+    return { error: '파일이 너무 큽니다(최대 12MB). 큰 동영상은 아래 "URL 직접 입력"을 이용하세요.' };
   }
   try {
     const url = await uploadMedia(file, prefix);
