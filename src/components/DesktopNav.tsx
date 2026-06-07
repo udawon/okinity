@@ -53,7 +53,7 @@ function NavDropdown({ item }: { item: NavItem }) {
   return (
     <li
       ref={liRef}
-      className="relative"
+      className="relative shrink-0"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       onBlur={onBlur}
@@ -66,7 +66,7 @@ function NavDropdown({ item }: { item: NavItem }) {
         aria-controls={menuId}
         onClick={() => setOpen((v) => !v)}
         onKeyDown={onButtonKeyDown}
-        className="flex items-center gap-1 py-2 transition-colors hover:text-white aria-expanded:text-white"
+        className="flex items-center gap-1 whitespace-nowrap py-2 transition-colors hover:text-white aria-expanded:text-white"
       >
         {t(item.key)}
         <Caret open={open} />
@@ -116,20 +116,20 @@ export default function DesktopNav() {
   const t = useTranslations('nav');
   return (
     <nav className="hidden xl:block" aria-label="주요 메뉴">
-      <ul className="flex items-center gap-6 text-sm font-medium text-white/70">
+      <ul className="flex items-center gap-x-4 text-sm font-medium text-white/70 2xl:gap-x-6">
         {NAV.map((item) => (
           <Fragment key={item.key}>
             {item.children ? (
               <NavDropdown item={item} />
             ) : (
-              <li>
-                <Link href={item.href} className="py-2 transition-colors hover:text-white">
+              <li className="shrink-0">
+                <Link href={item.href} className="whitespace-nowrap py-2 transition-colors hover:text-white">
                   {t(item.key)}
                 </Link>
               </li>
             )}
             {item.groupEnd && (
-              <li aria-hidden className="h-4 w-px self-center bg-white/20" />
+              <li aria-hidden className="h-4 w-px shrink-0 self-center bg-white/20" />
             )}
           </Fragment>
         ))}
