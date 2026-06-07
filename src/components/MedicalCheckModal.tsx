@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 
 type Group = { title: string; items: string[] };
@@ -18,6 +19,12 @@ export default function MedicalCheckModal({
   // 안전 체크리스트 — 6개 그룹(번역 카탈로그). 펼쳐 읽고 그룹 단위로 '해당 없음' 확인.
   const GROUPS = t.raw('groups') as Group[];
   const TOTAL = GROUPS.length;
+
+  // 모달을 document.body로 포털 — 예약 폼 패널의 backdrop-blur(backdrop-filter)가
+  // position:fixed의 기준(containing block)을 패널로 바꿔, 포털 없이는 모달이 폼 칼럼에
+  // 갇혀 화면을 덮지 못한다. 마운트 후에만 포털(SSR 안전).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   // 한 번에 하나만 열림(다른 영역은 자동으로 닫혀 집중 유도).
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -44,7 +51,7 @@ export default function MedicalCheckModal({
   const pct = Math.round((confirmed.size / TOTAL) * 100);
   const bold = { b: (chunks: React.ReactNode) => <strong>{chunks}</strong> };
 
-  return (
+  const modal = (
     <div className="fixed inset-0 z-[60] flex items-stretch justify-center overflow-y-auto bg-black/60 sm:items-center sm:p-4">
       <div className="flex h-dvh w-full max-w-lg flex-col border-white/10 bg-[#061522] sm:h-auto sm:max-h-[90vh] sm:rounded-card sm:border">
         {/* 헤더 */}
@@ -192,4 +199,6 @@ export default function MedicalCheckModal({
       </div>
     </div>
   );
+
+  return mounted ? createPortal(modal, document.body) : null;
 }
