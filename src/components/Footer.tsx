@@ -31,51 +31,27 @@ function LineGlyph() {
   );
 }
 
-/** 외부 링크 화살표(↗) */
-function ArrowGlyph() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-3.5 w-3.5 text-white/30 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#5fc6ef]"
-      aria-hidden
-    >
-      <path d="M7 17 17 7M9 7h8v8" />
-    </svg>
-  );
-}
+const linkCls =
+  'group inline-flex items-center gap-2.5 text-sm text-white/65 transition-colors duration-200 hover:text-white';
 
-const rowCls =
-  'group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2.5 text-sm text-white/75 backdrop-blur-sm transition-colors duration-200 hover:border-[#5fc6ef]/45 hover:bg-white/[0.07] hover:text-white sm:w-60';
-const chipCls = 'grid h-8 w-8 shrink-0 place-items-center rounded-full';
-
-/** 푸터 문의 링크 한 줄 — 글래스 버튼 + 저채도 브랜드 틴트 아이콘. */
-function ContactRow({
+/** 푸터 문의 링크 — 박스 없는 심플 목록(아이콘 + 라벨). */
+function ContactLink({
   href,
   label,
-  tint,
+  iconColor,
   external,
   children
 }: {
   href: string;
   label: string;
-  tint: string;
+  iconColor: string;
   external?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <a
-      href={href}
-      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-      className={rowCls}
-    >
-      <span className={`${chipCls} ${tint}`}>{children}</span>
-      <span className="flex-1 text-left font-medium">{label}</span>
-      <ArrowGlyph />
+    <a href={href} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className={linkCls}>
+      <span className={`shrink-0 ${iconColor}`}>{children}</span>
+      <span>{label}</span>
     </a>
   );
 }
@@ -113,33 +89,33 @@ export default async function Footer() {
 
         <div className="sm:text-right">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/45">Contact</p>
-          <div className="mt-4 flex flex-col gap-2.5 sm:items-end">
-            <ContactRow
+          <div className="mt-4 flex flex-col gap-3 sm:items-end">
+            <ContactLink
               href={`mailto:${site.contact.email}`}
               label={t('email')}
-              tint="bg-[#5fc6ef]/15 text-[#7dd3f5]"
+              iconColor="text-[#7dd3f5]"
             >
               <MailGlyph />
-            </ContactRow>
+            </ContactLink>
             {site.contact.kakaoChannel && (
-              <ContactRow
+              <ContactLink
                 href={site.contact.kakaoChannel}
                 label={t('kakao')}
-                tint="bg-[#FEE500]/15 text-[#FEE500]"
+                iconColor="text-[#FEE500]"
                 external
               >
                 <KakaoGlyph />
-              </ContactRow>
+              </ContactLink>
             )}
             {site.contact.line && (
-              <ContactRow
+              <ContactLink
                 href={site.contact.line}
                 label={t('line')}
-                tint="bg-[#06C755]/20 text-[#3fe09a]"
+                iconColor="text-[#3fe09a]"
                 external
               >
                 <LineGlyph />
-              </ContactRow>
+              </ContactLink>
             )}
           </div>
         </div>
