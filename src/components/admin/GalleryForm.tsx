@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { saveContent } from '@/app/admin/content-actions';
 import MediaInput from './MediaInput';
+import { useSaveStatus, SaveStatusBadge } from './save-status';
 
 type Item = { image: string; caption?: string };
 
@@ -18,7 +19,7 @@ export default function GalleryForm({
   disabled?: boolean;
 }) {
   const [items, setItems] = useState<Item[]>(defaults.length ? defaults : []);
-  const [msg, setMsg] = useState('');
+  const { status, show } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   const patch = (i: number, p: Partial<Item>) =>
@@ -37,11 +38,11 @@ export default function GalleryForm({
 
   async function save() {
     setSaving(true);
-    setMsg('');
     const clean = items.filter((it) => it.image.trim());
     const res = await saveContent('gallery', { items: clean });
     setSaving(false);
-    setMsg(res.ok ? `저장되었습니다 (${clean.length}장).` : (res.error ?? '저장 실패'));
+    if (res.ok) show(`저장되었습니다 (${clean.length}장).`);
+    else show(res.error ?? '저장 실패', 'err');
   }
 
   return (
@@ -115,7 +116,7 @@ export default function GalleryForm({
         >
           {saving ? '저장 중…' : '갤러리 저장'}
         </button>
-        {msg && <span className="text-sm text-muted">{msg}</span>}
+        <SaveStatusBadge status={status} />
       </div>
     </div>
   );

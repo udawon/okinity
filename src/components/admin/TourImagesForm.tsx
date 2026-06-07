@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { saveContent } from '@/app/admin/content-actions';
 import MediaInput from './MediaInput';
 import { ACTIVITIES } from '../ocean-home-data';
+import { useSaveStatus, SaveStatusBadge } from './save-status';
 
 /**
  * 홈 투어 카테고리 카드 이미지 편집 — 다이빙·PADI·낚시·스노클링 각 1장.
@@ -17,17 +18,17 @@ export default function TourImagesForm({
   disabled?: boolean;
 }) {
   const [images, setImages] = useState<Record<string, string>>(defaults ?? {});
-  const [msg, setMsg] = useState('');
+  const { status, show } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   const set = (id: string, url: string) => setImages((m) => ({ ...m, [id]: url }));
 
   async function save() {
     setSaving(true);
-    setMsg('');
     const res = await saveContent('home_tours', { images });
     setSaving(false);
-    setMsg(res.ok ? '저장되었습니다.' : (res.error ?? '저장 실패'));
+    if (res.ok) show('저장되었습니다.');
+    else show(res.error ?? '저장 실패', 'err');
   }
 
   return (
@@ -57,7 +58,7 @@ export default function TourImagesForm({
         >
           {saving ? '저장 중…' : '투어 이미지 저장'}
         </button>
-        {msg && <span className="text-sm text-muted">{msg}</span>}
+        <SaveStatusBadge status={status} />
       </div>
     </div>
   );

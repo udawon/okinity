@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSaveStatus, SaveStatusBadge } from './save-status';
 import { saveContent } from '@/app/admin/content-actions';
 import MediaInput from './MediaInput';
 
@@ -28,12 +29,11 @@ export default function HeroForm({
   defaults: HeroDefaults;
   disabled?: boolean;
 }) {
-  const [msg, setMsg] = useState('');
+  const { status, show } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   async function action(formData: FormData) {
     setSaving(true);
-    setMsg('');
     const res = await saveContent('hero', {
       eyebrow: String(formData.get('eyebrow') ?? ''),
       title: String(formData.get('title') ?? ''),
@@ -47,7 +47,8 @@ export default function HeroForm({
       ctaExplore: String(formData.get('ctaExplore') ?? '')
     });
     setSaving(false);
-    setMsg(res.ok ? '저장되었습니다.' : (res.error ?? '저장 실패'));
+    if (res.ok) show('저장되었습니다.');
+    else show(res.error ?? '저장 실패', 'err');
   }
 
   return (
@@ -181,7 +182,7 @@ export default function HeroForm({
         >
           {saving ? '저장 중…' : 'Hero 저장'}
         </button>
-        {msg && <span className="text-sm text-muted">{msg}</span>}
+        <SaveStatusBadge status={status} />
       </div>
     </form>
   );

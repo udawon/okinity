@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { saveContent } from '@/app/admin/content-actions';
 import { HOME_CONTENT_KEYS, type TestimonialItem } from '@/lib/home-content';
+import { useSaveStatus, SaveStatusBadge } from './save-status';
 
 const inputCls =
   'w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted disabled:opacity-50';
@@ -21,7 +22,7 @@ export default function TestimonialsForm({
 }) {
   const [title, setTitle] = useState(defaultTitle ?? '');
   const [items, setItems] = useState<TestimonialItem[]>(defaults);
-  const [msg, setMsg] = useState('');
+  const { status, show } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   const patch = (i: number, p: Partial<TestimonialItem>) =>
@@ -32,14 +33,14 @@ export default function TestimonialsForm({
 
   async function save() {
     setSaving(true);
-    setMsg('');
     const clean = items.filter((it) => it.quote.trim() || it.name.trim());
     const res = await saveContent(HOME_CONTENT_KEYS.testimonials, {
       sectionTitle: title.trim(),
       items: clean
     });
     setSaving(false);
-    setMsg(res.ok ? `저장되었습니다 (후기 ${clean.length}개).` : (res.error ?? '저장 실패'));
+    if (res.ok) show(`저장되었습니다 (후기 ${clean.length}개).`);
+    else show(res.error ?? '저장 실패', 'err');
   }
 
   return (
@@ -121,7 +122,7 @@ export default function TestimonialsForm({
         >
           {saving ? '저장 중…' : '후기 저장'}
         </button>
-        {msg && <span className="text-sm text-muted">{msg}</span>}
+        <SaveStatusBadge status={status} />
       </div>
       <p className="text-xs text-muted">
         후기를 모두 비우고 저장하면 기본 샘플 후기가 표시됩니다. (en/日 페이지는 번역본이 표시됩니다)

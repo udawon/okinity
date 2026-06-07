@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSaveStatus, SaveStatusBadge } from './save-status';
 import { useRouter } from 'next/navigation';
 import { saveNotice } from '@/app/admin/notice-actions';
 import { type NoticePost } from '@/lib/notice';
@@ -24,16 +25,15 @@ export default function NoticeEditor({
   const [pinned, setPinned] = useState(post.pinned);
   const [body, setBody] = useState(post.body);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState('');
+  const { status, show } = useSaveStatus();
 
   async function save() {
     setSaving(true);
-    setMsg('');
     const res = await saveNotice({ ...post, title, date, published, pinned, body });
     setSaving(false);
-    if (res.error) setMsg(res.error);
+    if (res.error) show(res.error, 'err');
     else {
-      setMsg('저장되었습니다.');
+      show('저장되었습니다.');
       router.refresh();
     }
   }
@@ -116,7 +116,7 @@ export default function NoticeEditor({
         >
           {saving ? '저장 중…' : '공지 저장'}
         </button>
-        {msg && <span className="text-sm text-muted">{msg}</span>}
+        <SaveStatusBadge status={status} />
       </div>
     </div>
   );
