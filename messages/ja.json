@@ -310,6 +310,9 @@
   },
   "footer": {
     "contactUs": "お問い合わせ",
+    "email": "メール",
+    "kakao": "カカオトーク",
+    "line": "LINE",
     "rights": "© {year} OKINITY. All rights reserved."
   },
   "common": {

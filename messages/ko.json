@@ -310,6 +310,9 @@
   },
   "footer": {
     "contactUs": "문의",
+    "email": "이메일",
+    "kakao": "카카오톡 채널",
+    "line": "라인",
     "rights": "© {year} OKINITY. All rights reserved."
   },
   "common": {

@@ -9,17 +9,22 @@ export const site = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://okinity.com',
   // 공유 미리보기 이미지. 실제 출시 전 1200×630 PNG로 교체 권장(크롤러 호환).
   defaultOgImage: '/images/placeholder.svg',
-  // 연락 채널 — 폼 외 직접 연락 경로
+  // 연락 채널 — 폼 외 직접 연락 경로(푸터 문의 링크)
   contact: {
     // 대표 수신 이메일(푸터 노출 + 문의 알림 수신 기본값). 자체 도메인 확보 시 도메인 메일로 교체.
     email: 'okinity8@gmail.com',
-    kakaoOpenChat: '', // 예: https://open.kakao.com/o/xxxx (비우면 카카오 밴드가 예약 폼으로 연결)
-    instagram: '' // 예: https://instagram.com/ponyokinawa
+    // 카카오톡 채널 URL (예: http://pf.kakao.com/_xxxxxx). 비우면 푸터에서 숨김.
+    kakaoChannel: 'http://pf.kakao.com/_GLkxlX',
+    // LINE URL (예: https://lin.ee/xxxxxx 또는 https://line.me/ti/p/@xxxx). 비우면 푸터에서 숨김.
+    line: ''
   },
-  // 푸터·소개에 노출할 주소 (실제 주소로 교체)
-  address: '오키나와 (주소 입력 예정)',
-  // PADI 제휴 표기 여부
-  padiAffiliated: true
+  // 푸터 주소·연락처 (일본 본사)
+  address: {
+    postal: '〒902-0075',
+    line: '192-3, Kokuba, Naha-Si, Okinawa-Ken, JAPAN',
+    representative: '代表　比嘉海斗'
+  },
+  phone: '+81-90-1947-5156'
 } as const;
 
 export type Site = typeof site;

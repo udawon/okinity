@@ -22,7 +22,7 @@ export default async function Header({ locale }: { locale: Locale }) {
             width={819}
             height={235}
             priority
-            className="h-8 w-auto sm:h-11"
+            className="h-9 w-auto sm:h-11"
           />
         </Link>
 
