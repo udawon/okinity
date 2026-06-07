@@ -231,7 +231,8 @@
     "successBody": "24시간 안에 한국어로 맞춤 일정과 견적을 보내드릴게요.",
     "successAnotherDate": "다른 날짜 보기",
     "successNew": "새 문의 작성",
-    "dateTbd": "날짜 미정"
+    "dateTbd": "날짜 미정",
+    "menuCtaSub": "원하는 날짜를 골라 바로 예약 문의"
   },
   "tourDetail": {
     "durationLabel": "소요",
