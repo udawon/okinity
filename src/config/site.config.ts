@@ -10,8 +10,8 @@ export const site = {
   defaultOgImage: '/images/placeholder.svg',
   // 연락 채널 — 폼 외 직접 연락 경로
   contact: {
-    // 자체 도메인 확보 시 도메인 메일로 교체. 현재는 수신 가능한 Gmail.
-    email: 'gapd20@gmail.com',
+    // 대표 수신 이메일(푸터 노출 + 문의 알림 수신 기본값). 자체 도메인 확보 시 도메인 메일로 교체.
+    email: 'okinity8@gmail.com',
     kakaoOpenChat: '', // 예: https://open.kakao.com/o/xxxx (비우면 카카오 밴드가 예약 폼으로 연결)
     instagram: '' // 예: https://instagram.com/ponyokinawa
   },
