@@ -67,6 +67,9 @@ export default async function AdminContentPage() {
     badge3?: string;
     ctaReserve?: string;
     ctaExplore?: string;
+    hideEyebrow?: boolean;
+    hideSubtitle?: boolean;
+    hideBadges?: boolean;
   };
   const hero = {
     eyebrow: heroOv.eyebrow?.trim() || HERO_DEFAULTS.eyebrow,
@@ -78,7 +81,10 @@ export default async function AdminContentPage() {
     badge2: heroOv.badge2,
     badge3: heroOv.badge3,
     ctaReserve: heroOv.ctaReserve,
-    ctaExplore: heroOv.ctaExplore
+    ctaExplore: heroOv.ctaExplore,
+    hideEyebrow: heroOv.hideEyebrow,
+    hideSubtitle: heroOv.hideSubtitle,
+    hideBadges: heroOv.hideBadges
   };
   const galleryOverrideItems = overrides[CONTENT_KEYS.gallery]?.items;
   const galleryDefaults: GalleryItem[] = Array.isArray(galleryOverrideItems)

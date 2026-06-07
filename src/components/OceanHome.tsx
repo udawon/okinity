@@ -255,11 +255,13 @@ function WaveDivider({ flip = false, className = '' }: { flip?: boolean; classNa
 function Hero({
   media,
   text,
-  extra
+  extra,
+  hide
 }: {
   media?: { url?: string; type?: string };
   text?: { eyebrow?: string; title?: string; subtitle?: string };
   extra?: { badges?: string[]; ctaReserve?: string; ctaExplore?: string };
+  hide?: { eyebrow?: boolean; subtitle?: boolean; badges?: boolean };
 }) {
   const t = useTranslations('ocean');
   const reduce = useStableReducedMotion();
@@ -342,9 +344,11 @@ function Hero({
         style={{ y: contentY, opacity: contentOpacity }}
         className="relative mx-auto max-w-3xl px-6 text-center [text-shadow:0_1px_3px_rgba(0,0,0,0.55),0_2px_22px_rgba(0,0,0,0.45)]"
       >
-        <R as="p" className="mb-5 text-xs font-semibold uppercase tracking-[0.32em] [text-indent:0.32em] text-cyan-200/90">
-          {eyebrow}
-        </R>
+        {!hide?.eyebrow && (
+          <R as="p" className="mb-5 text-xs font-semibold uppercase tracking-[0.32em] [text-indent:0.32em] text-cyan-200/90">
+            {eyebrow}
+          </R>
+        )}
         <h1 className="font-serif text-[2.6rem] font-medium leading-[1.08] text-white sm:text-6xl lg:text-7xl">
           {titleLines.map((line, i) => {
             // 줄이 2개 이상이면 마지막 줄을 강조색(오션)으로
@@ -356,15 +360,17 @@ function Hero({
             );
           })}
         </h1>
-        <R delay={0.2} className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/90 sm:text-lg">
-          {subtitleLines.map((line, i) => (
-            <span key={i}>
-              {i > 0 && <br className="hidden sm:block" />}
-              {line}
-              {i < subtitleLines.length - 1 ? ' ' : ''}
-            </span>
-          ))}
-        </R>
+        {!hide?.subtitle && (
+          <R delay={0.2} className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/90 sm:text-lg">
+            {subtitleLines.map((line, i) => (
+              <span key={i}>
+                {i > 0 && <br className="hidden sm:block" />}
+                {line}
+                {i < subtitleLines.length - 1 ? ' ' : ''}
+              </span>
+            ))}
+          </R>
+        )}
 
         <R delay={0.3} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
@@ -383,14 +389,16 @@ function Hero({
         </R>
 
         {/* 신뢰 배지 */}
-        <R delay={0.4} className="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-white/65">
-          {(extra?.badges?.length ? extra.badges : [t('badge1'), t('badge2'), t('badge3')]).map((b, i) => (
-            <span key={b} className="inline-flex items-center gap-2">
-              {i > 0 && <span className="h-1 w-1 rounded-full bg-white/30" />}
-              {b}
-            </span>
-          ))}
-        </R>
+        {!hide?.badges && (
+          <R delay={0.4} className="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-white/65">
+            {(extra?.badges?.length ? extra.badges : [t('badge1'), t('badge2'), t('badge3')]).map((b, i) => (
+              <span key={b} className="inline-flex items-center gap-2">
+                {i > 0 && <span className="h-1 w-1 rounded-full bg-white/30" />}
+                {b}
+              </span>
+            ))}
+          </R>
+        )}
       </motion.div>
 
       {/* 스크롤 큐 — 가로 중앙정렬(외부 div의 -translate-x-1/2)과 둥둥 애니메이션(내부 div의 translateY)을
@@ -452,7 +460,7 @@ function ActivityCard({ a, image, copy }: { a: Activity; image: string; copy?: T
       <div className="flex flex-1 flex-col p-6">
         <h3 className="text-balance font-serif text-2xl text-white">{categoryName}</h3>
         <p className="mt-1.5 text-sm font-medium text-white/70">{tagline}</p>
-        <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/65">{desc}</p>
+        <p className="mt-3 line-clamp-3 whitespace-pre-line text-sm leading-relaxed text-white/65">{desc}</p>
 
         {/* 하위 투어 */}
         <p className="mb-1 mt-5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-white/65">
@@ -642,7 +650,7 @@ function AssuranceSection({ data }: { data?: HomeAssurances }) {
                   <h3 className="mt-5 text-balance text-base font-semibold text-white">
                     {ov?.title?.trim() || t(`assurance${i + 1}Title`)}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/60">
+                  <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-white/60">
                     {ov?.desc?.trim() || t(`assurance${i + 1}Desc`)}
                   </p>
                 </div>
@@ -808,7 +816,7 @@ function Testimonials({ data }: { data?: HomeTestimonials }) {
                     <Star key={s} className="h-4 w-4" />
                   ))}
                 </div>
-                <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-white/80">
+                <blockquote className="mt-4 flex-1 whitespace-pre-line text-[15px] leading-relaxed text-white/80">
                   “{item.quote}”
                 </blockquote>
                 <figcaption className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
@@ -887,6 +895,8 @@ export type HomeMedia = {
   hero?: { url?: string; type?: string };
   /** Hero 텍스트(어드민 hero 키): eyebrow/title/subtitle. 비우면 기본값 */
   heroText?: { eyebrow?: string; title?: string; subtitle?: string };
+  /** Hero 영역 표시/숨김(어드민 hero 키, 전 언어 공통): true면 해당 블록 숨김 */
+  heroHide?: { eyebrow?: boolean; subtitle?: boolean; badges?: boolean };
   /** 투어 카테고리 카드 이미지(어드민 home_tours 키): { [activityId]: url } */
   tours?: Record<string, string>;
   /** 갤러리 이미지 URL 배열(어드민 gallery 키) */
@@ -919,7 +929,7 @@ export default function OceanHome({
       <CinematicBackground />
       <Particles />
 
-      <Hero media={media?.hero} text={media?.heroText} extra={content?.heroExtra} />
+      <Hero media={media?.hero} text={media?.heroText} extra={content?.heroExtra} hide={media?.heroHide} />
       <WaveDivider />
       <ActivitiesSection tourImages={media?.tours} copy={content?.tours} />
       <AssuranceSection data={content?.assurances} />
