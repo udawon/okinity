@@ -10,6 +10,11 @@ type HeroDefaults = {
   subtitle?: string;
   mediaUrl?: string;
   mediaType?: string;
+  badge1?: string;
+  badge2?: string;
+  badge3?: string;
+  ctaReserve?: string;
+  ctaExplore?: string;
 };
 
 const labelCls = 'block text-sm font-medium text-ink';
@@ -34,7 +39,12 @@ export default function HeroForm({
       title: String(formData.get('title') ?? ''),
       subtitle: String(formData.get('subtitle') ?? ''),
       mediaUrl: String(formData.get('mediaUrl') ?? ''),
-      mediaType: String(formData.get('mediaType') ?? 'image')
+      mediaType: String(formData.get('mediaType') ?? 'image'),
+      badge1: String(formData.get('badge1') ?? ''),
+      badge2: String(formData.get('badge2') ?? ''),
+      badge3: String(formData.get('badge3') ?? ''),
+      ctaReserve: String(formData.get('ctaReserve') ?? ''),
+      ctaExplore: String(formData.get('ctaExplore') ?? '')
     });
     setSaving(false);
     setMsg(res.ok ? '저장되었습니다.' : (res.error ?? '저장 실패'));
@@ -112,6 +122,55 @@ export default function HeroForm({
           rows={2}
           className={`${inputCls} !rounded-card`}
         />
+      </div>
+
+      <div>
+        <label className={labelCls}>CTA 버튼 문구</label>
+        <p className="mb-1 mt-0.5 text-xs text-muted">비우면 기본(예약하기 / 둘러보기). 링크는 고정.</p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <input
+            name="ctaReserve"
+            defaultValue={defaults.ctaReserve}
+            placeholder="기본: 투어 예약하기"
+            disabled={disabled}
+            className={inputCls}
+          />
+          <input
+            name="ctaExplore"
+            defaultValue={defaults.ctaExplore}
+            placeholder="기본: 액티비티 둘러보기"
+            disabled={disabled}
+            className={inputCls}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className={labelCls}>신뢰 배지 (최대 3개)</label>
+        <p className="mb-1 mt-0.5 text-xs text-muted">하단 작은 배지 문구. 비우면 기본값.</p>
+        <div className="grid gap-2 sm:grid-cols-3">
+          <input
+            name="badge1"
+            defaultValue={defaults.badge1}
+            placeholder="기본: PADI 공인 다이브센터"
+            disabled={disabled}
+            className={inputCls}
+          />
+          <input
+            name="badge2"
+            defaultValue={defaults.badge2}
+            placeholder="기본: 10년 무사고"
+            disabled={disabled}
+            className={inputCls}
+          />
+          <input
+            name="badge3"
+            defaultValue={defaults.badge3}
+            placeholder="기본: 한국어 가이드 동행"
+            disabled={disabled}
+            className={inputCls}
+          />
+        </div>
       </div>
 
       <div className="flex items-center gap-3">

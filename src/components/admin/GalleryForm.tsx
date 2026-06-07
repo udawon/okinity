@@ -25,6 +25,15 @@ export default function GalleryForm({
     setItems((arr) => arr.map((it, idx) => (idx === i ? { ...it, ...p } : it)));
   const remove = (i: number) => setItems((arr) => arr.filter((_, idx) => idx !== i));
   const add = () => setItems((arr) => [...arr, { image: '', caption: '' }]);
+  // 노출 순서 변경(위/아래로 한 칸 이동).
+  const move = (i: number, dir: -1 | 1) =>
+    setItems((arr) => {
+      const j = i + dir;
+      if (j < 0 || j >= arr.length) return arr;
+      const next = arr.slice();
+      [next[i], next[j]] = [next[j], next[i]];
+      return next;
+    });
 
   async function save() {
     setSaving(true);
@@ -42,14 +51,34 @@ export default function GalleryForm({
           <div key={i} className="space-y-2 rounded-card border border-line bg-bg/40 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-ink">#{i + 1}</span>
-              <button
-                type="button"
-                onClick={() => remove(i)}
-                disabled={disabled}
-                className="text-sm text-red-600 hover:underline"
-              >
-                삭제
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => move(i, -1)}
+                  disabled={disabled || i === 0}
+                  aria-label="위로"
+                  className="rounded border border-line px-1.5 text-sm text-ink hover:border-brand disabled:opacity-30"
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  onClick={() => move(i, 1)}
+                  disabled={disabled || i === items.length - 1}
+                  aria-label="아래로"
+                  className="rounded border border-line px-1.5 text-sm text-ink hover:border-brand disabled:opacity-30"
+                >
+                  ↓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => remove(i)}
+                  disabled={disabled}
+                  className="text-sm text-red-600 hover:underline disabled:opacity-50"
+                >
+                  삭제
+                </button>
+              </div>
             </div>
             <MediaInput
               prefix="gallery"

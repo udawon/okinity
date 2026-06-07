@@ -3,7 +3,14 @@ import { routing } from '@/i18n/routing';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems, publishedSorted, BLOG_CAROUSEL_LIMIT } from '@/lib/blog';
-import OceanHome from '@/components/OceanHome';
+import {
+  HOME_CONTENT_KEYS,
+  parseHomeTestimonials,
+  parseHomeAssurances,
+  parseHomeTourCopy,
+  nonEmpty
+} from '@/lib/home-content';
+import OceanHome, { type HomeContent } from '@/components/OceanHome';
 
 // 어드민 편집(블로그·일정)을 즉시 반영하기 위해 동적 렌더링.
 // (Supabase 미설정 시에도 오버라이드 조회는 빈 객체라 비용 거의 없음)
@@ -53,7 +60,18 @@ export default async function HomePage({
 
   // 어드민 편집 가능한 미디어(배경영상·투어 카드·갤러리). 비우면 기본값 사용.
   const heroOv = overrides[CONTENT_KEYS.hero] as
-    | { mediaUrl?: string; mediaType?: string; eyebrow?: string; title?: string; subtitle?: string }
+    | {
+        mediaUrl?: string;
+        mediaType?: string;
+        eyebrow?: string;
+        title?: string;
+        subtitle?: string;
+        badge1?: string;
+        badge2?: string;
+        badge3?: string;
+        ctaReserve?: string;
+        ctaExplore?: string;
+      }
     | undefined;
   const galleryItems = overrides[CONTENT_KEYS.gallery]?.items;
   const galleryImages = Array.isArray(galleryItems)
@@ -78,5 +96,24 @@ export default async function HomePage({
     tours: tourImages
   };
 
-  return <OceanHome posts={posts} locale={locale} schedule={schedule} media={media} />;
+  // 섹션 텍스트 어드민 오버라이드(후기·신뢰·투어카피·Hero 배지/CTA) — 운영자 한국어 입력이라
+  // 기본 로케일(ko)에만 적용. en/ja는 i18n 번역 사용(다국어 회귀 방지).
+  const content: HomeContent | undefined = isDefaultLocale
+    ? {
+        heroExtra: {
+          badges: [heroOv?.badge1, heroOv?.badge2, heroOv?.badge3]
+            .map(nonEmpty)
+            .filter((b): b is string => !!b),
+          ctaReserve: nonEmpty(heroOv?.ctaReserve),
+          ctaExplore: nonEmpty(heroOv?.ctaExplore)
+        },
+        tours: parseHomeTourCopy(overrides[HOME_CONTENT_KEYS.tourCopy]),
+        assurances: parseHomeAssurances(overrides[HOME_CONTENT_KEYS.assurances]),
+        testimonials: parseHomeTestimonials(overrides[HOME_CONTENT_KEYS.testimonials])
+      }
+    : undefined;
+
+  return (
+    <OceanHome posts={posts} locale={locale} schedule={schedule} media={media} content={content} />
+  );
 }
