@@ -130,9 +130,186 @@
       "required": "This field is required."
     }
   },
+  "ocean": {
+    "heroTitle1": "Where the ocean begins,",
+    "heroTitle2": "Okinawa",
+    "heroSubtitle1": "Scuba diving · PADI courses · fishing.",
+    "heroSubtitle2": "Small-group private ocean tours where even beginners feel at ease.",
+    "ctaReserve": "Book a Tour",
+    "ctaExplore": "Explore Activities",
+    "badge1": "PADI Dive Center",
+    "badge2": "10 years accident-free",
+    "badge3": "Guidance in your language",
+    "activitiesTitle": "Four ways to meet the sea",
+    "activitiesIntro": "Dive deep, get certified, feel the catch, or float on the surface — swipe to choose.",
+    "toursLabel": "Tours",
+    "carouselRegion": "Tour categories",
+    "prevTour": "Previous tour",
+    "nextTour": "Next tour",
+    "cardAlt": "{name} tour image",
+    "tagline": {
+      "snorkeling": "For the whole family, a coral garden at the surface",
+      "diving": "Hold your breath, into the blue",
+      "padi": "A diver certification for life",
+      "fishing": "Okinawa's catch — tropical game fishing"
+    },
+    "desc": {
+      "snorkeling": "A life vest and guide are always with you, so kids and seniors feel safe. The easiest way to meet the Blue Cave's mystical light, coral, and tropical fish — right from the surface.",
+      "diving": "No certification needed — a pro instructor accompanies you 1:2. From the Blue Cave's mystical light to the clarity of Kerama Blue, cruise Okinawa's signature points by boat.",
+      "padi": "Internationally certified PADI instructors guide you. From your first certification to pro specialties, grow safely step by step.",
+      "fishing": "Rich fishing grounds nurtured by the Kuroshio Current. From easy trial fishing to big-game trolling for mahi-mahi, gear and bait are all included."
+    },
+    "assuranceTitle": "Leave it to us with confidence",
+    "assurance1Title": "Small-group & private",
+    "assurance1Desc": "Up to 6 per team. The instructor cares for every guest's breathing to the end.",
+    "assurance2Title": "PADI certified · fully insured",
+    "assurance2Desc": "Internationally certified instructors and dive accident insurance for every guest keep you safe.",
+    "assurance3Title": "Comfortable in your language",
+    "assurance3Desc": "From booking to briefing to underwater hand signals, a guide is with you throughout.",
+    "assurance4Title": "Free photos · pickup",
+    "assurance4Desc": "Original underwater photos provided, plus free pickup from major accommodations.",
+    "blogViewAll": "View all posts",
+    "blogEmpty": "No stories yet. We're preparing our first one.",
+    "blogEmptyCta": "Visit the blog",
+    "galleryTitle": "Moments met underwater",
+    "galleryViewAll": "View full gallery",
+    "testimonialsTitle": "Stories from our guests",
+    "ratingAria": "Rated 5 out of 5",
+    "t1Quote": "It was my first dive, but the instructor held my hand the whole time so I wasn't scared at all. The Blue Cave light was absolutely magical!",
+    "t1City": "Seoul",
+    "t1Tour": "Blue Cave Discovery Dive",
+    "t2Quote": "I earned my Open Water certification step by step. From theory to open-water practice, the safety care was truly thorough.",
+    "t2City": "Busan",
+    "t2Tour": "PADI Open Water Course",
+    "t3Quote": "Went big-game trolling and caught four mahi-mahi! They sliced it into sashimi right on the boat — an unforgettable day.",
+    "t3City": "Daegu",
+    "t3Tour": "8hr Big Game Trolling",
+    "reserveTitle": "Check the schedule and book",
+    "reserveIntro": "Check available dates and send an inquiry — we'll reply within 24 hours with a tailored plan and quote."
+  },
+  "reservation": {
+    "metaTitle": "Reservation",
+    "metaDescription": "Pick a date and send your booking inquiry right away.",
+    "heading": "Reservation",
+    "intro": "Pick a date on the calendar and send your booking inquiry right away. Every date except closed days is available.",
+    "addBook": "+ Book",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "legendHint": "· Tap any date except closed days to start a booking inquiry",
+    "pickPromptTitle": "Select a date",
+    "pickHintAbove": "above",
+    "pickHintLeft": "on the left",
+    "pickHint": "Tap any date except closed days in the calendar {where} to start your booking right here.",
+    "scheduledTitle": "Already scheduled tours",
+    "busyNote": "This is a busy day. Timing may need coordination, so leave your preferred time and we'll do our best to fit you in.",
+    "freeNote": "Other times and tours are also available. Choose the tour you want below and send an inquiry.",
+    "dateOptional": "Preferred date (optional)",
+    "category": "Tour type",
+    "categoryPlaceholder": "Select a category (Snorkeling · Diving · PADI · Fishing)",
+    "program": "Program",
+    "programPlaceholder": "Select a program",
+    "programPlaceholderEmpty": "Select a tour type first",
+    "time": "Preferred time (optional)",
+    "timePlaceholder": "Select a time",
+    "timeMorning": "Morning",
+    "timeAfternoon": "Afternoon",
+    "timeAllDay": "All day",
+    "timeAny": "Any time",
+    "timeRestrictNote": "This date runs in the {period} only.",
+    "people": "People",
+    "name": "Name",
+    "contact": "Contact (email · phone · KakaoTalk)",
+    "message": "Requests",
+    "messagePlaceholder": "Pickup area, diving experience, questions, etc.",
+    "submit": "Send booking inquiry →",
+    "submitMedical": "Medical check & send inquiry",
+    "submitting": "Sending…",
+    "medicalNote": "For your safety, you'll complete a medical check in the next step before sending. (Fishing excluded)",
+    "errorMsg": "Sending failed. Please try again in a moment.",
+    "freeConsult": "Free pre-booking consultation · No cancellation fee on the booking day",
+    "successTitle": "Your inquiry has been received",
+    "successBody": "We'll reply within 24 hours with a tailored plan and quote.",
+    "successAnotherDate": "View another date",
+    "successNew": "Write a new inquiry",
+    "dateTbd": "Date TBD"
+  },
+  "tourDetail": {
+    "durationLabel": "Duration",
+    "priceLabel": "Price",
+    "includesTitle": "What's included",
+    "preparing": "Details are being prepared. Please use the button below to ask about dates and a quote — we'll get back to you within 24 hours.",
+    "reserveCta": "Ask about this tour →"
+  },
+  "medical": {
+    "title": "Medical Check",
+    "close": "Close",
+    "intro1": "This medical check is a required step for your <b>safe underwater experience</b>. If any item below applies to you, the tour may not be possible for safety reasons.",
+    "intro2": "If you provide false information and the tour cannot proceed on the day or an accident occurs, the responsibility is yours and <b>the deposit is non-refundable</b> (no fault of OKINITY).",
+    "intro3": "<b>Expand each section to read it</b>, then check 'None apply' if nothing applies to you.",
+    "itemsCount": "{count} items",
+    "confirmed": "Confirmed",
+    "noneApply": "None of the above apply to me",
+    "progress": "Confirmed {done} / {total} sections",
+    "progressHint": "Please expand and confirm every section",
+    "cancel": "Cancel",
+    "submit": "Send booking inquiry",
+    "submitting": "Sending…",
+    "groups": [
+      {
+        "title": "Flying after diving",
+        "items": [
+          "I have no plans to board a flight within 18 hours after scuba diving. (Not applicable to snorkeling tours — please just confirm.)"
+        ]
+      },
+      {
+        "title": "Ears · nose · sinuses",
+        "items": [
+          "I currently have no ear inflammation or pain.",
+          "I have never had or been diagnosed with ear disease (such as otitis media or externa), hearing loss, or balance/equilibrium problems.",
+          "I have never had ear or sinus surgery.",
+          "I currently have no cold, nasal congestion, sinusitis, or bronchitis."
+        ]
+      },
+      {
+        "title": "Respiratory · lungs",
+        "items": [
+          "I have no history of circulatory disease, severe allergic reactions (including hay fever), or lung disease.",
+          "I have never had a pneumothorax or any respiratory surgery.",
+          "I have never had or been diagnosed with asthma, emphysema, or tuberculosis."
+        ]
+      },
+      {
+        "title": "Cardiovascular · blood · metabolic",
+        "items": [
+          "I have no heart disease, no history of heart attack, and have never had heart or vascular surgery.",
+          "I have no history of high blood pressure or angina, and have never taken medication to control blood pressure.",
+          "No immediate family member has a history of heart attack or stroke.",
+          "I have no bleeding disorder or other blood disorder.",
+          "I have never had or been diagnosed with diabetes or a diabetes-related condition."
+        ]
+      },
+      {
+        "title": "Neurological · mental · medication",
+        "items": [
+          "I am not taking any medication that carries a warning of impaired physical or mental ability.",
+          "I have no behavioral or mental health disorder, psychological condition, or nervous system disorder.",
+          "I have no history of seizures, blackouts, fainting, convulsions, or epilepsy, and take no medication to prevent them."
+        ]
+      },
+      {
+        "title": "Other",
+        "items": [
+          "I am not pregnant and there is no possibility of pregnancy.",
+          "I have never had ostomy (stoma) surgery.",
+          "I have no history of functional problems in an arm or leg following an accident, fracture, or surgery.",
+          "I have no history of fear of enclosed or semi-enclosed spaces, or of panic attacks."
+        ]
+      }
+    ]
+  },
   "footer": {
     "contactUs": "Contact",
-    "rights": "© {year} PONYOKINAWA. All rights reserved."
+    "rights": "© {year} OKINITY. All rights reserved."
   },
   "common": {
     "translationPending": "This page is shown in Korean while translation is in progress."

@@ -20,8 +20,11 @@ export default function GlobalNotFound() {
         }}
       >
         <h1 style={{ fontSize: '3rem', fontWeight: 800 }}>404</h1>
-        <p style={{ color: '#64748b' }}>Page not found</p>
-        <Link href="/ko" style={{ color: '#0b6ca8', fontWeight: 600 }}>
+        <p style={{ color: '#64748b' }}>
+          페이지를 찾을 수 없습니다 / Page not found / ページが見つかりません
+        </p>
+        {/* 로케일 미상 컨텍스트 — 루트(/)로 보내면 미들웨어가 적절한 로케일로 리다이렉트한다. */}
+        <Link href="/" style={{ color: '#0b6ca8', fontWeight: 600 }}>
           OKINITY
         </Link>
       </body>

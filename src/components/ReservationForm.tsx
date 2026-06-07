@@ -1,7 +1,9 @@
 'use client';
 
 import { useRef, useState, type FormEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import { ACTIVITIES } from './ocean-home-data';
+import { TOUR_NAME_NAV_KEY } from '@/lib/tour';
 import MedicalCheckModal from './MedicalCheckModal';
 
 const inputCls =
@@ -35,6 +37,8 @@ export default function ReservationForm({
   /** 성공 후 동작(예: 플래너에서 날짜 선택 해제). 없으면 폼 내부에서 새 문의로 초기화. */
   onReset?: () => void;
 }) {
+  const t = useTranslations('reservation');
+  const tNav = useTranslations('nav');
   // 슬러그가 속한 대분류를 찾아 초기 선택값으로 사용(매칭 실패 시 빈 폼).
   const presetCat = initialSlug
     ? ACTIVITIES.find((a) => a.tours.some((t) => t.slug === initialSlug))
@@ -103,7 +107,7 @@ export default function ReservationForm({
       });
       if (!res.ok) throw new Error('failed');
       setMedOpen(false);
-      setDone({ product, dateLabel: lockedDateLabel ?? (date ?? '날짜 미정') });
+      setDone({ product, dateLabel: lockedDateLabel ?? (date ?? t('dateTbd')) });
       setState('success');
     } catch {
       setState('error');
@@ -116,19 +120,19 @@ export default function ReservationForm({
         <div className="grid h-14 w-14 place-items-center rounded-full border border-[#5fc6ef]/40 bg-[#5fc6ef]/15 text-2xl">
           ✓
         </div>
-        <p className="mt-5 font-serif text-xl text-white">문의가 접수되었어요</p>
+        <p className="mt-5 font-serif text-xl text-white">{t('successTitle')}</p>
         <p className="mt-2 max-w-[17rem] text-sm leading-relaxed text-white/65">
           {done.dateLabel}
           {done.product ? ` · ${done.product}` : ''}
           <br />
-          24시간 안에 한국어로 맞춤 일정과 견적을 보내드릴게요.
+          {t('successBody')}
         </p>
         <button
           type="button"
           onClick={() => (onReset ? onReset() : reset())}
           className="mt-6 rounded-full border border-white/20 px-5 py-2 text-sm text-white/80 transition-colors hover:border-white/45 hover:text-white"
         >
-          {onReset ? '다른 날짜 보기' : '새 문의 작성'}
+          {onReset ? t('successAnotherDate') : t('successNew')}
         </button>
       </div>
     );
@@ -147,7 +151,7 @@ export default function ReservationForm({
           {scheduled && scheduled.length > 0 && (
             <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.04] p-3">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-white/45">
-                이미 예정된 투어
+                {t('scheduledTitle')}
               </p>
               <ul className="mt-1.5 space-y-1">
                 {scheduled.map((s, i) => (
@@ -162,9 +166,7 @@ export default function ReservationForm({
                 ))}
               </ul>
               <p className="mt-2 text-xs text-white/45">
-                {hasBusy
-                  ? '예약이 많은 날이에요. 시간 조율이 필요할 수 있으니 희망 시간대를 남겨주시면 최대한 맞춰드릴게요.'
-                  : '다른 시간대·다른 투어도 예약 가능해요. 아래에서 원하는 투어를 선택해 문의해 주세요.'}
+                {hasBusy ? t('busyNote') : t('freeNote')}
               </p>
             </div>
           )}
@@ -172,7 +174,7 @@ export default function ReservationForm({
       ) : (
         <div>
           <label htmlFor="rf-date" className={labelCls}>
-            희망 날짜 (선택)
+            {t('dateOptional')}
           </label>
           <input id="rf-date" name="date" type="date" min={todayKey} className={`mt-1.5 ${inputCls}`} />
         </div>
@@ -181,7 +183,7 @@ export default function ReservationForm({
       {/* 대분류 */}
       <div className="mt-4">
         <label htmlFor="rf-cat" className={labelCls}>
-          투어 종류 *
+          {t('category')} *
         </label>
         <select
           id="rf-cat"
@@ -194,11 +196,11 @@ export default function ReservationForm({
           className={`mt-1.5 ${inputCls} [&>option]:text-ink`}
         >
           <option value="" disabled>
-            대분류 선택 (스노클링·다이빙·PADI·낚시)
+            {t('categoryPlaceholder')}
           </option>
           {ACTIVITIES.map((a) => (
             <option key={a.id} value={a.id}>
-              {a.title}
+              {tNav(a.id)}
             </option>
           ))}
         </select>
@@ -207,7 +209,7 @@ export default function ReservationForm({
       {/* 중분류 */}
       <div className="mt-4">
         <label htmlFor="rf-tour" className={labelCls}>
-          세부 프로그램 *
+          {t('program')} *
         </label>
         <select
           id="rf-tour"
@@ -218,11 +220,11 @@ export default function ReservationForm({
           className={`mt-1.5 ${inputCls} disabled:opacity-50 [&>option]:text-ink`}
         >
           <option value="" disabled>
-            {cat ? '세부 프로그램 선택' : '먼저 투어 종류를 선택하세요'}
+            {cat ? t('programPlaceholder') : t('programPlaceholderEmpty')}
           </option>
-          {cat?.tours.map((t) => (
-            <option key={t.slug} value={t.slug}>
-              {t.name}
+          {cat?.tours.map((tr) => (
+            <option key={tr.slug} value={tr.slug}>
+              {TOUR_NAME_NAV_KEY[tr.slug] ? tNav(TOUR_NAME_NAV_KEY[tr.slug]) : tr.name}
             </option>
           ))}
         </select>
@@ -231,26 +233,21 @@ export default function ReservationForm({
       {/* 희망 시간대 — 운영자 지정(오전만/오후만)이 있으면 옵션 제한 */}
       <div className="mt-4">
         <label htmlFor="rf-time" className={labelCls}>
-          희망 시간대 (선택)
+          {t('time')}
         </label>
+        {/* option value는 한국어 고정(운영자가 읽는 값), 표시 라벨만 번역 */}
         <select id="rf-time" name="time" defaultValue="" className={`mt-1.5 ${inputCls} [&>option]:text-ink`}>
-          <option value="">시간대 선택</option>
-          {(timeRestriction === 'afternoon' ? [] : ['오전']).map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-          {(timeRestriction === 'morning' ? [] : ['오후']).map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-          {!timeRestriction && <option value="종일">종일</option>}
-          <option value="시간 무관">시간 무관</option>
+          <option value="">{t('timePlaceholder')}</option>
+          {timeRestriction !== 'afternoon' && <option value="오전">{t('timeMorning')}</option>}
+          {timeRestriction !== 'morning' && <option value="오후">{t('timeAfternoon')}</option>}
+          {!timeRestriction && <option value="종일">{t('timeAllDay')}</option>}
+          <option value="시간 무관">{t('timeAny')}</option>
         </select>
         {timeRestriction && (
           <p className="mt-1 text-[11px] text-[#5fc6ef]">
-            이 날짜는 {timeRestriction === 'morning' ? '오전' : '오후'}만 운영합니다.
+            {t('timeRestrictNote', {
+              period: timeRestriction === 'morning' ? t('timeMorning') : t('timeAfternoon')
+            })}
           </p>
         )}
       </div>
@@ -258,15 +255,15 @@ export default function ReservationForm({
       {/* 인원 */}
       <div className="mt-4">
         <label htmlFor="rf-people" className={labelCls}>
-          인원
+          {t('people')}
         </label>
-        <input id="rf-people" name="people" type="number" min={1} defaultValue={2} className={`mt-1.5 ${inputCls}`} />
+        <input id="rf-people" name="people" type="number" min={1} max={50} defaultValue={2} className={`mt-1.5 ${inputCls}`} />
       </div>
 
       {/* 이름 */}
       <div className="mt-4">
         <label htmlFor="rf-name" className={labelCls}>
-          이름 *
+          {t('name')} *
         </label>
         <input id="rf-name" name="name" type="text" required className={`mt-1.5 ${inputCls}`} />
       </div>
@@ -274,7 +271,7 @@ export default function ReservationForm({
       {/* 연락처 */}
       <div className="mt-4">
         <label htmlFor="rf-contact" className={labelCls}>
-          연락처 (이메일·전화·카톡) *
+          {t('contact')} *
         </label>
         <input id="rf-contact" name="contact" type="text" required className={`mt-1.5 ${inputCls}`} />
       </div>
@@ -282,13 +279,13 @@ export default function ReservationForm({
       {/* 요청사항 */}
       <div className="mt-4">
         <label htmlFor="rf-message" className={labelCls}>
-          요청사항
+          {t('message')}
         </label>
         <textarea
           id="rf-message"
           name="message"
           rows={3}
-          placeholder="픽업 희망 지역, 다이빙 경험, 궁금한 점 등"
+          placeholder={t('messagePlaceholder')}
           className={`mt-1.5 !rounded-card ${inputCls}`}
         />
       </div>
@@ -299,27 +296,25 @@ export default function ReservationForm({
         className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 px-6 py-3.5 text-sm font-bold text-[#06202f] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-[transform,box-shadow,background-color] duration-200 hover:bg-amber-300 hover:shadow-[0_12px_42px_rgba(246,166,35,0.5)] active:scale-[0.98] disabled:opacity-60"
       >
         {state === 'submitting'
-          ? '보내는 중…'
+          ? t('submitting')
           : needsMedical
-            ? '메디컬 체크 & 예약 문의 발송'
-            : '예약 문의 보내기 →'}
+            ? t('submitMedical')
+            : t('submit')}
       </button>
 
       {needsMedical && (
         <p className="mt-2 text-center text-[11px] text-white/45">
-          안전을 위해 다음 단계에서 메디컬 체크 후 발송됩니다. (낚시는 제외)
+          {t('medicalNote')}
         </p>
       )}
 
       {state === 'error' && (
         <p role="alert" className="mt-3 rounded-button bg-red-500/15 px-4 py-2.5 text-sm text-red-200">
-          전송에 실패했어요. 잠시 후 다시 시도해 주세요.
+          {t('errorMsg')}
         </p>
       )}
 
-      <p className="mt-3 text-center text-xs text-white/45">
-        예약 전 상담은 무료 · 예약 당일 취소 수수료 없음
-      </p>
+      <p className="mt-3 text-center text-xs text-white/45">{t('freeConsult')}</p>
 
       {medOpen && (
         <MedicalCheckModal

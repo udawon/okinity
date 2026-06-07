@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import Container from '@/components/Container';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseAbout, resolveAbout, splitList } from '@/lib/about';
@@ -11,8 +11,9 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
-  await params;
-  return { title: '소개' };
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'about' });
+  return { title: t('title') };
 }
 
 export default async function AboutPage({

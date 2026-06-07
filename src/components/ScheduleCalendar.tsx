@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { ScheduleItem } from '@/lib/content';
 import { scheduleItemDates } from '@/lib/schedule-range';
 
@@ -14,13 +15,6 @@ const STATUS: Record<Status, { text: string; dot: string }> = {
   morning: { text: 'text-sky-300', dot: 'bg-sky-300' }, // 오전만 가능
   afternoon: { text: 'text-violet-300', dot: 'bg-violet-300' } // 오후만 가능
 };
-
-/** 셀에 표시할 텍스트 — morning/afternoon은 안내 문구로 자동 표기. */
-function eventLabel(e: { status: Status; program: string }): string {
-  if (e.status === 'morning') return '오전만 가능';
-  if (e.status === 'afternoon') return '오후만 가능';
-  return e.program;
-}
 
 // 2024-01-07은 일요일 → 요일 헤더(로케일별)를 일요일 시작으로 생성
 const weekdayLabels = (locale: string) =>
@@ -47,6 +41,15 @@ export default function ScheduleCalendar({
   selectedKey?: string | null;
   onSelectDate?: (key: string, events: ScheduleItem[]) => void;
 }) {
+  const t = useTranslations('reservation');
+  // 셀에 표시할 텍스트 — morning/afternoon은 운영자 지정 시간대 라벨(번역됨), 그 외는 프로그램명.
+  const evLabel = (e: { status: Status; program: string }): string =>
+    e.status === 'morning'
+      ? statusLabel.morning
+      : e.status === 'afternoon'
+        ? statusLabel.afternoon
+        : e.program;
+
   // 날짜별 이벤트 맵 — 기간 항목(endDate)은 모든 날짜로 전개. 표시용 문자열만 있는 항목은 제외.
   const byDate = useMemo(() => {
     const map = new Map<string, ScheduleItem[]>();
@@ -127,11 +130,11 @@ export default function ScheduleCalendar({
     <div>
       {/* 헤더: 월 이동 */}
       <div className="flex items-center justify-between">
-        <button type="button" aria-label="이전 달" onClick={() => shift(-1)} className={navBtn}>
+        <button type="button" aria-label={t('prevMonth')} onClick={() => shift(-1)} className={navBtn}>
           ‹
         </button>
         <h2 className="font-serif text-2xl text-white sm:text-3xl">{monthTitle}</h2>
-        <button type="button" aria-label="다음 달" onClick={() => shift(1)} className={navBtn}>
+        <button type="button" aria-label={t('nextMonth')} onClick={() => shift(1)} className={navBtn}>
           ›
         </button>
       </div>
@@ -185,7 +188,7 @@ export default function ScheduleCalendar({
                 <div
                   className={`-mx-1.5 truncate bg-rose-400/20 px-1.5 py-0.5 text-[10px] font-bold leading-tight text-rose-100 sm:-mx-2 sm:text-[11px] ${closedRound}`}
                 >
-                  {isClosedRunStart ? '🚫 휴무' : ' '}
+                  {isClosedRunStart ? `🚫 ${statusLabel.closed}` : ' '}
                 </div>
               )}
               {nonClosed.map((e, j) => (
@@ -193,9 +196,9 @@ export default function ScheduleCalendar({
                   <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS[e.status].dot}`} />
                   <span
                     className={`truncate text-[10px] leading-tight sm:text-[11px] ${STATUS[e.status].text}`}
-                    title={eventLabel(e)}
+                    title={evLabel(e)}
                   >
-                    {eventLabel(e)}
+                    {evLabel(e)}
                   </span>
                 </div>
               ))}
@@ -228,7 +231,7 @@ export default function ScheduleCalendar({
                       isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                     }`}
                   >
-                    + 예약
+                    {t('addBook')}
                   </span>
                 )}
               </button>
@@ -245,17 +248,17 @@ export default function ScheduleCalendar({
         })}
       </div>
 
-      {/* 범례 — 공개 캘린더에 실제로 나타나는 상태만(휴무·오전 가능·오후 가능).
-          예약가능(기본값)·예약됨·예약많음(확정 예약 연동 해제)은 표시되지 않으므로 제외. */}
+      {/* 범례 — 캘린더 셀에 실제로 렌더되는 상태를 모두 설명한다.
+          예약가능·예약많음 일정도 색 점+라벨로 표시되므로 범례에 포함(범례-데이터 일치). */}
       <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55">
-        {(['closed', 'morning', 'afternoon'] as Status[]).map((s) => (
+        {(['available', 'full', 'closed', 'morning', 'afternoon'] as Status[]).map((s) => (
           <span key={s} className="inline-flex items-center gap-1.5">
             <span className={`h-2 w-2 rounded-full ${STATUS[s].dot}`} />
             {statusLabel[s]}
           </span>
         ))}
         {selectable && (
-          <span className="text-white/45">· 휴무를 제외한 날짜를 누르면 예약 문의를 시작할 수 있어요</span>
+          <span className="text-white/45">{t('legendHint')}</span>
         )}
       </div>
     </div>

@@ -7,8 +7,10 @@ import {
   useTransform,
   useMotionValue
 } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { useStableReducedMotion } from '@/hooks/useStableReducedMotion';
 import { Link } from '@/i18n/routing';
+import { TOUR_NAME_NAV_KEY } from '@/lib/tour';
 import { type BlogPost } from '@/lib/blog';
 import { type ScheduleItem } from '@/lib/content';
 import BlogCard from '@/components/BlogCard';
@@ -251,6 +253,7 @@ function Hero({
   media?: { url?: string; type?: string };
   text?: { eyebrow?: string; title?: string; subtitle?: string };
 }) {
+  const t = useTranslations('ocean');
   const reduce = useStableReducedMotion();
   // 어드민 오버라이드(hero 키)의 배경 영상/이미지. 없으면 기본 노을 영상.
   const heroUrl = media?.url?.trim() || '/videos/surface.mp4';
@@ -266,10 +269,12 @@ function Hero({
     el.muted = true;
     el.play().catch(() => {});
   }, [heroUrl, heroIsVideo]);
-  // 텍스트도 어드민 오버라이드 → 비어 있으면 기본값. 제목/부제는 \n 으로 여러 줄.
+  // 텍스트도 어드민 오버라이드 → 비어 있으면 로케일별 기본값(i18n). 제목/부제는 \n 으로 여러 줄.
   const eyebrow = text?.eyebrow?.trim() || HERO_DEFAULTS.eyebrow;
-  const titleLines = (text?.title?.trim() || HERO_DEFAULTS.title).split('\n');
-  const subtitleLines = (text?.subtitle?.trim() || HERO_DEFAULTS.subtitle).split('\n');
+  const titleLines = (text?.title?.trim() || `${t('heroTitle1')}\n${t('heroTitle2')}`).split('\n');
+  const subtitleLines = (
+    text?.subtitle?.trim() || `${t('heroSubtitle1')}\n${t('heroSubtitle2')}`
+  ).split('\n');
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -358,20 +363,20 @@ function Hero({
             href="/reserve"
             className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-400 px-8 py-4 text-sm font-bold text-[#06202f] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-[transform,box-shadow,background-color] duration-200 hover:bg-amber-300 hover:shadow-[0_10px_38px_rgba(246,166,35,0.5)] active:scale-[0.97] sm:w-auto"
           >
-            투어 예약하기
+            {t('ctaReserve')}
             <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
           <a
             href="#activities"
             className="inline-flex w-full items-center justify-center rounded-full border border-white/25 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-colors duration-200 hover:border-white/50 hover:bg-white/10 sm:w-auto"
           >
-            액티비티 둘러보기
+            {t('ctaExplore')}
           </a>
         </R>
 
         {/* 신뢰 배지 */}
         <R delay={0.4} className="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-white/65">
-          {['PADI 공인 다이브센터', '10년 무사고', '한국어 가이드 동행'].map((b, i) => (
+          {[t('badge1'), t('badge2'), t('badge3')].map((b, i) => (
             <span key={b} className="inline-flex items-center gap-2">
               {i > 0 && <span className="h-1 w-1 rounded-full bg-white/30" />}
               {b}
@@ -402,13 +407,16 @@ function Hero({
    ACTIVITY — 다이빙 / PADI / 낚시 / 스노클링 (가로 캐러셀, 좌우 스와이프)
    ──────────────────────────────────────────────────────────── */
 function ActivityCard({ a, image }: { a: Activity; image: string }) {
+  const t = useTranslations('ocean');
+  const tNav = useTranslations('nav');
+  const categoryName = tNav(a.id); // 카테고리 표시명(로케일별)
   return (
     <article className="group flex w-[80vw] max-w-[400px] shrink-0 snap-start snap-always flex-col overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/[0.04] shadow-[0_16px_36px_-18px_rgba(0,0,0,0.5)] transition-colors hover:border-white/20 sm:w-[400px]">
       {/* 이미지 */}
       <div className="relative aspect-[16/11] w-full overflow-hidden">
         <img
           src={image}
-          alt={`${a.title} 투어 이미지`}
+          alt={t('cardAlt', { name: categoryName })}
           width={1200}
           height={825}
           loading="lazy"
@@ -431,13 +439,13 @@ function ActivityCard({ a, image }: { a: Activity; image: string }) {
 
       {/* 본문 */}
       <div className="flex flex-1 flex-col p-6">
-        <h3 className="font-serif text-2xl text-white">{a.title}</h3>
-        <p className="mt-1.5 text-sm font-medium text-white/70">{a.tagline}</p>
-        <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/65">{a.desc}</p>
+        <h3 className="font-serif text-2xl text-white">{categoryName}</h3>
+        <p className="mt-1.5 text-sm font-medium text-white/70">{t(`tagline.${a.id}`)}</p>
+        <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/65">{t(`desc.${a.id}`)}</p>
 
         {/* 하위 투어 */}
         <p className="mb-1 mt-5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-white/65">
-          투어 구성
+          {t('toursLabel')}
           <span
             className="rounded-full px-1.5 py-0.5 text-[10px] tabular-nums"
             style={{ backgroundColor: `${a.accent}22`, color: a.accent }}
@@ -446,15 +454,15 @@ function ActivityCard({ a, image }: { a: Activity; image: string }) {
           </span>
         </p>
         <ul className="divide-y divide-white/10">
-          {a.tours.map((t) => (
-            <li key={t.slug}>
+          {a.tours.map((tour) => (
+            <li key={tour.slug}>
               <Link
-                href={`/tours/${t.slug}`}
+                href={`/tours/${tour.slug}`}
                 className="group/row -mx-2 flex items-center justify-between rounded-lg px-2 py-2.5 text-sm text-white/85 transition-colors hover:bg-white/5 hover:text-white"
               >
                 <span className="flex items-center gap-3">
                   <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: a.accent }} />
-                  {t.name}
+                  {TOUR_NAME_NAV_KEY[tour.slug] ? tNav(TOUR_NAME_NAV_KEY[tour.slug]) : tour.name}
                 </span>
                 <ArrowRight
                   className="h-4 w-4 shrink-0 opacity-0 transition-all duration-200 group-hover/row:translate-x-0.5 group-hover/row:opacity-100"
@@ -470,6 +478,7 @@ function ActivityCard({ a, image }: { a: Activity; image: string }) {
 }
 
 function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string> }) {
+  const t = useTranslations('ocean');
   const reduce = useStableReducedMotion();
   const scrollerRef = useRef<HTMLDivElement>(null);
   // 스크롤 가능 여부 + 시작/끝 위치(양옆 화살표 표시·비활성용)
@@ -525,10 +534,10 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
             What We Offer
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">네 가지 방법으로 만나는 바다</h2>
+            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">{t('activitiesTitle')}</h2>
           </R>
           <R delay={0.12} className="mt-4 text-white/65">
-            깊이 잠수하든, 자격증을 따든, 손맛을 즐기든, 수면을 떠다니든 — 옆으로 넘기며 골라보세요.
+            {t('activitiesIntro')}
           </R>
         </div>
       </div>
@@ -541,7 +550,7 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
         <div
           ref={scrollerRef}
           role="region"
-          aria-label="투어 카테고리"
+          aria-label={t('carouselRegion')}
           tabIndex={0}
           className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-5 overflow-x-auto scroll-px-6 px-6 pb-3 lg:scroll-px-0 lg:px-0"
         >
@@ -556,7 +565,7 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
               type="button"
               onClick={() => nudge(-1)}
               disabled={atStart}
-              aria-label="이전 투어"
+              aria-label={t('prevTour')}
               className={`${arrowCls} left-2 sm:left-4 lg:left-3`}
             >
               <ArrowRight className="h-6 w-6 rotate-180" />
@@ -565,7 +574,7 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
               type="button"
               onClick={() => nudge(1)}
               disabled={atEnd}
-              aria-label="다음 투어"
+              aria-label={t('nextTour')}
               className={`${arrowCls} right-2 sm:right-4 lg:right-3`}
             >
               <ArrowRight className="h-6 w-6" />
@@ -581,6 +590,7 @@ function ActivitiesSection({ tourImages }: { tourImages?: Record<string, string>
    ASSURANCE — 왜 우리인가
    ──────────────────────────────────────────────────────────── */
 function AssuranceSection() {
+  const t = useTranslations('ocean');
   return (
     <section className="relative py-24 sm:py-28">
       <div className="mx-auto max-w-container px-6">
@@ -590,7 +600,7 @@ function AssuranceSection() {
             Why OKINITY
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">안심하고 맡기세요</h2>
+            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">{t('assuranceTitle')}</h2>
           </R>
         </div>
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -602,8 +612,8 @@ function AssuranceSection() {
                   <span className="grid h-12 w-12 place-items-center rounded-xl bg-cyan-300/10 text-cyan-200 transition-colors duration-300 group-hover:bg-cyan-300/20">
                     <Icon className="h-6 w-6" />
                   </span>
-                  <h3 className="mt-5 text-base font-semibold text-white">{a.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/60">{a.desc}</p>
+                  <h3 className="mt-5 text-base font-semibold text-white">{t(`assurance${i + 1}Title`)}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/60">{t(`assurance${i + 1}Desc`)}</p>
                 </div>
               </R>
             );
@@ -619,6 +629,8 @@ function AssuranceSection() {
    공개글 최신 3개 그리드 + 전체보기. 글 없으면 빈 상태.
    ──────────────────────────────────────────────────────────── */
 function BlogSection({ posts, locale }: { posts: BlogPost[]; locale: string }) {
+  const t = useTranslations('ocean');
+  const tBlog = useTranslations('blog');
   const featured = posts.slice(0, 3);
   return (
     <section className="relative py-24 sm:py-28">
@@ -629,10 +641,10 @@ function BlogSection({ posts, locale }: { posts: BlogPost[]; locale: string }) {
             Journal
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">오늘의 오키니티</h2>
+            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">{tBlog('sectionTitle')}</h2>
           </R>
           <R delay={0.12} className="mt-4 text-white/65">
-            다이빙 로그와 포인트 소식, 생생한 바다 이야기를 전해드립니다.
+            {tBlog('sectionIntro')}
           </R>
         </div>
 
@@ -650,7 +662,7 @@ function BlogSection({ posts, locale }: { posts: BlogPost[]; locale: string }) {
                 href="/blog"
                 className="group inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-white/50 hover:bg-white/10"
               >
-                블로그 전체보기
+                {t('blogViewAll')}
                 <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </R>
@@ -658,12 +670,12 @@ function BlogSection({ posts, locale }: { posts: BlogPost[]; locale: string }) {
         ) : (
           <R delay={0.15}>
             <div className="mt-12 flex flex-col items-center gap-4 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-6 py-16 text-center">
-              <p className="text-white/65">아직 등록된 소식이 없습니다. 첫 이야기를 준비하고 있어요.</p>
+              <p className="text-white/65">{t('blogEmpty')}</p>
               <Link
                 href="/blog"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-200 transition-colors hover:text-white"
               >
-                블로그 보러가기
+                {t('blogEmptyCta')}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -678,6 +690,7 @@ function BlogSection({ posts, locale }: { posts: BlogPost[]; locale: string }) {
    GALLERY — 어드민에 올린 모든 사진을 순서대로 반응형 그리드로
    ──────────────────────────────────────────────────────────── */
 function GallerySection({ images }: { images?: string[] }) {
+  const t = useTranslations('ocean');
   // 어드민 갤러리(gallery 키) 이미지가 있으면 그대로(순서 유지), 없으면 기본.
   const list = images && images.length ? images : GALLERY;
   return (
@@ -688,7 +701,7 @@ function GallerySection({ images }: { images?: string[] }) {
             Gallery
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">물속에서 만난 순간들</h2>
+            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">{t('galleryTitle')}</h2>
           </R>
         </div>
 
@@ -717,7 +730,7 @@ function GallerySection({ images }: { images?: string[] }) {
           href="/gallery"
           className="group inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-white/50 hover:bg-white/10"
         >
-          갤러리 전체보기
+          {t('galleryViewAll')}
           <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
         </Link>
       </R>
@@ -729,6 +742,7 @@ function GallerySection({ images }: { images?: string[] }) {
    TESTIMONIALS
    ──────────────────────────────────────────────────────────── */
 function Testimonials() {
+  const t = useTranslations('ocean');
   return (
     <section className="relative py-24 sm:py-28">
       <div className="mx-auto max-w-container px-6">
@@ -737,34 +751,34 @@ function Testimonials() {
             Guest Stories
           </R>
           <R delay={0.06}>
-            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">다녀온 분들의 이야기</h2>
+            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">{t('testimonialsTitle')}</h2>
           </R>
         </div>
 
         <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {TESTIMONIALS.map((t, i) => (
-            <R key={t.name} delay={i * 0.1}>
+          {TESTIMONIALS.map((item, i) => (
+            <R key={item.name} delay={i * 0.1}>
               <figure className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.04] p-7">
-                <div className="flex gap-0.5 text-amber-300" aria-label="별점 5점 만점에 5점">
+                <div className="flex gap-0.5 text-amber-300" aria-label={t('ratingAria')}>
                   {Array.from({ length: 5 }).map((_, s) => (
                     <Star key={s} className="h-4 w-4" />
                   ))}
                 </div>
                 <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-white/80">
-                  “{t.quote}”
+                  “{t(`t${i + 1}Quote`)}”
                 </blockquote>
                 <figcaption className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
                   <span
                     className="grid h-10 w-10 place-items-center rounded-full bg-cyan-300/15 text-sm font-bold text-cyan-100"
                     aria-hidden
                   >
-                    {t.name.slice(0, 1)}
+                    {item.name.slice(0, 1)}
                   </span>
                   <span className="text-sm">
                     <span className="block font-semibold text-white">
-                      {t.name} · {t.city}
+                      {item.name} · {t(`t${i + 1}City`)}
                     </span>
-                    <span className="text-white/65">{t.tour}</span>
+                    <span className="text-white/65">{t(`t${i + 1}Tour`)}</span>
                   </span>
                 </figcaption>
               </figure>
@@ -780,6 +794,7 @@ function Testimonials() {
    RESERVE — 일정표(실제 데이터, 본 사이트 P4) + 예약 CTA 통합. 마지막 섹션.
    ──────────────────────────────────────────────────────────── */
 function ReserveSection({ schedule, locale }: { schedule: ScheduleData; locale: string }) {
+  const t = useTranslations('ocean');
   return (
     <section className="relative overflow-hidden py-28 sm:py-32">
       {/* 집중 글로우 — 가장 깊은 구간이라 아주 미세하게만(단조 하강 유지) */}
@@ -798,11 +813,11 @@ function ReserveSection({ schedule, locale }: { schedule: ScheduleData; locale: 
           </R>
           <R delay={0.06}>
             <h2 className="mt-3 font-serif text-4xl leading-tight text-white sm:text-5xl">
-              일정을 확인하고 예약하세요
+              {t('reserveTitle')}
             </h2>
           </R>
           <R delay={0.12} className="mx-auto mt-4 max-w-md text-white/65">
-            예약 가능한 날짜를 확인한 뒤 문의하시면, 24시간 안에 한국어로 맞춤 일정과 견적을 보내드립니다.
+            {t('reserveIntro')}
           </R>
         </div>
 
