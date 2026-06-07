@@ -87,7 +87,8 @@ export default async function Footer() {
           </p>
         </div>
 
-        <div className="sm:text-right">
+        {/* PC에서 CONTACT 상단을 주소(〒) 상단과 맞춤: 로고 높이(h-11=44) + 간격(mt-5=20) = 64px 내림 */}
+        <div className="sm:mt-16 sm:text-right">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/45">Contact</p>
           <div className="mt-4 flex flex-col gap-3 sm:items-end">
             <ContactLink
