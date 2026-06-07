@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getGallery, type GalleryItem } from '@/lib/content';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
+import { cdnMedia } from '@/lib/media';
 import Container from '@/components/Container';
 
 export const dynamic = 'force-dynamic';
@@ -54,7 +55,7 @@ export default async function GalleryPage({
               >
                 <div
                   className="aspect-square w-full bg-cover bg-center"
-                  style={{ backgroundImage: `url(${it.image})` }}
+                  style={{ backgroundImage: `url(${cdnMedia(it.image)})` }}
                   role="img"
                   aria-label={it.caption ?? `gallery ${i + 1}`}
                 />

@@ -1,5 +1,6 @@
 import { Link } from '@/i18n/routing';
 import { type BlogPost } from '@/lib/blog';
+import { cdnMedia } from '@/lib/media';
 
 function formatDate(date: string, locale: string): string {
   if (!date) return '';
@@ -21,7 +22,7 @@ export default function BlogCard({ post, locale }: { post: BlogPost; locale: str
           {post.thumbnail ? (
             <div
               className="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-              style={{ backgroundImage: `url(${post.thumbnail})` }}
+              style={{ backgroundImage: `url(${cdnMedia(post.thumbnail)})` }}
               role="img"
               aria-label={post.title}
             />

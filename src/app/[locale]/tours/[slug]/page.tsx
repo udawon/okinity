@@ -5,6 +5,7 @@ import { Link } from '@/i18n/routing';
 import Container from '@/components/Container';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { getTourCatalogEntry, parseTourDetail, splitLines, TOUR_NAME_NAV_KEY } from '@/lib/tour';
+import { cdnMedia } from '@/lib/media';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +65,7 @@ export default async function TourDetailPage({
           <div className="mt-6 overflow-hidden rounded-card border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={detail.heroImage}
+              src={cdnMedia(detail.heroImage)}
               alt={tourName}
               className="aspect-[16/9] w-full object-cover"
             />
