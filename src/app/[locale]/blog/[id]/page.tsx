@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems } from '@/lib/blog';
+import { cdnMedia } from '@/lib/media';
 import Container from '@/components/Container';
 
 export const dynamic = 'force-dynamic';
@@ -67,7 +68,7 @@ export default async function BlogPostPage({
               <figure key={i} className="overflow-hidden rounded-card border border-white/10">
                 {/* 원격(Supabase) 이미지 — next/image 도메인 설정 회피 위해 img 사용 */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={b.url} alt={b.caption || ''} className="w-full" />
+                <img src={cdnMedia(b.url)} alt={b.caption || ''} className="w-full" />
                 {b.caption && (
                   <figcaption className="bg-black/20 px-4 py-2 text-center text-sm text-white/55">
                     {b.caption}

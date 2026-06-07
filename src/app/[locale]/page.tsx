@@ -11,6 +11,7 @@ import {
   nonEmpty
 } from '@/lib/home-content';
 import OceanHome, { type HomeContent } from '@/components/OceanHome';
+import { cdnMedia } from '@/lib/media';
 
 // 어드민 편집(블로그·일정)을 즉시 반영하기 위해 동적 렌더링.
 // (Supabase 미설정 시에도 오버라이드 조회는 빈 객체라 비용 거의 없음)
@@ -75,12 +76,14 @@ export default async function HomePage({
     | undefined;
   const galleryItems = overrides[CONTENT_KEYS.gallery]?.items;
   const galleryImages = Array.isArray(galleryItems)
-    ? (galleryItems as { image?: string }[]).map((g) => g.image ?? '').filter(Boolean)
+    ? (galleryItems as { image?: string }[]).map((g) => cdnMedia(g.image)).filter(Boolean)
     : undefined;
   const tourImagesOv = overrides[CONTENT_KEYS.homeTours]?.images;
   const tourImages =
     tourImagesOv && typeof tourImagesOv === 'object'
-      ? (tourImagesOv as Record<string, string>)
+      ? Object.fromEntries(
+          Object.entries(tourImagesOv as Record<string, string>).map(([k, v]) => [k, cdnMedia(v)])
+        )
       : undefined;
 
   // 어드민 hero 텍스트 오버라이드는 한국어로 입력된 운영자 콘텐츠라 기본 로케일(ko)에서만 적용.
@@ -88,7 +91,9 @@ export default async function HomePage({
   // 배경 영상/이미지(media.hero)는 텍스트가 아니므로 전 로케일 공통 적용.
   const isDefaultLocale = locale === routing.defaultLocale;
   const media = {
-    hero: heroOv?.mediaUrl?.trim() ? { url: heroOv.mediaUrl, type: heroOv.mediaType } : undefined,
+    hero: heroOv?.mediaUrl?.trim()
+      ? { url: cdnMedia(heroOv.mediaUrl), type: heroOv.mediaType }
+      : undefined,
     heroText: isDefaultLocale
       ? { eyebrow: heroOv?.eyebrow, title: heroOv?.title, subtitle: heroOv?.subtitle }
       : undefined,

@@ -3,6 +3,7 @@ import { setRequestLocale, getTranslations } from 'next-intl/server';
 import Container from '@/components/Container';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseAbout, resolveAbout, splitList } from '@/lib/about';
+import { cdnMedia } from '@/lib/media';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,7 +55,7 @@ export default async function AboutPage({
           <div className="mt-8 overflow-hidden rounded-card border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={about.heroImage}
+              src={cdnMedia(about.heroImage)}
               alt={about.instructorName || '소개 이미지'}
               className="aspect-[16/9] w-full object-cover"
             />
@@ -91,7 +92,7 @@ export default async function AboutPage({
               {about.instructorPhoto && (
                 <div
                   className="aspect-[3/4] w-48 shrink-0 overflow-hidden rounded-card border border-white/10 bg-cover bg-center shadow-[0_18px_40px_-20px_rgba(0,0,0,0.65)] sm:w-72"
-                  style={{ backgroundImage: `url(${about.instructorPhoto})` }}
+                  style={{ backgroundImage: `url(${cdnMedia(about.instructorPhoto)})` }}
                   role="img"
                   aria-label={about.instructorName}
                 />
