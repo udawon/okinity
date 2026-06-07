@@ -310,6 +310,9 @@
   },
   "footer": {
     "contactUs": "Contact",
+    "email": "Email",
+    "kakao": "KakaoTalk",
+    "line": "LINE",
     "rights": "© {year} OKINITY. All rights reserved."
   },
   "common": {
