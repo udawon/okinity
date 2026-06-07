@@ -10,8 +10,9 @@ const nextConfig = {
     remotePatterns: []
   },
   experimental: {
-    // 미디어 업로드는 Server Action 본문으로 전송된다. 기본 1MB 한도를 상향.
-    // (클라이언트에서 이미지는 자동 압축하므로 대부분 1MB 이하지만, 동영상·원본 대비 여유)
+    // 미디어 업로드는 Server Action 본문으로 전송된다. 기본 1MB 한도를 상향(12MB).
+    // 이미지는 클라이언트에서 WebP로 자동 압축되어 보통 1MB 미만이라 충분.
+    // 12MB를 넘는 큰 동영상은 어드민의 'URL 직접 입력'으로 외부 호스팅 링크를 사용한다.
     serverActions: { bodySizeLimit: '12mb' }
   },
   // 보안 응답 헤더 — 모든 경로에 적용.

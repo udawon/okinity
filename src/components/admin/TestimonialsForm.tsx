@@ -7,7 +7,7 @@ import { HOME_CONTENT_KEYS, type TestimonialItem } from '@/lib/home-content';
 const inputCls =
   'w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted disabled:opacity-50';
 const textareaCls =
-  'w-full rounded-card border border-line bg-surface px-3 py-2.5 text-sm leading-relaxed text-ink placeholder:text-muted disabled:opacity-50';
+  'w-full resize-y rounded-card border border-line bg-surface px-3 py-2.5 text-sm leading-relaxed text-ink placeholder:text-muted disabled:opacity-50';
 
 /** 후기 편집 — 섹션 제목 + 후기 목록(이름·도시·투어·인용문) CRUD. home_testimonials 키에 저장. */
 export default function TestimonialsForm({

@@ -7,14 +7,16 @@ const VIDEO_RE = /\.(mp4|webm|mov|m4v)(\?|$)/i;
 
 /**
  * 업로드 전 이미지 자동 축소·압축(canvas, 무의존).
- * 긴 변을 maxDim 으로 제한하고 JPEG 품질 적용 → 대용량 사진을 1MB 안팎으로.
- * GIF/SVG·비이미지(동영상)는 원본 그대로 반환.
+ * 긴 변을 maxDim 으로 제한하고 WebP 로 인코딩 → 화질 손실은 최소화하면서 용량을 크게 줄인다.
+ * (WebP 는 동일 화질에서 JPEG보다 25~35% 작고 최신 브라우저 대부분 지원)
+ * 가볍게 저장해 그대로 서빙하므로, 사진이 많아져도 서버 변환 비용이 들지 않는다.
+ * GIF/SVG·비이미지(동영상)·이미 작은 WebP 는 원본 그대로 반환.
  */
-async function compressImage(file: File, maxDim = 2400, quality = 0.85): Promise<File> {
+async function compressImage(file: File, maxDim = 2000, quality = 0.82): Promise<File> {
   if (!file.type.startsWith('image/')) return file;
   if (file.type === 'image/gif' || file.type === 'image/svg+xml') return file;
-  // 이미 충분히 작으면(≤1.2MB) 굳이 재인코딩하지 않음
-  if (file.size <= 1.2 * 1024 * 1024) return file;
+  // 이미 작은 WebP 면 재인코딩 불필요(화질 보존)
+  if (file.type === 'image/webp' && file.size <= 600 * 1024) return file;
 
   const url = URL.createObjectURL(file);
   try {
@@ -34,9 +36,10 @@ async function compressImage(file: File, maxDim = 2400, quality = 0.85): Promise
     const ctx = canvas.getContext('2d');
     if (!ctx) return file;
     ctx.drawImage(img, 0, 0, w, h);
-    const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/jpeg', quality));
+    // WebP 우선. 미지원 브라우저면 toBlob 이 null → 원본 폴백.
+    const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/webp', quality));
     if (!blob || blob.size >= file.size) return file; // 압축 이득 없으면 원본 유지
-    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.webp', { type: 'image/webp' });
   } catch {
     return file; // 압축 실패 시 원본으로 폴백
   } finally {
