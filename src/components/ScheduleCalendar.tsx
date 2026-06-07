@@ -188,7 +188,13 @@ export default function ScheduleCalendar({
                 <div
                   className={`-mx-1.5 truncate bg-rose-400/20 px-1.5 py-0.5 text-[10px] font-bold leading-tight text-rose-100 sm:-mx-2 sm:text-[11px] ${closedRound}`}
                 >
-                  {isClosedRunStart ? `🚫 ${statusLabel.closed}` : ' '}
+                  {isClosedRunStart ? (
+                    <>
+                      🚫<span className="hidden sm:inline"> {statusLabel.closed}</span>
+                    </>
+                  ) : (
+                    '\u00a0'
+                  )}
                 </div>
               )}
               {nonClosed.map((e, j) => (
