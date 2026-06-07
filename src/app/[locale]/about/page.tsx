@@ -37,7 +37,7 @@ export default async function AboutPage({
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200/80">
           {about.eyebrow}
         </p>
-        <h1 className="mt-3 font-serif text-4xl leading-tight text-white sm:text-5xl">
+        <h1 className="mt-3 text-balance font-serif text-4xl leading-tight text-white sm:text-5xl">
           {titleLines.map((line, i) => {
             const accent = titleLines.length > 1 && i === titleLines.length - 1;
             return (

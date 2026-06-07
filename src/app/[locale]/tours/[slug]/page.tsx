@@ -79,7 +79,7 @@ export default async function TourDetailPage({
           >
             {entry.categoryKicker}
           </p>
-          <h1 className="mt-3 font-serif text-4xl leading-tight text-white sm:text-5xl">
+          <h1 className="mt-3 text-balance font-serif text-4xl leading-tight text-white sm:text-5xl">
             {tourName}
           </h1>
           {showDetail && detail.summary && (
