@@ -4,8 +4,9 @@
  */
 export const site = {
   name: 'OKINITY',
-  // 공유·SEO 기본값 (OG 태그). 배포 시 NEXT_PUBLIC_SITE_URL 환경변수로 도메인 지정.
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://okinity.vercel.app',
+  // 공유·SEO 기본값 (OG 태그). 대표 도메인 okinity.com.
+  // Vercel의 NEXT_PUBLIC_SITE_URL 환경변수가 있으면 그 값이 우선(환경별 override용).
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://okinity.com',
   // 공유 미리보기 이미지. 실제 출시 전 1200×630 PNG로 교체 권장(크롤러 호환).
   defaultOgImage: '/images/placeholder.svg',
   // 연락 채널 — 폼 외 직접 연락 경로
