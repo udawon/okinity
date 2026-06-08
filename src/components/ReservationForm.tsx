@@ -100,6 +100,7 @@ export default function ReservationForm({
           time: fd.get('time'),
           people: fd.get('people'),
           name: fd.get('name'),
+          email: fd.get('email'),
           contact: fd.get('contact'),
           message,
           company: fd.get('company') // 허니팟
@@ -268,12 +269,35 @@ export default function ReservationForm({
         <input id="rf-name" name="name" type="text" required className={`mt-1.5 ${inputCls}`} />
       </div>
 
-      {/* 연락처 */}
+      {/* 이메일 — 확정/변경/취소 안내 수신용(필수) */}
+      <div className="mt-4">
+        <label htmlFor="rf-email" className={labelCls}>
+          {t('email')} *
+        </label>
+        <input
+          id="rf-email"
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+          placeholder={t('emailPlaceholder')}
+          className={`mt-1.5 ${inputCls}`}
+        />
+      </div>
+
+      {/* 연락처(전화/카카오톡/라인) */}
       <div className="mt-4">
         <label htmlFor="rf-contact" className={labelCls}>
           {t('contact')} *
         </label>
-        <input id="rf-contact" name="contact" type="text" required className={`mt-1.5 ${inputCls}`} />
+        <input
+          id="rf-contact"
+          name="contact"
+          type="text"
+          required
+          placeholder={t('contactPlaceholder')}
+          className={`mt-1.5 ${inputCls}`}
+        />
       </div>
 
       {/* 요청사항 */}

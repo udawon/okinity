@@ -19,6 +19,7 @@ type Row = {
   time: string | null;
   people: number | null;
   name: string;
+  email: string | null;
   contact: string;
   message: string | null;
   status: string;
@@ -35,6 +36,7 @@ function toInquiry(r: Row): Inquiry {
     time: r.time ?? undefined,
     people: r.people ?? undefined,
     name: r.name,
+    email: r.email ?? undefined,
     contact: r.contact,
     message: r.message ?? undefined,
     status: r.status as InquiryStatus,
@@ -60,6 +62,7 @@ export const supabaseStore: InquiryStore = {
         time: input.time ?? null,
         people: input.people ?? null,
         name: input.name,
+        email: input.email || null,
         contact: input.contact,
         message: input.message ?? null,
         status: 'tentative'
@@ -108,6 +111,7 @@ export const supabaseStore: InquiryStore = {
         time: input.time ?? null,
         people: input.people ?? null,
         name: input.name,
+        email: input.email || null,
         contact: input.contact,
         message: input.message ?? null
       })

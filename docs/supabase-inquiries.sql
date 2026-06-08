@@ -9,6 +9,7 @@ create table if not exists public.inquiries (
   date        text,
   people      integer,
   name        text not null,
+  email       text,  -- 고객 이메일(확정/변경/취소 안내 수신용)
   contact     text not null,
   message     text,
   status      text not null default 'new',
@@ -21,6 +22,7 @@ create table if not exists public.inquiries (
 alter table public.inquiries add column if not exists note text;
 alter table public.inquiries add column if not exists time text;
 alter table public.inquiries add column if not exists scheduled_time text;
+alter table public.inquiries add column if not exists email text;
 
 -- 어드민 목록 정렬(최신순) 최적화
 create index if not exists inquiries_created_at_idx

@@ -96,6 +96,7 @@ export default function MonthBoard({
           time: q.time,
           people: q.people,
           name: q.name,
+          email: q.email,
           contact: q.contact,
           message: q.message
         });

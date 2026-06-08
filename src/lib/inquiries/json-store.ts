@@ -73,6 +73,7 @@ export const jsonStore: InquiryStore = {
       time: input.time,
       people: input.people,
       name: input.name,
+      email: input.email,
       contact: input.contact,
       message: input.message
     };

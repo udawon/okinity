@@ -12,6 +12,10 @@ export const NewInquirySchema = z.object({
   time: z.string().max(40).optional(),
   people: z.coerce.number().int().min(1).max(50).optional(),
   name: z.string().min(1).max(100),
+  /** 이메일 — 확정/변경/취소 안내 수신용. 고객 예약 폼에서는 필수(required)로 강제.
+   *  스키마는 레거시(이메일 없는 기존 문의)의 어드민 수정·이동을 깨지 않도록 빈 값/미입력 허용. */
+  email: z.string().email().max(200).optional().or(z.literal('')),
+  /** 전화·카카오톡·라인 등 즉시 연락 수단. */
   contact: z.string().min(1).max(200),
   message: z.string().max(2000).optional()
 });
