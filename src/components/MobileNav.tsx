@@ -133,14 +133,14 @@ export default function MobileNav({ current }: { current: Locale }) {
             <Link
               href="/reserve"
               onClick={close}
-              className="group mt-4 flex items-center gap-3 rounded-2xl bg-amber-400 px-4 py-3.5 text-[#06202f] shadow-[0_10px_28px_rgba(246,166,35,0.4)] transition-[transform,background-color] duration-200 hover:bg-amber-300 active:scale-[0.98]"
+              className="group mt-4 flex items-center gap-3 rounded-2xl bg-brand px-4 py-3.5 text-brand-contrast shadow-[0_10px_28px_rgba(12,139,208,0.4)] transition-[transform,background-color] duration-200 hover:bg-brand-dark active:scale-[0.98]"
             >
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#06202f]/10">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/15">
                 <CalendarIcon className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-extrabold leading-tight">{t('contact')}</span>
-                <span className="mt-0.5 block text-[12px] font-medium leading-tight text-[#06202f]/70">
+                <span className="mt-0.5 block text-[12px] font-medium leading-tight text-white/70">
                   {tr('menuCtaSub')}
                 </span>
               </span>

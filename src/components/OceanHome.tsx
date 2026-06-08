@@ -443,8 +443,8 @@ function ActivityCard({ a, image, copy }: { a: Activity; image: string; copy?: T
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#02101e]/75 via-transparent to-transparent" />
         <span
-          className="absolute left-4 top-4 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider"
-          style={{ backgroundColor: `${a.accent}26`, color: a.accent }}
+          className="absolute left-4 top-4 rounded-full bg-[#02101e]/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider backdrop-blur-sm"
+          style={{ color: a.accent, boxShadow: `inset 0 0 0 1px ${a.accent}66` }}
         >
           {a.kicker}
         </span>
