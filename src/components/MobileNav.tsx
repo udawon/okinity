@@ -74,24 +74,6 @@ export default function MobileNav({ current }: { current: Locale }) {
       {open && (
         <div className="absolute left-0 right-0 top-16 max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-white/10 bg-[#061522]/95 backdrop-blur-md sm:top-[111px]">
           <nav className="flex flex-col px-5 py-4 text-sm font-medium text-white/80" aria-label="주요 메뉴">
-            {/* 핵심 전환 CTA — 메뉴를 열면 가장 먼저 보이도록 최상단에 강조 배치 */}
-            <Link
-              href="/reserve"
-              onClick={close}
-              className="group mb-4 flex items-center gap-3 rounded-2xl bg-amber-400 px-4 py-3.5 text-[#06202f] shadow-[0_10px_28px_rgba(246,166,35,0.4)] transition-[transform,background-color] duration-200 hover:bg-amber-300 active:scale-[0.98]"
-            >
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#06202f]/10">
-                <CalendarIcon className="h-5 w-5" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[15px] font-extrabold leading-tight">{t('contact')}</span>
-                <span className="mt-0.5 block text-[12px] font-medium leading-tight text-[#06202f]/70">
-                  {tr('menuCtaSub')}
-                </span>
-              </span>
-              <ArrowRight className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" />
-            </Link>
-
             {NAV.map((item) =>
               item.children ? (
                 <div key={item.key} className="border-b border-white/10">
@@ -146,6 +128,24 @@ export default function MobileNav({ current }: { current: Locale }) {
             <div className="pt-4">
               <LocaleSwitcher current={current} />
             </div>
+
+            {/* 핵심 전환 CTA — 언어 선택 아래에 강조 배치 */}
+            <Link
+              href="/reserve"
+              onClick={close}
+              className="group mt-4 flex items-center gap-3 rounded-2xl bg-amber-400 px-4 py-3.5 text-[#06202f] shadow-[0_10px_28px_rgba(246,166,35,0.4)] transition-[transform,background-color] duration-200 hover:bg-amber-300 active:scale-[0.98]"
+            >
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#06202f]/10">
+                <CalendarIcon className="h-5 w-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[15px] font-extrabold leading-tight">{t('contact')}</span>
+                <span className="mt-0.5 block text-[12px] font-medium leading-tight text-[#06202f]/70">
+                  {tr('menuCtaSub')}
+                </span>
+              </span>
+              <ArrowRight className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Link>
           </nav>
         </div>
       )}
