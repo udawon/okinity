@@ -6,6 +6,7 @@ import Container from '@/components/Container';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { getTourCatalogEntry, parseTourDetail, splitLines, TOUR_NAME_NAV_KEY } from '@/lib/tour';
 import { cdnMedia } from '@/lib/media';
+import { localeAlternates } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +21,15 @@ export async function generateMetadata({
   // 표시명은 로케일별(nav 키). title 템플릿('%s | OKINITY')이 브랜드를 자동으로 붙인다.
   const tNav = await getTranslations({ locale, namespace: 'nav' });
   const navKey = TOUR_NAME_NAV_KEY[slug];
-  return { title: navKey ? tNav(navKey) : entry.name };
+  const tourName = navKey ? tNav(navKey) : entry.name;
+  const detail = parseTourDetail(await getSiteContent(CONTENT_KEYS.tour(slug)));
+  const description =
+    detail.summary?.trim() || `${tourName} — 오키나와 현지 OKINITY 투어. 일정·가격·예약 안내.`;
+  return {
+    title: tourName,
+    description,
+    alternates: localeAlternates(locale, `/tours/${slug}`)
+  };
 }
 
 export default async function TourDetailPage({

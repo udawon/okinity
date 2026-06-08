@@ -3,7 +3,8 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
-import { parseNoticeItems } from '@/lib/notice';
+import { parseNoticeItems, excerptOf } from '@/lib/notice';
+import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
 
 export const dynamic = 'force-dynamic';
@@ -30,7 +31,11 @@ export async function generateMetadata({
   const { locale, id } = await params;
   const t = await getTranslations({ locale, namespace: 'notice' });
   const post = await loadPost(id);
-  return { title: post?.title || t('title') };
+  return {
+    title: post?.title || t('title'),
+    description: post ? excerptOf(post) : undefined,
+    alternates: localeAlternates(locale, `/notice/${id}`)
+  };
 }
 
 export default async function NoticePostPage({

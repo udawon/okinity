@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
+import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
 import ReservePlanner from '@/components/ReservePlanner';
 
@@ -14,7 +15,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'reservation' });
-  return { title: t('metaTitle'), description: t('metaDescription') };
+  return {
+    title: t('metaTitle'),
+    description: t('metaDescription'),
+    alternates: localeAlternates(locale, '/reserve')
+  };
 }
 
 export default async function ReservePage({

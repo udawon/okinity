@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getGallery, type GalleryItem } from '@/lib/content';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { cdnMedia } from '@/lib/media';
+import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
 
 export const dynamic = 'force-dynamic';
@@ -14,7 +15,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'gallery' });
-  return { title: t('title'), description: t('subtitle') };
+  return {
+    title: t('title'),
+    description: t('subtitle'),
+    alternates: localeAlternates(locale, '/gallery')
+  };
 }
 
 export default async function GalleryPage({

@@ -4,6 +4,7 @@ import Container from '@/components/Container';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseAbout, resolveAbout, splitList } from '@/lib/about';
 import { cdnMedia } from '@/lib/media';
+import { localeAlternates } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'about' });
-  return { title: t('title') };
+  return {
+    title: t('title'),
+    description: t('description'),
+    alternates: localeAlternates(locale, '/about')
+  };
 }
 
 export default async function AboutPage({

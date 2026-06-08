@@ -3,8 +3,9 @@ import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
-import { parseBlogItems } from '@/lib/blog';
+import { parseBlogItems, excerptOf } from '@/lib/blog';
 import { cdnMedia } from '@/lib/media';
+import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
 
 export const dynamic = 'force-dynamic';
@@ -26,9 +27,13 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; id: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
+  const { locale, id } = await params;
   const post = await loadPost(id);
-  return { title: post?.title || '블로그' };
+  return {
+    title: post?.title || '블로그',
+    description: post ? excerptOf(post) : undefined,
+    alternates: localeAlternates(locale, `/blog/${id}`)
+  };
 }
 
 export default async function BlogPostPage({
