@@ -9,11 +9,19 @@ export const ADMIN_COOKIE = 'admin_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12; // 12시간
 
 function getSecret(): string {
-  return (
-    process.env.ADMIN_SESSION_SECRET ||
-    // 개발 편의용 폴백 — 운영에서는 반드시 ADMIN_SESSION_SECRET 설정.
-    'dev-insecure-secret-change-me'
-  );
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  // 운영에서는 시크릿이 없거나 약하면 구동을 거부한다(fail-closed).
+  // 폴백을 허용하면 공개 소스의 기본 시크릿으로 세션이 위조될 수 있다.
+  if (process.env.NODE_ENV === 'production') {
+    if (!secret || secret.length < 32) {
+      throw new Error(
+        'ADMIN_SESSION_SECRET 미설정 또는 32자 미만 — 운영 환경에서 어드민 세션을 발급할 수 없습니다.'
+      );
+    }
+    return secret;
+  }
+  // 개발 편의용 폴백 — 운영에서는 반드시 ADMIN_SESSION_SECRET 설정.
+  return secret || 'dev-insecure-secret-change-me';
 }
 
 const enc = new TextEncoder();
