@@ -87,10 +87,8 @@ export default async function Footer() {
           </p>
         </div>
 
-        {/* PC에서 CONTACT 상단을 주소(〒) 상단과 맞춤: 로고 높이(h-11=44) + 간격(mt-5=20) = 64px 내림 */}
-        <div className="sm:mt-16 sm:text-right">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/45">Contact</p>
-          <div className="mt-4 flex flex-col gap-3 sm:items-end">
+        {/* PC에서 첫 링크(이메일) 상단을 주소(〒) 상단과 맞춤: 로고 높이(h-11=44) + 간격(mt-5=20) = 64px 내림 */}
+        <div className="flex flex-col gap-3 sm:mt-16 sm:items-end">
             <ContactLink
               href={`mailto:${site.contact.email}`}
               label={t('email')}
@@ -118,7 +116,6 @@ export default async function Footer() {
                 <LineGlyph />
               </ContactLink>
             )}
-          </div>
         </div>
       </Container>
     </footer>
