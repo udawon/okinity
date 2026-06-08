@@ -1,5 +1,7 @@
+import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
+import { site } from '@/config/site.config';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems, publishedSorted, BLOG_CAROUSEL_LIMIT } from '@/lib/blog';
@@ -16,6 +18,27 @@ import { cdnMedia } from '@/lib/media';
 // 어드민 편집(블로그·일정)을 즉시 반영하기 위해 동적 렌더링.
 // (Supabase 미설정 시에도 오버라이드 조회는 빈 객체라 비용 거의 없음)
 export const dynamic = 'force-dynamic';
+
+// 홈은 브랜드 검색의 대표 페이지 — 다국어 canonical/hreflang를 명시해 구글에
+// ko/en/ja가 같은 페이지의 언어 변형임을 알린다(중복 색인 방지·다국어 신호).
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    alternates: {
+      canonical: `${site.url}/${locale}`,
+      languages: {
+        ko: `${site.url}/ko`,
+        en: `${site.url}/en`,
+        ja: `${site.url}/ja`,
+        'x-default': `${site.url}/${routing.defaultLocale}`
+      }
+    }
+  };
+}
 
 /**
  * 홈 — 시네마틱 몰입형(OceanHome). 다이빙·PADI·낚시·스노클링 4종 + 블로그·갤러리·후기·일정.
@@ -127,7 +150,38 @@ export default async function HomePage({
       }
     : undefined;
 
+  // 구조화 데이터(JSON-LD) — 구글이 "OKINITY = 오키나와 다이빙샵(주소·연락처)"를
+  // 명확히 인식하도록. 브랜드/지역 검색 노출에 유리.
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: site.name,
+    url: site.url,
+    image: `${site.url}/og-image.png`,
+    logo: `${site.url}/icon.png`,
+    description:
+      '오키나와 케라마 블루에서 즐기는 현지 체험 다이빙·스노클링·낚시·PADI 투어. OKINITY.',
+    telephone: site.phone,
+    email: site.contact.email,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: site.address.line,
+      addressLocality: 'Naha',
+      addressRegion: 'Okinawa',
+      postalCode: site.address.postal.replace(/[^0-9-]/g, ''),
+      addressCountry: 'JP'
+    },
+    areaServed: 'Okinawa, Japan',
+    sameAs: [site.contact.kakaoChannel, site.contact.line].filter(Boolean)
+  };
+
   return (
-    <OceanHome posts={posts} locale={locale} schedule={schedule} media={media} content={content} />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <OceanHome posts={posts} locale={locale} schedule={schedule} media={media} content={content} />
+    </>
   );
 }
