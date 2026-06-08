@@ -59,13 +59,16 @@ export default function TourPricingForm({
         예상매출 미표시. <strong>고객에게는 보이지 않습니다.</strong>
       </p>
 
-      <div className="space-y-5">
+      <div className="space-y-4">
         {groups.map(([title, tours]) => (
-          <div key={title}>
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted">{title}</p>
-            <div className="mt-2 space-y-2">
+          <div key={title} className="rounded-card border border-line bg-bg/40 p-4">
+            <p className="flex items-center gap-2 border-b border-line pb-2.5 text-sm font-bold text-ink">
+              <span className="h-3.5 w-1 rounded-full bg-brand" aria-hidden />
+              {title}
+            </p>
+            <div className="mt-1 divide-y divide-line/70">
               {tours.map((t) => (
-                <div key={t.slug} className="flex items-center gap-3">
+                <div key={t.slug} className="flex items-center gap-3 py-2.5">
                   <label htmlFor={`price-${t.slug}`} className="flex-1 text-sm text-ink">
                     {t.name}
                   </label>
