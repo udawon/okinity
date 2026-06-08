@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseNoticeItems, publishedNotices, excerptOf } from '@/lib/notice';
+import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
 
 export const dynamic = 'force-dynamic';
@@ -23,7 +24,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'notice' });
-  return { title: t('title'), description: t('intro') };
+  return {
+    title: t('title'),
+    description: t('intro'),
+    alternates: localeAlternates(locale, '/notice')
+  };
 }
 
 export default async function NoticeListPage({

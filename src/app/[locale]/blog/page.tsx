@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Locale } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems, publishedSorted } from '@/lib/blog';
+import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
 import BlogCard from '@/components/BlogCard';
 
@@ -15,7 +16,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'blog' });
-  return { title: t('sectionTitle'), description: t('sectionIntro') };
+  return {
+    title: t('sectionTitle'),
+    description: t('sectionIntro'),
+    alternates: localeAlternates(locale, '/blog')
+  };
 }
 
 export default async function BlogListPage({

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { site } from '@/config/site.config';
+import { localeAlternates } from '@/lib/seo';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems, publishedSorted, BLOG_CAROUSEL_LIMIT } from '@/lib/blog';
@@ -27,17 +28,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return {
-    alternates: {
-      canonical: `${site.url}/${locale}`,
-      languages: {
-        ko: `${site.url}/ko`,
-        en: `${site.url}/en`,
-        ja: `${site.url}/ja`,
-        'x-default': `${site.url}/${routing.defaultLocale}`
-      }
-    }
-  };
+  return { alternates: localeAlternates(locale, '') };
 }
 
 /**
