@@ -190,7 +190,8 @@ export default function ScheduleCalendar({
                 >
                   {isClosedRunStart ? (
                     <>
-                      🚫<span className="hidden sm:inline"> {statusLabel.closed}</span>
+                      <span className="hidden sm:inline">🚫 </span>
+                      {statusLabel.closed}
                     </>
                   ) : (
                     '\u00a0'
@@ -254,10 +255,10 @@ export default function ScheduleCalendar({
         })}
       </div>
 
-      {/* 범례 — 캘린더 셀에 실제로 렌더되는 상태를 모두 설명한다.
-          예약가능·예약많음 일정도 색 점+라벨로 표시되므로 범례에 포함(범례-데이터 일치). */}
+      {/* 범례 — 운영자가 실제로 지정하는 상태(휴무·오전 가능·오후 가능)만 표시.
+          예약 가능=기본값, 예약 많음=자동이라 셀에 별도로 찍히지 않으므로 범례에서 제외. */}
       <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55">
-        {(['available', 'full', 'closed', 'morning', 'afternoon'] as Status[]).map((s) => (
+        {(['closed', 'morning', 'afternoon'] as Status[]).map((s) => (
           <span key={s} className="inline-flex items-center gap-1.5">
             <span className={`h-2 w-2 rounded-full ${STATUS[s].dot}`} />
             {statusLabel[s]}
