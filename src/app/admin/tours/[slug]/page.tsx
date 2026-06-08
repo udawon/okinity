@@ -21,7 +21,7 @@ export default async function AdminTourEditPage({
   const detail = parseTourDetail(value);
 
   return (
-    <AdminShell title="투어 상세 편집" back={{ href: '/admin/tours', label: '투어 상세 목록' }}>
+    <AdminShell title="투어 4종 편집" back={{ href: '/admin/tours', label: '투어 4종 목록' }}>
       <div>
         <p className="text-sm text-muted">
           {entry.categoryTitle} · {entry.categoryKicker}
