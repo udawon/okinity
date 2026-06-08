@@ -119,7 +119,7 @@ export default async function AdminContentPage() {
     : TESTIMONIALS.map((x) => ({ name: x.name, city: x.city, tour: x.tour, quote: x.quote }));
 
   return (
-    <AdminShell title="콘텐츠 편집">
+    <AdminShell title="사이트 편집">
       <div className="space-y-6">
         <EditSection
           title="Hero (홈 첫 화면)"

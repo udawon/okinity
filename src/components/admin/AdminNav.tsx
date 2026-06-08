@@ -3,22 +3,24 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-type Tab = { href: string; label: string; group: 'schedule' | 'content' };
+type Tab = { href: string; label: string; group: 'schedule' | 'site' | 'detail' };
 
 const TABS: Tab[] = [
   // 일정 관리
   { href: '/admin', label: '예약 관리', group: 'schedule' },
   { href: '/admin/board', label: '운영 보드', group: 'schedule' },
   { href: '/admin/schedule', label: '일정·휴무', group: 'schedule' },
-  // 콘텐츠
-  { href: '/admin/content', label: '콘텐츠 편집', group: 'content' },
-  { href: '/admin/about', label: '소개', group: 'content' },
-  { href: '/admin/tours', label: '투어 상세', group: 'content' },
-  { href: '/admin/notice', label: '공지사항', group: 'content' },
-  { href: '/admin/blog', label: '블로그', group: 'content' }
+  // 사이트 편집
+  { href: '/admin/content', label: '사이트 편집', group: 'site' },
+  // 상세 콘텐츠
+  { href: '/admin/about', label: '소개', group: 'detail' },
+  { href: '/admin/tours', label: '투어 4종', group: 'detail' },
+  { href: '/admin/notice', label: '공지사항', group: 'detail' },
+  { href: '/admin/blog', label: '블로그', group: 'detail' }
 ];
 
-/** 어드민 상단 탭. 일정 관리 ↔ 콘텐츠 그룹을 구분선으로 묶는다. (/admin 은 [locale] 밖이라 next/link) */
+/** 어드민 상단 탭. 일정 관리 · 사이트 편집 · 상세 콘텐츠 3개 그룹을 구분선으로 묶는다.
+ *  (/admin 은 [locale] 밖이라 next/link) */
 export default function AdminNav() {
   const pathname = usePathname();
   return (

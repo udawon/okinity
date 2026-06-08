@@ -17,7 +17,7 @@ export default async function AdminToursPage() {
   const prices = parseTourPrices(map[CONTENT_KEYS.tourPrices]);
 
   return (
-    <AdminShell title="투어 상세">
+    <AdminShell title="투어 4종">
       <p className="mb-6 text-sm text-muted">
         투어 목록은 고정되어 있고, 각 투어를 눌러 상세 내용을 등록합니다. 공개된 상세는{' '}
         <code>/tours/&#123;slug&#125;</code> 페이지에 표시됩니다.
