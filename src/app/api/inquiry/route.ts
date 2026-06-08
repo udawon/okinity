@@ -50,6 +50,7 @@ function buildEmail(data: NewInquiry): Notif {
     ['희망 시간대', data.time ?? '-'],
     ['인원', data.people != null ? `${data.people}명` : '-'],
     ['성함', data.name],
+    ['이메일', data.email || '-'],
     ['연락처', data.contact],
     ['메시지', data.message ?? '-']
   ];
@@ -81,7 +82,9 @@ function buildEmail(data: NewInquiry): Notif {
     </div>
   </div>`;
 
-  return { subject, text, html, replyTo: data.contact.includes('@') ? data.contact : undefined };
+  // 회신은 고객 이메일로(없으면 연락처가 이메일 형식일 때만).
+  const replyTo = data.email || (data.contact.includes('@') ? data.contact : undefined);
+  return { subject, text, html, replyTo };
 }
 
 async function sendEmail(n: Notif) {

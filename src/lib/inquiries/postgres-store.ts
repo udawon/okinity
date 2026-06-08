@@ -20,6 +20,7 @@ async function ensureTable(): Promise<void> {
       time        TEXT,
       people      INTEGER,
       name        TEXT NOT NULL,
+      email       TEXT,
       contact     TEXT NOT NULL,
       message     TEXT,
       status      TEXT NOT NULL DEFAULT 'tentative',
@@ -30,6 +31,7 @@ async function ensureTable(): Promise<void> {
   await sql`ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS note TEXT`;
   await sql`ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS time TEXT`;
   await sql`ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS scheduled_time TEXT`;
+  await sql`ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS email TEXT`;
   initialized = true;
 }
 
@@ -41,6 +43,7 @@ type Row = {
   time: string | null;
   people: number | null;
   name: string;
+  email: string | null;
   contact: string;
   message: string | null;
   status: string;
@@ -57,6 +60,7 @@ function toInquiry(r: Row): Inquiry {
     time: r.time ?? undefined,
     people: r.people ?? undefined,
     name: r.name,
+    email: r.email ?? undefined,
     contact: r.contact,
     message: r.message ?? undefined,
     status: r.status as InquiryStatus,
@@ -70,9 +74,9 @@ export const postgresStore: InquiryStore = {
     await ensureTable();
     const id = randomUUID();
     const { rows } = await sql<Row>`
-      INSERT INTO inquiries (id, product, date, time, people, name, contact, message, status)
+      INSERT INTO inquiries (id, product, date, time, people, name, email, contact, message, status)
       VALUES (${id}, ${input.product ?? null}, ${input.date ?? null}, ${input.time ?? null},
-              ${input.people ?? null}, ${input.name}, ${input.contact},
+              ${input.people ?? null}, ${input.name}, ${input.email || null}, ${input.contact},
               ${input.message ?? null}, 'tentative')
       RETURNING *
     `;
@@ -107,7 +111,8 @@ export const postgresStore: InquiryStore = {
       UPDATE inquiries SET
         product = ${input.product ?? null}, date = ${input.date ?? null},
         time = ${input.time ?? null}, people = ${input.people ?? null},
-        name = ${input.name}, contact = ${input.contact}, message = ${input.message ?? null}
+        name = ${input.name}, email = ${input.email || null},
+        contact = ${input.contact}, message = ${input.message ?? null}
       WHERE id = ${id}
     `;
     return (rowCount ?? 0) > 0;

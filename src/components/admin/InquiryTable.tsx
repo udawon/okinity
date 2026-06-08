@@ -70,7 +70,7 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
     return inquiries.filter((i) => {
       if (filter !== 'all' && i.status !== filter) return false;
       if (!needle) return true;
-      return [i.name, i.contact, i.product, i.message].some((v) =>
+      return [i.name, i.email, i.contact, i.product, i.message].some((v) =>
         v?.toLowerCase().includes(needle)
       );
     });
@@ -104,7 +104,7 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="이름·연락처·상품·메시지 검색"
+          placeholder="이름·이메일·연락처·상품·메시지 검색"
           className="ml-auto w-full max-w-xs rounded-button border border-line bg-surface px-3 py-1.5 text-sm text-ink placeholder:text-muted focus:border-brand focus:outline-none"
         />
       </div>
@@ -120,6 +120,7 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
               <tr>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">접수(JST)</th>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">이름</th>
+                <th className="whitespace-nowrap px-4 py-3 font-medium">이메일</th>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">연락처</th>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">상품</th>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">희망일</th>
@@ -142,6 +143,15 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
                     <div className="text-xs">{fmtReceived(q.createdAt).time}</div>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 font-medium text-ink">{q.name}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-ink">
+                    {q.email ? (
+                      <a href={`mailto:${q.email}`} className="text-sky-600 hover:underline">
+                        {q.email}
+                      </a>
+                    ) : (
+                      <span className="text-muted">-</span>
+                    )}
+                  </td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink">
                     <ContactLink contact={q.contact} />
                   </td>

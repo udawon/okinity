@@ -50,6 +50,7 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
           time: fd.get('time'),
           people: fd.get('people'),
           name: fd.get('name'),
+          email: fd.get('email'),
           contact: fd.get('contact'),
           message: fd.get('message')
         });
@@ -186,6 +187,18 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
                     type="text"
                     required
                     defaultValue={inquiry.name}
+                    className={inputCls}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="ei-email" className={labelCls}>
+                    이메일
+                  </label>
+                  <input
+                    id="ei-email"
+                    name="email"
+                    type="email"
+                    defaultValue={inquiry.email ?? ''}
                     className={inputCls}
                   />
                 </div>
