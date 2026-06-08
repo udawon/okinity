@@ -20,6 +20,12 @@ export async function getInquiryStore(): Promise<InquiryStore> {
   } else if (process.env.POSTGRES_URL) {
     const { postgresStore } = await import('./postgres-store');
     cached = postgresStore;
+  } else if (process.env.NODE_ENV === 'production') {
+    // 운영에서 JSON 파일 저장소는 읽기 전용 파일시스템(EROFS)으로 쓰기가 실패하고,
+    // 설령 가능해도 서버리스 인스턴스마다 휘발된다. 무증상 데이터 유실 대신 즉시 실패시킨다.
+    throw new Error(
+      '운영 환경에는 영속 저장소가 필요합니다 — SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 또는 POSTGRES_URL을 설정하세요.'
+    );
   } else {
     cached = jsonStore;
   }

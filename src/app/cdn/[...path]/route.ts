@@ -17,8 +17,35 @@ export async function GET(
   const base = process.env.SUPABASE_URL;
   if (!base || !path?.length) return new Response('Not found', { status: 404 });
 
+  // 경로 탈출(../) 및 비정상 세그먼트 차단 — encodeURIComponent('..')는 '..'을 그대로 두므로
+  // 검증 없이 fetch에 넘기면 URL 정규화로 /public/ 경계를 벗어날 수 있다.
+  if (
+    path.some(
+      (seg) =>
+        seg === '..' ||
+        seg === '.' ||
+        seg === '' ||
+        seg.includes('/') ||
+        seg.includes('\0')
+    )
+  ) {
+    return new Response('Not found', { status: 404 });
+  }
+
   const objectPath = path.map(encodeURIComponent).join('/');
-  const upstream = await fetch(`${base}/storage/v1/object/public/${objectPath}`);
+  const target = new URL(`/storage/v1/object/public/${objectPath}`, base);
+  // 정규화 후에도 공개 객체 접두사 안에 머무는지 최종 확인.
+  if (!target.pathname.startsWith('/storage/v1/object/public/')) {
+    return new Response('Not found', { status: 404 });
+  }
+
+  // 업스트림 지연 시 서버리스 함수가 매달리지 않도록 타임아웃을 건다.
+  let upstream: Response;
+  try {
+    upstream = await fetch(target, { signal: AbortSignal.timeout(10_000) });
+  } catch {
+    return new Response('Not found', { status: 404 });
+  }
   if (!upstream.ok || !upstream.body) {
     return new Response('Not found', { status: 404 });
   }
