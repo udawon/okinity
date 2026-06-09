@@ -96,13 +96,16 @@ function R({
 }) {
   const reduce = useStableReducedMotion();
   const Tag = motion[as] as typeof motion.div;
+  // fail-open: 서버·초기 렌더는 보이는 상태(initial=false → opacity:1, transform none)로 내보낸다.
+  // 진입 연출은 whileInView 키프레임(0→1)으로만 얹어, JS가 실패하거나 IntersectionObserver가
+  // 발화하지 않아도(일부 안드로이드 크롬) 텍스트가 소멸하지 않는다. 가시성을 애니메이션에 의존하지 않음.
   return (
     <Tag
       className={className}
       style={style}
-      initial={reduce ? false : { opacity: 0, y }}
-      whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
+      initial={false}
+      whileInView={reduce ? undefined : { opacity: [0, 1], y: [y, 0] }}
+      viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.8, ease: EASE, delay }}
     >
       {children}
