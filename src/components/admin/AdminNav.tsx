@@ -14,7 +14,7 @@ const TABS: Tab[] = [
   { href: '/admin/content', label: '사이트 편집', group: 'site' },
   // 상세 콘텐츠
   { href: '/admin/about', label: '소개', group: 'detail' },
-  { href: '/admin/tours', label: '투어 4종', group: 'detail' },
+  { href: '/admin/tours', label: '투어 5종', group: 'detail' },
   { href: '/admin/notice', label: '공지사항', group: 'detail' },
   { href: '/admin/blog', label: '블로그', group: 'detail' }
 ];
