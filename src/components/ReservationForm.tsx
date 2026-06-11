@@ -3,8 +3,14 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { ACTIVITIES } from './ocean-home-data';
-import { TOUR_NAME_NAV_KEY } from '@/lib/tour';
+import { TOUR_NAME_NAV_KEY, FISHING_CLASS_KEYS, type FishingClassKey } from '@/lib/tour';
 import MedicalCheckModal from './MedicalCheckModal';
+
+// 문의 내역(product)에 실리는 클래스 표기 — 운영자가 읽는 한국어 고정값(표시 라벨만 i18n).
+const FISHING_CLASS_PRODUCT: Record<FishingClassKey, string> = {
+  middle: '미들 클래스',
+  luxury: '럭셔리 클래스'
+};
 
 const inputCls =
   'w-full rounded-button border border-white/15 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-[#5fc6ef] focus:outline-none focus:ring-2 focus:ring-[#5fc6ef]/25';
@@ -45,12 +51,14 @@ export default function ReservationForm({
     : undefined;
   const [catId, setCatId] = useState(presetCat?.id ?? '');
   const [slug, setSlug] = useState(presetCat ? (initialSlug as string) : '');
+  const [fishingClass, setFishingClass] = useState<FishingClassKey | ''>('');
   const [state, setState] = useState<SubmitState>('idle');
   const [done, setDone] = useState<{ product: string; dateLabel: string } | null>(null);
   const [medOpen, setMedOpen] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   const cat = ACTIVITIES.find((a) => a.id === catId);
+  const isFishing = cat?.id === 'fishing';
   // 낚시 외 투어는 메디컬 체크 필수
   const needsMedical = !!cat && cat.id !== 'fishing';
   // 예약이 많은(마감 표기) 투어가 있는 날 → 조율 안내 문구로 전환
@@ -68,6 +76,7 @@ export default function ReservationForm({
     setDone(null);
     setCatId('');
     setSlug('');
+    setFishingClass('');
   }
 
   // 제출 버튼 클릭 — 필수값 검증 후, 낚시 외 투어는 메디컬 체크 모달로, 그 외는 바로 전송.
@@ -84,7 +93,10 @@ export default function ReservationForm({
     setState('submitting');
     const fd = new FormData(form);
     const tourName = cat?.tours.find((t) => t.slug === slug)?.name ?? '';
-    const product = cat ? `${cat.title}${tourName ? ' · ' + tourName : ''}` : '';
+    const classLabel = isFishing && fishingClass ? FISHING_CLASS_PRODUCT[fishingClass] : '';
+    const product = cat
+      ? `${cat.title}${tourName ? ' · ' + tourName : ''}${classLabel ? ' · ' + classLabel : ''}`
+      : '';
     const date = lockedDateKey ?? (String(fd.get('date') || '') || undefined);
     const baseMsg = String(fd.get('message') || '');
     const message = medical
@@ -193,6 +205,7 @@ export default function ReservationForm({
           onChange={(e) => {
             setCatId(e.target.value);
             setSlug('');
+            setFishingClass('');
           }}
           className={`mt-1.5 ${inputCls} [&>option]:text-ink`}
         >
@@ -230,6 +243,31 @@ export default function ReservationForm({
           ))}
         </select>
       </div>
+
+      {/* 소분류(클래스) — 낚시 선택 시에만 노출(미들/럭셔리). 문의 내역에 함께 기록. */}
+      {isFishing && (
+        <div className="mt-4">
+          <label htmlFor="rf-class" className={labelCls}>
+            {t('classLabel')} *
+          </label>
+          <select
+            id="rf-class"
+            required
+            value={fishingClass}
+            onChange={(e) => setFishingClass(e.target.value as FishingClassKey)}
+            className={`mt-1.5 ${inputCls} [&>option]:text-ink`}
+          >
+            <option value="" disabled>
+              {t('classPlaceholder')}
+            </option>
+            {FISHING_CLASS_KEYS.map((key) => (
+              <option key={key} value={key}>
+                {key === 'middle' ? t('classMiddle') : t('classLuxury')}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* 희망 시간대 — 운영자 지정(오전만/오후만)이 있으면 옵션 제한 */}
       <div className="mt-4">

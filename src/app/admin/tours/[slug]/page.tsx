@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
-import { getTourCatalogEntry, parseTourDetail } from '@/lib/tour';
+import { getTourCatalogEntry, resolveTourDetail, tourHasClasses } from '@/lib/tour';
 import AdminShell from '@/components/admin/AdminShell';
 import TourEditor from '@/components/admin/TourEditor';
 
@@ -18,10 +18,10 @@ export default async function AdminTourEditPage({
 
   const enabled = isSupabaseEnabled();
   const value = enabled ? await getSiteContent(CONTENT_KEYS.tour(slug)) : null;
-  const detail = parseTourDetail(value);
+  const detail = resolveTourDetail(slug, value);
 
   return (
-    <AdminShell title="투어 4종 편집" back={{ href: '/admin/tours', label: '투어 4종 목록' }}>
+    <AdminShell title="투어 5종 편집" back={{ href: '/admin/tours', label: '투어 5종 목록' }}>
       <div>
         <p className="text-sm text-muted">
           {entry.categoryTitle} · {entry.categoryKicker}
@@ -33,7 +33,7 @@ export default async function AdminTourEditPage({
       </div>
 
       <div className="mt-5">
-        <TourEditor slug={slug} detail={detail} disabled={!enabled} />
+        <TourEditor slug={slug} detail={detail} disabled={!enabled} showClasses={tourHasClasses(slug)} />
       </div>
     </AdminShell>
   );

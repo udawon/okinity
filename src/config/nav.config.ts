@@ -53,12 +53,20 @@ export const NAV: NavItem[] = [
   {
     key: 'fishing',
     href: '/tours/trial-fishing-4h',
-    groupEnd: true,
     children: [
       { tKey: 'tours.fishing.trial4', href: '/tours/trial-fishing-4h' },
       { tKey: 'tours.fishing.five6', href: '/tours/fishing-5species-6h' },
       { tKey: 'tours.fishing.overnight', href: '/tours/overnight-fishing' },
       { tKey: 'tours.fishing.biggame8', href: '/tours/biggame-trolling-8h' }
+    ]
+  },
+  {
+    key: 'yacht',
+    href: '/tours/luxury-yacht-cruise',
+    groupEnd: true,
+    children: [
+      { tKey: 'tours.yacht.luxury', href: '/tours/luxury-yacht-cruise' },
+      { tKey: 'tours.yacht.middle', href: '/tours/middle-yacht-cruise' }
     ]
   },
   { key: 'notice', href: '/notice' },

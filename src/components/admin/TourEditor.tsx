@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { saveTour } from '@/app/admin/tour-actions';
-import { type TourDetail } from '@/lib/tour';
+import { emptyTourClasses, type TourClasses, type FishingClassKey, type TourDetail } from '@/lib/tour';
 import MediaInput from './MediaInput';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
 
@@ -11,15 +11,22 @@ const labelCls = 'block text-sm font-medium text-ink';
 const inputCls =
   'mt-1 w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted';
 
-/** 투어 상세 편집 폼 — 요약·이미지·소요·가격·포함·본문·공개. (목록은 코드 고정) */
+const CLASS_LABEL: Record<FishingClassKey, string> = { middle: '미들 클래스', luxury: '럭셔리 클래스' };
+
+/**
+ * 투어 상세 편집 폼 — 요약·이미지·소요·가격·포함·본문·공개. (목록은 코드 고정)
+ * showClasses(낚시)면 미들/럭셔리 클래스별 사진+설명 편집 블록을 추가로 노출한다.
+ */
 export default function TourEditor({
   slug,
   detail,
-  disabled = false
+  disabled = false,
+  showClasses = false
 }: {
   slug: string;
   detail: TourDetail;
   disabled?: boolean;
+  showClasses?: boolean;
 }) {
   const router = useRouter();
   const [published, setPublished] = useState(detail.published);
@@ -29,8 +36,12 @@ export default function TourEditor({
   const [price, setPrice] = useState(detail.price);
   const [included, setIncluded] = useState(detail.included);
   const [body, setBody] = useState(detail.body);
+  const [classes, setClasses] = useState<TourClasses>(detail.classes ?? emptyTourClasses());
   const [saving, setSaving] = useState(false);
   const { status, show } = useSaveStatus();
+
+  const patchClass = (key: FishingClassKey, p: Partial<TourClasses[FishingClassKey]>) =>
+    setClasses((c) => ({ ...c, [key]: { ...c[key], ...p } }));
 
   async function save() {
     setSaving(true);
@@ -41,7 +52,8 @@ export default function TourEditor({
       duration,
       price,
       included,
-      body
+      body,
+      classes
     });
     setSaving(false);
     if (res.error) show(res.error, 'err');
@@ -151,6 +163,53 @@ export default function TourEditor({
           className={`${inputCls} resize-y !rounded-card`}
         />
       </div>
+
+      {/* 낚시 클래스(소분류) — 미들/럭셔리별 사진+설명. 상세페이지 '클래스' 탭에 노출. */}
+      {showClasses && (
+        <div className="rounded-card border border-line bg-surface p-5 sm:p-6">
+          <h3 className="text-sm font-bold text-ink">클래스 (미들 / 럭셔리)</h3>
+          <p className="mt-1 text-xs text-muted">
+            소분류는 별도 페이지 없이 이 투어 상세의 <strong>클래스 탭</strong>에 사진·설명으로
+            노출됩니다. 비워 두면 해당 클래스 탭은 “준비 중”으로 표시됩니다.
+          </p>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2">
+            {(['middle', 'luxury'] as FishingClassKey[]).map((key) => (
+              <div key={key} className="rounded-card border border-line bg-bg/40 p-4">
+                <p className="flex items-center gap-2 text-sm font-semibold text-ink">
+                  <span className="h-3.5 w-1 rounded-full bg-brand" aria-hidden />
+                  {CLASS_LABEL[key]}
+                </p>
+                <div className="mt-3">
+                  <label className={labelCls}>사진</label>
+                  <div className="mt-1">
+                    <MediaInput
+                      prefix="tours"
+                      accept="image/*"
+                      defaultUrl={classes[key].image}
+                      disabled={disabled}
+                      onChange={(url) => patchClass(key, { image: url })}
+                    />
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <label className={labelCls} htmlFor={`class-desc-${key}`}>
+                    설명
+                  </label>
+                  <textarea
+                    id={`class-desc-${key}`}
+                    value={classes[key].description}
+                    onChange={(e) => patchClass(key, { description: e.target.value })}
+                    placeholder={`${CLASS_LABEL[key]} 구성·차별점·요금 안내 등 (줄바꿈 가능)`}
+                    rows={5}
+                    disabled={disabled}
+                    className={`${inputCls} resize-y !rounded-card`}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex items-center gap-3">
         <button

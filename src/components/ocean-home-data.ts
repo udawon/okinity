@@ -19,7 +19,7 @@ export const HERO_DEFAULTS = {
 export type TourRef = { slug: string; name: string };
 
 export type Activity = {
-  id: 'diving' | 'padi' | 'fishing' | 'snorkeling';
+  id: 'diving' | 'padi' | 'fishing' | 'snorkeling' | 'yacht';
   no: string;
   kicker: string;
   title: string;
@@ -90,6 +90,20 @@ export const ACTIVITIES: Activity[] = [
     ],
     image: '/images/ph-3.svg',
     accent: '#f6a623'
+  },
+  {
+    id: 'yacht',
+    no: '05',
+    kicker: 'YACHT CRUISING',
+    title: '요트 크루징',
+    tagline: '오키나와 블루를 가르는 프라이빗 요트',
+    desc: '에메랄드빛 케라마 해역을 전세 요트로 누비는 프리미엄 크루징. 선셋·스노클링·온보드 다이닝까지, 일행만을 위한 프라이빗한 하루를 설계합니다.',
+    tours: [
+      { slug: 'luxury-yacht-cruise', name: '럭셔리 클래스 투어' },
+      { slug: 'middle-yacht-cruise', name: '미들 클래스 투어' }
+    ],
+    image: '/images/ph-5.svg',
+    accent: '#d4b878'
   }
 ];
 

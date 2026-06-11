@@ -29,11 +29,16 @@
       },
       "snorkeling": {
         "cave": "Blue Cave Snorkeling"
+      },
+      "yacht": {
+        "luxury": "Luxury Class Tour",
+        "middle": "Middle Class Tour"
       }
     },
     "blog": "Blog",
     "snorkeling": "Snorkeling",
-    "notice": "Notices"
+    "notice": "Notices",
+    "yacht": "Yacht Cruising"
   },
   "home": {
     "categoriesTitle": "Programs",
@@ -152,13 +157,15 @@
       "snorkeling": "For the whole family, a coral garden at the surface",
       "diving": "Hold your breath, into the blue",
       "padi": "A diver certification for life",
-      "fishing": "Okinawa's catch — tropical game fishing"
+      "fishing": "Okinawa's catch — tropical game fishing",
+      "yacht": "Private yacht cruising across the Okinawa blue"
     },
     "desc": {
       "snorkeling": "A life vest and guide are always with you, so kids and seniors feel safe. The easiest way to meet the Blue Cave's mystical light, coral, and tropical fish — right from the surface.",
       "diving": "No certification needed — a pro instructor accompanies you 1:2. From the Blue Cave's mystical light to the clarity of Kerama Blue, cruise Okinawa's signature points by boat.",
       "padi": "Internationally certified PADI instructors guide you. From your first certification to pro specialties, grow safely step by step.",
-      "fishing": "Rich fishing grounds nurtured by the Kuroshio Current. From easy trial fishing to big-game trolling for mahi-mahi, gear and bait are all included."
+      "fishing": "Rich fishing grounds nurtured by the Kuroshio Current. From easy trial fishing to big-game trolling for mahi-mahi, gear and bait are all included.",
+      "yacht": "A premium charter cruise across the emerald Kerama waters. Sunset, snorkeling, and onboard dining — a fully private day designed just for your group."
     },
     "assuranceTitle": "Leave it to us with confidence",
     "assurance1Title": "Small-group & private",
@@ -206,7 +213,7 @@
     "freeNote": "Other times and tours are also available. Choose the tour you want below and send an inquiry.",
     "dateOptional": "Preferred date (optional)",
     "category": "Tour type",
-    "categoryPlaceholder": "Select a category (Snorkeling · Diving · PADI · Fishing)",
+    "categoryPlaceholder": "Select a category (Snorkeling · Diving · PADI · Fishing · Yacht)",
     "program": "Program",
     "programPlaceholder": "Select a program",
     "programPlaceholderEmpty": "Select a tour type first",
@@ -236,14 +243,22 @@
     "successAnotherDate": "View another date",
     "successNew": "Write a new inquiry",
     "dateTbd": "Date TBD",
-    "menuCtaSub": "Pick a date and inquire instantly"
+    "menuCtaSub": "Pick a date and inquire instantly",
+    "classLabel": "Class",
+    "classPlaceholder": "Select a class (Middle · Luxury)",
+    "classMiddle": "Middle Class",
+    "classLuxury": "Luxury Class"
   },
   "tourDetail": {
     "durationLabel": "Duration",
     "priceLabel": "Price",
     "includesTitle": "What's included",
     "preparing": "Details are being prepared. Please use the button below to ask about dates and a quote — we'll get back to you within 24 hours.",
-    "reserveCta": "Ask about this tour →"
+    "reserveCta": "Ask about this tour →",
+    "classTitle": "Class",
+    "classMiddle": "Middle Class",
+    "classLuxury": "Luxury Class",
+    "classPreparing": "Details for this class are being prepared. Please get in touch using the button below."
   },
   "medical": {
     "title": "Medical Check",

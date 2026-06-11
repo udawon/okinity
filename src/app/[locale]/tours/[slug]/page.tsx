@@ -4,9 +4,16 @@ import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import Container from '@/components/Container';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
-import { getTourCatalogEntry, parseTourDetail, splitLines, TOUR_NAME_NAV_KEY } from '@/lib/tour';
+import {
+  getTourCatalogEntry,
+  resolveTourDetail,
+  splitLines,
+  tourHasClasses,
+  TOUR_NAME_NAV_KEY
+} from '@/lib/tour';
 import { cdnMedia } from '@/lib/media';
 import { localeAlternates } from '@/lib/seo';
+import TourClassTabs from '@/components/TourClassTabs';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +29,7 @@ export async function generateMetadata({
   const tNav = await getTranslations({ locale, namespace: 'nav' });
   const navKey = TOUR_NAME_NAV_KEY[slug];
   const tourName = navKey ? tNav(navKey) : entry.name;
-  const detail = parseTourDetail(await getSiteContent(CONTENT_KEYS.tour(slug)));
+  const detail = resolveTourDetail(slug, await getSiteContent(CONTENT_KEYS.tour(slug)));
   const description =
     detail.summary?.trim() || `${tourName} — 오키나와 현지 OKINITY 투어. 일정·가격·예약 안내.`;
   return {
@@ -51,9 +58,10 @@ export default async function TourDetailPage({
   const categoryName = tNav(entry.categoryId);
 
   const value = await getSiteContent(CONTENT_KEYS.tour(slug));
-  const detail = parseTourDetail(value);
+  const detail = resolveTourDetail(slug, value);
   const showDetail = detail.published;
   const included = splitLines(detail.included);
+  const showClasses = tourHasClasses(slug); // 낚시 투어 → 클래스(미들/럭셔리) 탭 노출
   // 카테고리 허브 페이지가 없으므로(diving·padi는 대표 투어로 redirect) 모든 투어가
   // 홈의 액티비티 섹션으로 일관되게 복귀한다. (이전: 카테고리별로 행선지가 제각각이었음)
   const hubHref = '/#activities';
@@ -129,9 +137,24 @@ export default async function TourDetailPage({
             {detail.body}
           </div>
         ) : (
-          <p className="mt-8 text-[15px] leading-relaxed text-white/65">
-            {t('preparing')}
-          </p>
+          // 낚시 투어는 아래 클래스 탭이 본문 역할을 하므로 일반 '준비 중' 문구는 생략.
+          !showClasses && (
+            <p className="mt-8 text-[15px] leading-relaxed text-white/65">{t('preparing')}</p>
+          )
+        )}
+
+        {/* 낚시 클래스(소분류) 탭 — 미들/럭셔리. 별도 페이지 없이 각 낚시 상세에 상시 노출(공개 여부 무관). */}
+        {showClasses && (
+          <TourClassTabs
+            classes={detail.classes}
+            accent={entry.accent}
+            labels={{
+              title: t('classTitle'),
+              middle: t('classMiddle'),
+              luxury: t('classLuxury'),
+              preparing: t('classPreparing')
+            }}
+          />
         )}
 
         <div className="mt-10">

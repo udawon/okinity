@@ -3,54 +3,73 @@ import { getTranslations } from 'next-intl/server';
 import { site } from '@/config/site.config';
 import Container from './Container';
 
-/** 이메일 글리프 */
-function MailGlyph() {
+/**
+ * 앱 아이콘 타일 — 채널 색의 라운드 스퀘어 위에 글리프를 얹어 '실제 앱 아이콘'처럼 보이게 한다.
+ * tileCls 로 배경(브랜드 색/그라데이션)을, 내부 svg 로 글리프(흰색/대비색)를 지정.
+ */
+function AppIconTile({ tileCls, children }: { tileCls: string; children: React.ReactNode }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden>
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="m3 7 9 6 9-6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <span
+      aria-hidden
+      className={`grid h-8 w-8 shrink-0 place-items-center rounded-[9px] shadow-[0_4px_12px_rgba(0,0,0,0.35)] ring-1 ring-inset ring-white/15 transition-transform duration-200 group-hover:-translate-y-0.5 ${tileCls}`}
+    >
+      {children}
+    </span>
   );
 }
 
-/** 카카오톡 말풍선 글리프 */
-function KakaoGlyph() {
+/** 이메일 앱 아이콘 — 브랜드 스카이블루 타일 + 흰색 봉투. */
+function MailIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden>
-      <path d="M12 3C6.477 3 2 6.463 2 10.74c0 2.74 1.83 5.146 4.6 6.51-.2.69-.72 2.48-.83 2.87-.13.48.18.47.37.34.15-.1 2.4-1.62 3.37-2.28.68.1 1.38.15 2.09.15 5.523 0 10-3.463 10-7.74S17.523 3 12 3z" />
-    </svg>
+    <AppIconTile tileCls="bg-gradient-to-br from-[#5fc6ef] to-[#2f9fd4]">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" className="h-[18px] w-[18px]">
+        <rect x="3" y="5" width="18" height="14" rx="2.5" />
+        <path d="m3.5 7.5 8.5 6 8.5-6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </AppIconTile>
   );
 }
 
-/** LINE 말풍선 글리프 */
-function LineGlyph() {
+/** 카카오톡 앱 아이콘 — 카카오 옐로 타일 + 브라운 말풍선. */
+function KakaoIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden>
-      <path d="M12 3.5c-5.24 0-9.5 3.46-9.5 7.72 0 3.82 3.38 7.02 7.94 7.63.31.07.73.2.84.47.1.24.06.62.03.86l-.13.8c-.04.24-.19.94.83.51 1.02-.43 5.49-3.23 7.49-5.53C20.55 14.46 21 12.86 21 11.22 21 6.96 16.74 3.5 12 3.5z" />
-    </svg>
+    <AppIconTile tileCls="bg-[#FEE500]">
+      <svg viewBox="0 0 24 24" fill="#3C1E1E" className="h-[17px] w-[17px]">
+        <path d="M12 4C6.9 4 2.75 7.2 2.75 11.16c0 2.54 1.7 4.77 4.27 6.03-.19.64-.67 2.3-.77 2.66-.12.45.17.44.35.32.14-.09 2.23-1.5 3.13-2.11.74.11 1.5.16 2.27.16 5.1 0 9.25-3.2 9.25-7.16S17.1 4 12 4z" />
+      </svg>
+    </AppIconTile>
+  );
+}
+
+/** LINE 앱 아이콘 — LINE 그린 타일 + 흰색 말풍선. */
+function LineIcon() {
+  return (
+    <AppIconTile tileCls="bg-[#06C755]">
+      <svg viewBox="0 0 24 24" fill="#ffffff" className="h-[18px] w-[18px]">
+        <path d="M12 4C6.76 4 2.5 7.46 2.5 11.72c0 3.82 3.38 7.02 7.94 7.63.31.07.73.2.84.47.1.24.06.62.03.86l-.13.8c-.04.24-.19.94.83.51 1.02-.43 5.49-3.23 7.49-5.53 1.38-1.51 2.0-3.05 2.0-4.74C21.5 7.46 17.24 4 12 4z" />
+      </svg>
+    </AppIconTile>
   );
 }
 
 const linkCls =
-  'group inline-flex items-center gap-2.5 text-sm text-white/65 transition-colors duration-200 hover:text-white';
+  'group inline-flex items-center gap-3 text-sm text-white/70 transition-colors duration-200 hover:text-white';
 
-/** 푸터 문의 링크 — 박스 없는 심플 목록(아이콘 + 라벨). */
+/** 푸터 문의 링크 — 앱 아이콘 타일 + 라벨. */
 function ContactLink({
   href,
   label,
-  iconColor,
   external,
   children
 }: {
   href: string;
   label: string;
-  iconColor: string;
   external?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <a href={href} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className={linkCls}>
-      <span className={`shrink-0 ${iconColor}`}>{children}</span>
+      {children}
       <span>{label}</span>
     </a>
   );
@@ -88,32 +107,18 @@ export default async function Footer() {
         </div>
 
         {/* PC에서 첫 링크(이메일) 상단을 주소(〒) 상단과 맞춤: 로고 높이(h-11=44) + 간격(mt-5=20) = 64px 내림 */}
-        <div className="flex flex-col gap-3 sm:mt-16 sm:items-end">
-            <ContactLink
-              href={`mailto:${site.contact.email}`}
-              label={t('email')}
-              iconColor="text-[#7dd3f5]"
-            >
-              <MailGlyph />
+        <div className="flex flex-col gap-3.5 sm:mt-16 sm:items-end">
+            <ContactLink href={`mailto:${site.contact.email}`} label={t('email')}>
+              <MailIcon />
             </ContactLink>
             {site.contact.kakaoChannel && (
-              <ContactLink
-                href={site.contact.kakaoChannel}
-                label={t('kakao')}
-                iconColor="text-[#FEE500]"
-                external
-              >
-                <KakaoGlyph />
+              <ContactLink href={site.contact.kakaoChannel} label={t('kakao')} external>
+                <KakaoIcon />
               </ContactLink>
             )}
             {site.contact.line && (
-              <ContactLink
-                href={site.contact.line}
-                label={t('line')}
-                iconColor="text-[#3fe09a]"
-                external
-              >
-                <LineGlyph />
+              <ContactLink href={site.contact.line} label={t('line')} external>
+                <LineIcon />
               </ContactLink>
             )}
         </div>
