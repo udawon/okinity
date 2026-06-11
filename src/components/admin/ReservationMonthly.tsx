@@ -89,10 +89,16 @@ export default function ReservationMonthly({
             <p className="text-lg font-bold text-ink">
               {ym.y}년 {ym.m}월
             </p>
+            <p
+              className="mt-0.5 text-[11px] font-medium text-muted"
+              title="확정일이 있으면 확정일, 미확정 예약은 희망일 기준으로 집계됩니다"
+            >
+              확정일 기준 예약건
+            </p>
             <button
               type="button"
               onClick={() => setYm({ y: ty, m: tm })}
-              className="text-xs text-muted hover:text-brand"
+              className="mt-1 text-xs text-muted hover:text-brand"
             >
               이번 달로
             </button>
