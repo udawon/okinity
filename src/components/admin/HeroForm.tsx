@@ -101,7 +101,7 @@ export default function HeroForm({
           name="mediaType"
           defaultValue={defaults.mediaType ?? 'image'}
           disabled={disabled}
-          className={inputCls}
+          className={`${inputCls} app-select app-select-light`}
         >
           <option value="image">이미지</option>
           <option value="video">동영상</option>

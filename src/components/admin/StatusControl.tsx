@@ -45,7 +45,7 @@ export default function StatusControl({
       value={current}
       disabled={pending}
       onChange={(e) => onChange(e.target.value as InquiryStatus)}
-      className={`rounded-button px-2 py-1 text-sm font-medium disabled:opacity-50 ${COLOR[current]}`}
+      className={`app-select app-select-light rounded-button px-2 py-1 text-sm font-medium disabled:opacity-50 ${COLOR[current]}`}
       aria-label="문의 상태 변경"
     >
       {INQUIRY_STATUSES.map((s) => (

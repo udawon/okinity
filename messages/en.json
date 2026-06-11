@@ -235,7 +235,7 @@
     "submit": "Send booking inquiry →",
     "submitMedical": "Medical check & send inquiry",
     "submitting": "Sending…",
-    "medicalNote": "For your safety, you'll complete a medical check in the next step before sending. (Fishing excluded)",
+    "medicalNote": "For your safety, you'll complete a medical check in the next step before sending. (Fishing & yacht excluded)",
     "errorMsg": "Sending failed. Please try again in a moment.",
     "freeConsult": "Free pre-booking consultation · No cancellation fee on the booking day",
     "successTitle": "Your inquiry has been received",

@@ -209,3 +209,24 @@ html {
     animation: none;
   }
 }
+
+/* 드롭다운(select) 화살표 — 네이티브 화살표가 우측 끝에 바짝 붙는 문제를 해결.
+   appearance 제거 후, 우측에서 살짝 안쪽으로 들인 커스텀 ⌄를 깔아 시각적 여백을 준다.
+   .app-select-dark = 어두운 배경용(밝은 ⌄) · .app-select-light = 밝은 배경용(짙은 ⌄). */
+@layer components {
+  .app-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    background-size: 1.05rem 1.05rem;
+    padding-right: 2.4rem !important;
+  }
+  .app-select-dark {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  }
+  .app-select-light {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  }
+}

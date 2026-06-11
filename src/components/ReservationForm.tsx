@@ -4,6 +4,7 @@ import { useRef, useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { ACTIVITIES } from './ocean-home-data';
 import { TOUR_NAME_NAV_KEY, FISHING_CLASS_KEYS, type FishingClassKey } from '@/lib/tour';
+import { MEDICAL_MARKER } from '@/lib/inquiries/types';
 import MedicalCheckModal from './MedicalCheckModal';
 
 // 문의 내역(product)에 실리는 클래스 표기 — 운영자가 읽는 한국어 고정값(표시 라벨만 i18n).
@@ -59,8 +60,8 @@ export default function ReservationForm({
 
   const cat = ACTIVITIES.find((a) => a.id === catId);
   const isFishing = cat?.id === 'fishing';
-  // 낚시 외 투어는 메디컬 체크 필수
-  const needsMedical = !!cat && cat.id !== 'fishing';
+  // 낚시·요트 크루징은 메디컬 체크 불필요(다이빙·스노클링·PADI만 필수).
+  const needsMedical = !!cat && cat.id !== 'fishing' && cat.id !== 'yacht';
   // 예약이 많은(마감 표기) 투어가 있는 날 → 조율 안내 문구로 전환
   const hasBusy = scheduled?.some((s) => s.badge);
 
@@ -100,7 +101,7 @@ export default function ReservationForm({
     const date = lockedDateKey ?? (String(fd.get('date') || '') || undefined);
     const baseMsg = String(fd.get('message') || '');
     const message = medical
-      ? `[메디컬 체크 완료 · 전 항목 확인]${baseMsg ? '\n' + baseMsg : ''}`
+      ? `${MEDICAL_MARKER}${baseMsg ? '\n' + baseMsg : ''}`
       : baseMsg;
     try {
       const res = await fetch('/api/inquiry', {
@@ -207,7 +208,7 @@ export default function ReservationForm({
             setSlug('');
             setFishingClass('');
           }}
-          className={`mt-1.5 ${inputCls} [&>option]:text-ink`}
+          className={`mt-1.5 ${inputCls} app-select app-select-dark [&>option]:text-ink`}
         >
           <option value="" disabled>
             {t('categoryPlaceholder')}
@@ -231,7 +232,7 @@ export default function ReservationForm({
           value={slug}
           disabled={!cat}
           onChange={(e) => setSlug(e.target.value)}
-          className={`mt-1.5 ${inputCls} disabled:opacity-50 [&>option]:text-ink`}
+          className={`mt-1.5 ${inputCls} disabled:opacity-50 app-select app-select-dark [&>option]:text-ink`}
         >
           <option value="" disabled>
             {cat ? t('programPlaceholder') : t('programPlaceholderEmpty')}
@@ -255,7 +256,7 @@ export default function ReservationForm({
             required
             value={fishingClass}
             onChange={(e) => setFishingClass(e.target.value as FishingClassKey)}
-            className={`mt-1.5 ${inputCls} [&>option]:text-ink`}
+            className={`mt-1.5 ${inputCls} app-select app-select-dark [&>option]:text-ink`}
           >
             <option value="" disabled>
               {t('classPlaceholder')}
@@ -275,7 +276,7 @@ export default function ReservationForm({
           {t('time')}
         </label>
         {/* option value는 한국어 고정(운영자가 읽는 값), 표시 라벨만 번역 */}
-        <select id="rf-time" name="time" defaultValue="" className={`mt-1.5 ${inputCls} [&>option]:text-ink`}>
+        <select id="rf-time" name="time" defaultValue="" className={`mt-1.5 ${inputCls} app-select app-select-dark [&>option]:text-ink`}>
           <option value="">{t('timePlaceholder')}</option>
           {timeRestriction !== 'afternoon' && <option value="오전">{t('timeMorning')}</option>}
           {timeRestriction !== 'morning' && <option value="오후">{t('timeAfternoon')}</option>}
