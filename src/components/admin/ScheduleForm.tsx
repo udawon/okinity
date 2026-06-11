@@ -106,7 +106,7 @@ export default function ScheduleForm({
               value={it.status}
               onChange={(e) => patch(i, { status: e.target.value as Status })}
               disabled={disabled}
-              className={`${inputCls} w-32`}
+              className={`${inputCls} app-select app-select-light w-32`}
             >
               {/* 기존 항목 상태(예약가능/예약많음 등)가 옵션에 없으면 보존용으로 추가 */}
               {!STATUS_OPTS.some((o) => o.value === it.status) && (

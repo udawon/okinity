@@ -3,7 +3,7 @@
 import { useState, useTransition, type FormEvent } from 'react';
 import { updateInquiry } from '@/app/admin/actions';
 import { ACTIVITIES } from '@/components/ocean-home-data';
-import type { Inquiry } from '@/lib/inquiries/types';
+import { splitMedical, MEDICAL_MARKER, type Inquiry } from '@/lib/inquiries/types';
 
 const TIME_OPTS = ['오전', '오후', '종일', '시간 무관'];
 
@@ -33,6 +33,9 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
   const [slug, setSlug] = useState(init.slug);
   const cat = ACTIVITIES.find((a) => a.id === catId);
 
+  // 메디컬 표식을 요청사항과 분리 — textarea엔 순수 요청만, 메디컬은 읽기전용 배지로.
+  const { medicalChecked, request } = splitMedical(inquiry.message);
+
   // 기존 시간값이 표준 옵션에 없으면(직접 입력 등) 보존용으로 추가
   const timeOptions =
     inquiry.time && !TIME_OPTS.includes(inquiry.time) ? [inquiry.time, ...TIME_OPTS] : TIME_OPTS;
@@ -42,6 +45,11 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
     const fd = new FormData(e.currentTarget);
     const tourName = cat?.tours.find((t) => t.slug === slug)?.name ?? '';
     const product = cat ? `${cat.title}${tourName ? ' · ' + tourName : ''}` : '';
+    // 요청사항만 편집하고, 메디컬 표식은 보존(완료였던 건 다시 앞에 붙여 저장).
+    const reqMsg = String(fd.get('message') || '').trim();
+    const message = medicalChecked
+      ? `${MEDICAL_MARKER}${reqMsg ? '\n' + reqMsg : ''}`
+      : reqMsg;
     start(async () => {
       try {
         await updateInquiry(inquiry.id, {
@@ -52,7 +60,7 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
           name: fd.get('name'),
           email: fd.get('email'),
           contact: fd.get('contact'),
-          message: fd.get('message')
+          message
         });
         setOpen(false);
       } catch {
@@ -98,7 +106,7 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
                     setCatId(e.target.value);
                     setSlug('');
                   }}
-                  className={inputCls}
+                  className={`${inputCls} app-select app-select-light`}
                 >
                   <option value="">선택 안 함</option>
                   {ACTIVITIES.map((a) => (
@@ -118,7 +126,7 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
                   value={slug}
                   disabled={!cat}
                   onChange={(e) => setSlug(e.target.value)}
-                  className={`${inputCls} disabled:opacity-50`}
+                  className={`${inputCls} app-select app-select-light disabled:opacity-50`}
                 >
                   <option value="">{cat ? '선택 안 함' : '먼저 투어 종류 선택'}</option>
                   {cat?.tours.map((t) => (
@@ -150,7 +158,7 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
                     id="ei-time"
                     name="time"
                     defaultValue={inquiry.time ?? ''}
-                    className={inputCls}
+                    className={`${inputCls} app-select app-select-light`}
                   >
                     <option value="">선택 안 함</option>
                     {timeOptions.map((t) => (
@@ -217,6 +225,20 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
                 </div>
               </div>
 
+              {/* 메디컬 체크 — 요청사항과 분리한 읽기전용 표시(저장 시 보존). */}
+              <div>
+                <span className={labelCls}>메디컬 체크</span>
+                <div className="mt-1">
+                  {medicalChecked ? (
+                    <span className="inline-block rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                      완료 · 전 항목 확인 (수정해도 유지됩니다)
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted">해당 없음</span>
+                  )}
+                </div>
+              </div>
+
               <div>
                 <label htmlFor="ei-message" className={labelCls}>
                   요청사항
@@ -225,7 +247,8 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
                   id="ei-message"
                   name="message"
                   rows={2}
-                  defaultValue={inquiry.message ?? ''}
+                  defaultValue={request}
+                  placeholder="고객 요청사항"
                   className={`${inputCls} !rounded-card`}
                 />
               </div>

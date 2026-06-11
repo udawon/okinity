@@ -5,7 +5,9 @@ import StatusControl from './StatusControl';
 import DeleteInquiryButton from './DeleteInquiryButton';
 import EditInquiryButton from './EditInquiryButton';
 import MemoCell from './MemoCell';
-import type { Inquiry, InquiryStatus } from '@/lib/inquiries/types';
+import ConfirmedDateCell from './ConfirmedDateCell';
+import { splitMedical, type Inquiry, type InquiryStatus } from '@/lib/inquiries/types';
+import { emptySettlement, type SettlementMap } from '@/lib/inquiry-settlement';
 
 /** 접수 시각(오키나와 JST) → 날짜 YYYY.MM.DD + 시간 HH:MM(24h) 두 줄. */
 function fmtReceived(iso: string): { date: string; time: string } {
@@ -55,7 +57,13 @@ function ContactLink({ contact }: { contact: string }) {
   return <span>{contact}</span>;
 }
 
-export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
+export default function InquiryTable({
+  inquiries,
+  settlements = {}
+}: {
+  inquiries: Inquiry[];
+  settlements?: SettlementMap;
+}) {
   const [filter, setFilter] = useState<'all' | InquiryStatus>('all');
   const [query, setQuery] = useState('');
 
@@ -124,9 +132,11 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
                 <th className="whitespace-nowrap px-4 py-3 font-medium">연락처</th>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">상품</th>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">희망일</th>
+                <th className="whitespace-nowrap px-4 py-3 font-medium">확정일</th>
                 <th className="whitespace-nowrap px-4 py-3 text-center font-medium">시간대</th>
                 <th className="whitespace-nowrap px-4 py-3 text-center font-medium">인원</th>
-                <th className="whitespace-nowrap px-4 py-3 font-medium">메시지</th>
+                <th className="whitespace-nowrap px-4 py-3 text-center font-medium">메디컬</th>
+                <th className="whitespace-nowrap px-4 py-3 font-medium">요청사항</th>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">메모</th>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">상태</th>
                 <th className="whitespace-nowrap px-4 py-3 text-right font-medium">관리</th>
@@ -157,12 +167,24 @@ export default function InquiryTable({ inquiries }: { inquiries: Inquiry[] }) {
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink">{q.product ?? '-'}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink">{q.date ?? '-'}</td>
+                  <td className="whitespace-nowrap px-4 py-3">
+                    <ConfirmedDateCell id={q.id} settlement={settlements[q.id] ?? emptySettlement()} />
+                  </td>
                   <td className="whitespace-nowrap px-4 py-3 text-center text-ink">{q.time ?? '-'}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-center text-ink">
                     {q.people ?? '-'}
                   </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-center">
+                    {splitMedical(q.message).medicalChecked ? (
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                        완료
+                      </span>
+                    ) : (
+                      <span className="text-muted">–</span>
+                    )}
+                  </td>
                   <td className="min-w-[14rem] max-w-md whitespace-normal px-4 py-3 text-muted">
-                    {q.message ?? '-'}
+                    {splitMedical(q.message).request || '-'}
                   </td>
                   <td className="px-4 py-3">
                     <MemoCell id={q.id} note={q.note} />

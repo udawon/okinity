@@ -4,6 +4,21 @@ import { z } from 'zod';
 export const INQUIRY_STATUSES = ['tentative', 'confirmed', 'done', 'canceled'] as const;
 export type InquiryStatus = (typeof INQUIRY_STATUSES)[number];
 
+/**
+ * 메디컬 체크 완료 표식 — 예약 폼이 메시지(요청사항) 앞에 붙이고, 어드민은 이를 떼어내 별도로 표시한다.
+ * (DB 컬럼 추가 없이 메디컬 완료 여부를 보관·복원하기 위한 약속된 접두사)
+ */
+export const MEDICAL_MARKER = '[메디컬 체크 완료 · 전 항목 확인]';
+
+/** 저장된 메시지에서 메디컬 표식을 분리 → { 메디컬 완료 여부, 순수 요청사항 }. */
+export function splitMedical(message?: string): { medicalChecked: boolean; request: string } {
+  const m = (message ?? '').trim();
+  if (m.startsWith(MEDICAL_MARKER)) {
+    return { medicalChecked: true, request: m.slice(MEDICAL_MARKER.length).trim() };
+  }
+  return { medicalChecked: false, request: m };
+}
+
 /** 폼에서 받는 입력 (검증용). API 라우트와 store가 공유. */
 export const NewInquirySchema = z.object({
   product: z.string().max(100).optional(),

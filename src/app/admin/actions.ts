@@ -16,6 +16,12 @@ import {
   NewInquirySchema,
   type InquiryStatus
 } from '@/lib/inquiries';
+import { getSiteContent, setSiteContent, CONTENT_KEYS } from '@/lib/site-content';
+import {
+  InquirySettlementSchema,
+  parseSettlementMap,
+  type InquirySettlement
+} from '@/lib/inquiry-settlement';
 
 export type LoginState = { error?: string };
 
@@ -95,6 +101,36 @@ export async function updateInquiry(id: string, input: unknown): Promise<void> {
   if (!parsed.success) throw new Error('invalid inquiry');
   const store = await getInquiryStore();
   await store.update(id, parsed.data);
+  revalidatePath('/admin');
+  revalidatePath('/admin/board');
+}
+
+/**
+ * 예약 정산(확정일+금액 ₩/¥) 저장 — site_content `inquiry_settlement` 의 해당 id만 read-modify-write.
+ * DB 컬럼 추가 없이 운영자 입력을 보관한다. (확정일은 월별/수익 집계 기준일)
+ */
+export async function saveInquirySettlement(id: string, input: unknown): Promise<void> {
+  await requireAdmin();
+  if (!id || typeof id !== 'string') throw new Error('invalid id');
+  const parsed = InquirySettlementSchema.safeParse(input);
+  if (!parsed.success) throw new Error('invalid settlement');
+  // 확정일은 빈 문자열 또는 YYYY-MM-DD 만 허용
+  const cd = parsed.data.confirmedDate.trim();
+  if (cd && !/^\d{4}-\d{2}-\d{2}$/.test(cd)) throw new Error('invalid date');
+
+  const map = parseSettlementMap(await getSiteContent(CONTENT_KEYS.inquirySettlement));
+  const next: InquirySettlement = {
+    confirmedDate: cd,
+    amountJPY: parsed.data.amountJPY != null ? Math.round(parsed.data.amountJPY) : undefined,
+    amountKRW: parsed.data.amountKRW != null ? Math.round(parsed.data.amountKRW) : undefined
+  };
+  // 모두 비었으면 항목 제거(불필요한 잔재 방지)
+  if (!next.confirmedDate && next.amountJPY == null && next.amountKRW == null) {
+    delete map[id];
+  } else {
+    map[id] = next;
+  }
+  await setSiteContent(CONTENT_KEYS.inquirySettlement, { items: map });
   revalidatePath('/admin');
   revalidatePath('/admin/board');
 }
