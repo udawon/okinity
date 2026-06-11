@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
-import { getTourCatalogEntry, resolveTourDetail, tourHasClasses } from '@/lib/tour';
+import { getTourCatalogEntry, resolveTourDetail, parseFishingClasses, tourHasClasses } from '@/lib/tour';
 import AdminShell from '@/components/admin/AdminShell';
 import TourEditor from '@/components/admin/TourEditor';
+import FishingClassesForm from '@/components/admin/FishingClassesForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,12 @@ export default async function AdminTourEditPage({
   const value = enabled ? await getSiteContent(CONTENT_KEYS.tour(slug)) : null;
   const detail = resolveTourDetail(slug, value);
 
+  // 낚시 투어면 공통 클래스(미들/럭셔리)도 함께 편집 — 단일 키라 4종 전체에 동기화.
+  const showClasses = tourHasClasses(slug);
+  const fishingClasses = showClasses
+    ? parseFishingClasses(enabled ? await getSiteContent(CONTENT_KEYS.fishingClasses) : null)
+    : null;
+
   return (
     <AdminShell title="투어 5종 편집" back={{ href: '/admin/tours', label: '투어 5종 목록' }}>
       <div>
@@ -32,8 +39,9 @@ export default async function AdminTourEditPage({
         </p>
       </div>
 
-      <div className="mt-5">
-        <TourEditor slug={slug} detail={detail} disabled={!enabled} showClasses={tourHasClasses(slug)} />
+      <div className="mt-5 space-y-5">
+        <TourEditor slug={slug} detail={detail} disabled={!enabled} />
+        {fishingClasses && <FishingClassesForm initial={fishingClasses} disabled={!enabled} />}
       </div>
     </AdminShell>
   );

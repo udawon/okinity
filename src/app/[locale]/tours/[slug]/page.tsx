@@ -7,6 +7,7 @@ import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import {
   getTourCatalogEntry,
   resolveTourDetail,
+  parseFishingClasses,
   splitLines,
   tourHasClasses,
   TOUR_NAME_NAV_KEY
@@ -62,6 +63,10 @@ export default async function TourDetailPage({
   const showDetail = detail.published;
   const included = splitLines(detail.included);
   const showClasses = tourHasClasses(slug); // 낚시 투어 → 클래스(미들/럭셔리) 탭 노출
+  // 클래스는 낚시 공통(단일 키) — 모든 낚시 투어가 동일한 미들/럭셔리 콘텐츠를 공유.
+  const fishingClasses = showClasses
+    ? parseFishingClasses(await getSiteContent(CONTENT_KEYS.fishingClasses))
+    : null;
   // 카테고리 허브 페이지가 없으므로(diving·padi는 대표 투어로 redirect) 모든 투어가
   // 홈의 액티비티 섹션으로 일관되게 복귀한다. (이전: 카테고리별로 행선지가 제각각이었음)
   const hubHref = '/#activities';
@@ -144,9 +149,9 @@ export default async function TourDetailPage({
         )}
 
         {/* 낚시 클래스(소분류) 탭 — 미들/럭셔리. 별도 페이지 없이 각 낚시 상세에 상시 노출(공개 여부 무관). */}
-        {showClasses && (
+        {showClasses && fishingClasses && (
           <TourClassTabs
-            classes={detail.classes}
+            classes={fishingClasses}
             accent={entry.accent}
             labels={{
               title: t('classTitle'),

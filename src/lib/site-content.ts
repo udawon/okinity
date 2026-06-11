@@ -22,6 +22,8 @@ export const CONTENT_KEYS = {
   homeTours: 'home_tours',
   /** 하위 투어 상세 콘텐츠. value: TourDetail. 목록은 코드 카탈로그(lib/tour) 고정. */
   tour: (slug: string) => `tour:${slug}`,
+  /** 낚시 공통 클래스(미들/럭셔리). value: TourClasses. 4개 낚시 투어 상세에 공통 적용(동기화). */
+  fishingClasses: 'fishing_classes',
   /** 소개(About) 페이지 콘텐츠. value: AboutContent(lib/about). */
   about: 'about',
   /** 투어별 기준 단가(운영 보드 예상매출용, 고객 비노출). value: { prices: { [slug]: number } } */

@@ -84,10 +84,23 @@ export const TourClassesSchema = z
   .default({ middle: { image: '', description: '' }, luxury: { image: '', description: '' } });
 export type TourClasses = z.infer<typeof TourClassesSchema>;
 
+export function emptyTourClasses(): TourClasses {
+  return { middle: { image: '', description: '' }, luxury: { image: '', description: '' } };
+}
+
+/**
+ * 낚시 클래스(미들/럭셔리)는 투어별이 아니라 **낚시 전체 공통**이다.
+ * site_content `fishing_classes` 단일 키에 저장 → 한 곳에서 수정하면 4개 낚시 투어 상세에 모두 반영(동기화).
+ */
+export function parseFishingClasses(raw: unknown): TourClasses {
+  const parsed = TourClassesSchema.safeParse(raw ?? {});
+  return parsed.success ? parsed.data : emptyTourClasses();
+}
+
 /**
  * 어드민이 등록하는 상세 콘텐츠. site_content `tour:{slug}` 의 value.
  * published=false 면 상세 본문은 비공개(페이지는 기본 정보 + 예약 문의만 노출).
- * classes 는 낚시 투어에서만 사용(미들/럭셔리 클래스 탭).
+ * (클래스(미들/럭셔리)는 투어별이 아닌 낚시 공통이므로 여기 포함하지 않는다 — fishing_classes 키 참조.)
  */
 export const TourDetailSchema = z.object({
   summary: z.string().default(''), // 상단 한 줄 요약
@@ -96,14 +109,9 @@ export const TourDetailSchema = z.object({
   price: z.string().default(''), // 가격 안내
   included: z.string().default(''), // 포함 사항(줄바꿈 구분)
   body: z.string().default(''), // 상세 본문(여러 단락)
-  classes: TourClassesSchema, // 낚시 클래스 탭(미들/럭셔리) — 비낚시 투어는 미사용
   published: z.boolean().default(false)
 });
 export type TourDetail = z.infer<typeof TourDetailSchema>;
-
-export function emptyTourClasses(): TourClasses {
-  return { middle: { image: '', description: '' }, luxury: { image: '', description: '' } };
-}
 
 export function emptyTourDetail(): TourDetail {
   return {
@@ -113,7 +121,6 @@ export function emptyTourDetail(): TourDetail {
     price: '',
     included: '',
     body: '',
-    classes: emptyTourClasses(),
     published: false
   };
 }
