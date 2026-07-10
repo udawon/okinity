@@ -1,4 +1,5 @@
 import { getSchedule, type ScheduleItem } from '@/lib/content';
+import { normalizeScheduleItems } from '@/lib/schedule-range';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import AdminShell from '@/components/admin/AdminShell';
@@ -10,16 +11,19 @@ export default async function AdminSchedulePage() {
   const enabled = isSupabaseEnabled();
   const value = enabled ? await getSiteContent(CONTENT_KEYS.schedule) : null;
   const overrideItems = (value as { items?: unknown } | null)?.items;
+  // 과거 저장분(휴무/오전만/오후만 상태 체계)도 현재 구분으로 자동 변환해 보여준다.
   const defaults: ScheduleItem[] = Array.isArray(overrideItems)
-    ? (overrideItems as ScheduleItem[])
+    ? normalizeScheduleItems(overrideItems)
     : getSchedule();
 
   return (
     <AdminShell title="일정·휴무">
       <p className="mb-4 text-sm text-muted">
-        <strong>휴무일</strong> 등을 지정합니다. <strong>시작일~종료일</strong>로 기간 지정 가능(단일
-        날짜는 종료일 비움). 예약 페이지 달력에 반영되며, 기간 휴무는 <strong>이어진 형태</strong>로
-        표시됩니다. 확정 예약 2건 이상인 날은 자동으로 “예약 많음”으로 표시됩니다.
+        달력에 표시할 일정을 등록합니다. <strong>입력한 내용이 그대로</strong> 홈·예약 달력에
+        표시되고, 구분에 따라 색으로 구분됩니다 — <strong>투어·프로그램</strong>(파랑),{' '}
+        <strong>특별 일정</strong>(노랑), <strong>예약 불가</strong>(빨강 — 휴무·출장 등, 해당 날짜는
+        예약 선택이 막힙니다). <strong>시작일~종료일</strong>로 기간 지정 가능(단일 날짜는 종료일
+        비움)하며, 기간 일정은 이어진 막대로 표시됩니다.
       </p>
       <ScheduleForm defaults={defaults} disabled={!enabled} />
     </AdminShell>

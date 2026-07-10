@@ -4,6 +4,8 @@ import { routing } from '@/i18n/routing';
 import { site } from '@/config/site.config';
 import { localeAlternates } from '@/lib/seo';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
+import { normalizeScheduleItems } from '@/lib/schedule-range';
+import { getGoogleReviews } from '@/lib/google-reviews';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems, publishedSorted, BLOG_CAROUSEL_LIMIT } from '@/lib/blog';
 import {
@@ -54,22 +56,18 @@ export default async function HomePage({
   );
 
   // 일정표 — 어드민이 지정한 일정/휴무만(확정 예약은 공개 일정표에 연동하지 않음).
+  // 과거 저장분(구 status 체계)은 normalize에서 현재 구분으로 변환된다.
   const scheduleOverride = overrides[CONTENT_KEYS.schedule]?.items;
-  const scheduleItems: ScheduleItem[] = (
-    Array.isArray(scheduleOverride) ? (scheduleOverride as ScheduleItem[]) : getSchedule()
-  )
-    .slice()
-    .sort((a, b) => a.date.localeCompare(b.date));
+  const scheduleItems: ScheduleItem[] = Array.isArray(scheduleOverride)
+    ? normalizeScheduleItems(scheduleOverride)
+    : getSchedule();
 
   const schedule = {
     items: scheduleItems,
     statusLabel: {
-      available: tSchedule('statusAvailable'),
-      full: tSchedule('statusFull'),
-      closed: tSchedule('statusClosed'),
-      booked: tSchedule('statusBooked'),
-      morning: tSchedule('statusMorning'),
-      afternoon: tSchedule('statusAfternoon')
+      tour: tSchedule('kindTour'),
+      special: tSchedule('kindSpecial'),
+      blocked: tSchedule('kindBlocked')
     }
   };
 
@@ -166,13 +164,23 @@ export default async function HomePage({
     sameAs: [site.contact.kakaoChannel, site.contact.line].filter(Boolean)
   };
 
+  // 구글맵 후기 — 랜딩 후기 카드 수(3)에 맞춰 별점 높은 순으로. 키 미설정/실패 시 null(기존 후기 표시).
+  const googleReviews = await getGoogleReviews(locale, 3);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <OceanHome posts={posts} locale={locale} schedule={schedule} media={media} content={content} />
+      <OceanHome
+        posts={posts}
+        locale={locale}
+        schedule={schedule}
+        media={media}
+        content={content}
+        googleReviews={googleReviews}
+      />
     </>
   );
 }

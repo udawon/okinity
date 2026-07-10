@@ -29,16 +29,13 @@ export default function ReservationForm({
   lockedDateKey,
   lockedDateLabel,
   scheduled,
-  timeRestriction,
   initialSlug,
   onReset
 }: {
   lockedDateKey?: string;
   lockedDateLabel?: string;
-  /** 선택한 날짜에 이미 예정된 투어(정보 표시용). badge는 '마감' 등 제약만 표기('예약 가능'은 생략). */
-  scheduled?: { program: string; badge?: string }[];
-  /** 운영자 지정 시간대 제한 — 'morning'이면 오전·시간 무관만, 'afternoon'이면 오후·시간 무관만. */
-  timeRestriction?: 'morning' | 'afternoon';
+  /** 선택한 날짜에 이미 예정된 일정(정보 표시용 — 입력 원문 그대로). */
+  scheduled?: { program: string }[];
   /** 투어 상세에서 넘어온 슬러그 — 대분류·중분류를 사전 선택(없거나 매칭 실패 시 빈 값). */
   initialSlug?: string;
   /** 성공 후 동작(예: 플래너에서 날짜 선택 해제). 없으면 폼 내부에서 새 문의로 초기화. */
@@ -62,8 +59,6 @@ export default function ReservationForm({
   const isFishing = cat?.id === 'fishing';
   // 낚시·요트 크루징은 메디컬 체크 불필요(다이빙·스노클링·PADI만 필수).
   const needsMedical = !!cat && cat.id !== 'fishing' && cat.id !== 'yacht';
-  // 예약이 많은(마감 표기) 투어가 있는 날 → 조율 안내 문구로 전환
-  const hasBusy = scheduled?.some((s) => s.badge);
 
   const todayKey = (() => {
     const t = new Date();
@@ -171,17 +166,10 @@ export default function ReservationForm({
                 {scheduled.map((s, i) => (
                   <li key={i} className="flex items-center gap-1.5 text-sm text-white/80">
                     <span>{s.program}</span>
-                    {s.badge && (
-                      <span className="rounded-full bg-[#f2c879]/15 px-2 py-0.5 text-[11px] font-medium text-[#f2c879]">
-                        {s.badge}
-                      </span>
-                    )}
                   </li>
                 ))}
               </ul>
-              <p className="mt-2 text-xs text-white/45">
-                {hasBusy ? t('busyNote') : t('freeNote')}
-              </p>
+              <p className="mt-2 text-xs text-white/45">{t('freeNote')}</p>
             </div>
           )}
         </div>
@@ -270,7 +258,7 @@ export default function ReservationForm({
         </div>
       )}
 
-      {/* 희망 시간대 — 운영자 지정(오전만/오후만)이 있으면 옵션 제한 */}
+      {/* 희망 시간대 */}
       <div className="mt-4">
         <label htmlFor="rf-time" className={labelCls}>
           {t('time')}
@@ -278,18 +266,11 @@ export default function ReservationForm({
         {/* option value는 한국어 고정(운영자가 읽는 값), 표시 라벨만 번역 */}
         <select id="rf-time" name="time" defaultValue="" className={`mt-1.5 ${inputCls} app-select app-select-dark [&>option]:text-ink`}>
           <option value="">{t('timePlaceholder')}</option>
-          {timeRestriction !== 'afternoon' && <option value="오전">{t('timeMorning')}</option>}
-          {timeRestriction !== 'morning' && <option value="오후">{t('timeAfternoon')}</option>}
-          {!timeRestriction && <option value="종일">{t('timeAllDay')}</option>}
+          <option value="오전">{t('timeMorning')}</option>
+          <option value="오후">{t('timeAfternoon')}</option>
+          <option value="종일">{t('timeAllDay')}</option>
           <option value="시간 무관">{t('timeAny')}</option>
         </select>
-        {timeRestriction && (
-          <p className="mt-1 text-[11px] text-[#5fc6ef]">
-            {t('timeRestrictNote', {
-              period: timeRestriction === 'morning' ? t('timeMorning') : t('timeAfternoon')
-            })}
-          </p>
-        )}
       </div>
 
       {/* 인원 */}

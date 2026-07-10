@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
+import { normalizeScheduleItems } from '@/lib/schedule-range';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
@@ -33,21 +34,17 @@ export default async function ReservePage({
   const tr = await getTranslations('reservation');
 
   // 어드민이 지정한 일정/휴무만(확정 예약은 공개 일정표에 연동하지 않음).
+  // 과거 저장분(구 status 체계)은 normalize에서 현재 구분으로 변환된다.
   const override = await getSiteContent(CONTENT_KEYS.schedule);
   const overrideItems = (override as { items?: unknown } | null)?.items;
-  const items: ScheduleItem[] = (
-    Array.isArray(overrideItems) ? (overrideItems as ScheduleItem[]) : getSchedule()
-  )
-    .slice()
-    .sort((a, b) => a.date.localeCompare(b.date));
+  const items: ScheduleItem[] = Array.isArray(overrideItems)
+    ? normalizeScheduleItems(overrideItems)
+    : getSchedule();
 
   const statusLabel: Record<ScheduleItem['status'], string> = {
-    available: t('statusAvailable'),
-    full: t('statusFull'),
-    closed: t('statusClosed'),
-    booked: t('statusBooked'),
-    morning: t('statusMorning'),
-    afternoon: t('statusAfternoon')
+    tour: t('kindTour'),
+    special: t('kindSpecial'),
+    blocked: t('kindBlocked')
   };
 
   return (

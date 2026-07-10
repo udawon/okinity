@@ -53,12 +53,13 @@ export default function MonthBoard({
   inquiries,
   prices,
   todayKey,
-  closedDates
+  blockedDates
 }: {
   inquiries: Inquiry[];
   prices: TourPrices;
   todayKey: string;
-  closedDates: string[];
+  /** 예약 불가 날짜 → 입력 원문 라벨(휴무·장기출장 등) */
+  blockedDates: Record<string, string>;
 }) {
   const [ty, tm] = todayKey.split('-').map(Number);
   const [ym, setYm] = useState({ y: ty, m: tm - 1 }); // m: 0-based
@@ -66,8 +67,6 @@ export default function MonthBoard({
   const [dragOverKey, setDragOverKey] = useState<string | null>(null);
   const [, startMove] = useTransition();
   const router = useRouter();
-
-  const closed = useMemo(() => new Set(closedDates), [closedDates]);
 
   const byDate = useMemo(() => {
     const map = new Map<string, Inquiry[]>();
@@ -174,7 +173,7 @@ export default function MonthBoard({
           const key = dateKey(y, m, day);
           const items = (byDate.get(key) ?? []).slice().sort(byTime);
           const isToday = key === todayKey;
-          const isClosed = closed.has(key);
+          const blockedLabel = blockedDates[key];
           return (
             <div
               key={i}
@@ -194,7 +193,7 @@ export default function MonthBoard({
               className={`min-h-[92px] cursor-pointer p-1.5 transition-colors sm:min-h-[112px] ${
                 dragOverKey === key
                   ? 'bg-brand-light ring-2 ring-inset ring-brand/50'
-                  : isClosed
+                  : blockedLabel
                     ? 'bg-rose-50 hover:bg-rose-100'
                     : 'bg-surface hover:bg-bg/60'
               }`}
@@ -210,9 +209,12 @@ export default function MonthBoard({
                 {items.length > 0 && <span className="text-[10px] text-muted">{items.length}</span>}
               </div>
 
-              {isClosed && (
-                <span className="mt-1 inline-block rounded bg-rose-100 px-1 py-0.5 text-[10px] font-bold text-rose-600">
-                  🚫 휴무
+              {blockedLabel && (
+                <span
+                  title={blockedLabel}
+                  className="mt-1 inline-block max-w-full truncate rounded bg-rose-100 px-1 py-0.5 text-[10px] font-bold text-rose-600"
+                >
+                  🚫 {blockedLabel}
                 </span>
               )}
 

@@ -7,13 +7,12 @@ import { scheduleItemDates } from '@/lib/schedule-range';
 
 type Status = ScheduleItem['status'];
 
-const STATUS: Record<Status, { text: string; dot: string }> = {
-  available: { text: 'text-[#5fc6ef]', dot: 'bg-[#5fc6ef]' },
-  booked: { text: 'text-[#5fc6ef]', dot: 'bg-[#5fc6ef]' }, // 확정 1건 — 터콰이즈
-  full: { text: 'text-[#f2c879]', dot: 'bg-[#f2c879]' }, // 예약많음/확정 2건+ — 베이지
-  closed: { text: 'text-rose-200', dot: 'bg-rose-300/80' },
-  morning: { text: 'text-sky-300', dot: 'bg-sky-300' }, // 오전만 가능
-  afternoon: { text: 'text-violet-300', dot: 'bg-violet-300' } // 오후만 가능
+// 구분별 색 — 입력한 텍스트(program)가 이 색으로 그대로 표시된다.
+// blocked(예약 불가)는 점 대신 붉은 막대로 렌더링(아래 참조).
+const KIND: Record<Status, { text: string; dot: string }> = {
+  tour: { text: 'text-[#5fc6ef]', dot: 'bg-[#5fc6ef]' }, // 투어·프로그램 — 브랜드 블루
+  special: { text: 'text-[#f2c879]', dot: 'bg-[#f2c879]' }, // 특별 일정 — 앰버
+  blocked: { text: 'text-rose-200', dot: 'bg-rose-300/80' } // 예약 불가(휴무·출장 등) — 로즈
 };
 
 // 2024-01-07은 일요일 → 요일 헤더(로케일별)를 일요일 시작으로 생성
@@ -42,15 +41,8 @@ export default function ScheduleCalendar({
   onSelectDate?: (key: string, events: ScheduleItem[]) => void;
 }) {
   const t = useTranslations('reservation');
-  // 셀에 표시할 텍스트 — morning/afternoon은 운영자 지정 시간대 라벨(번역됨), 그 외는 프로그램명.
-  const evLabel = (e: { status: Status; program: string }): string =>
-    e.status === 'morning'
-      ? statusLabel.morning
-      : e.status === 'afternoon'
-        ? statusLabel.afternoon
-        : e.program;
 
-  // 날짜별 이벤트 맵 — 기간 항목(endDate)은 모든 날짜로 전개. 표시용 문자열만 있는 항목은 제외.
+  // 날짜별 이벤트 맵 — 기간 항목(endDate)은 모든 날짜로 전개.
   const byDate = useMemo(() => {
     const map = new Map<string, ScheduleItem[]>();
     for (const it of items) {
@@ -61,10 +53,10 @@ export default function ScheduleCalendar({
     return map;
   }, [items]);
 
-  // 휴무 날짜 집합 — 연속 휴무 표시(연속 구간 시작에만 라벨)용.
-  const closedSet = useMemo(() => {
+  // 예약 불가(blocked) 날짜 집합 — 연속 구간 표시(구간 시작에만 라벨)용.
+  const blockedSet = useMemo(() => {
     const s = new Set<string>();
-    for (const [k, evs] of byDate) if (evs.some((e) => e.status === 'closed')) s.add(k);
+    for (const [k, evs] of byDate) if (evs.some((e) => e.status === 'blocked')) s.add(k);
     return s;
   }, [byDate]);
 
@@ -79,14 +71,11 @@ export default function ScheduleCalendar({
   const prevKey = (key: string) => shiftKey(key, -1);
   const nextKey = (key: string) => shiftKey(key, 1);
 
-  // 초기 월 = 가장 이른 일정의 월(없으면 오늘)
-  const initial = useMemo(() => {
-    const first = [...byDate.keys()].sort()[0];
-    const d = first ? new Date(first) : new Date();
+  // 초기 월 = 오늘의 월 — 시간이 흐르면 달력도 자연히 따라간다(과거 일정 월로 고정 금지).
+  const [{ y, m }, setYM] = useState(() => {
+    const d = new Date();
     return { y: d.getFullYear(), m: d.getMonth() };
-  }, [byDate]);
-
-  const [{ y, m }, setYM] = useState(initial);
+  });
 
   const weekdays = useMemo(() => weekdayLabels(locale), [locale]);
   const monthTitle = new Intl.DateTimeFormat(locale, {
@@ -119,9 +108,9 @@ export default function ScheduleCalendar({
   const navBtn =
     'flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/80 transition-colors hover:border-white/40 hover:text-white';
 
-  // 휴무(closed)·과거만 예약 불가. 프로그램이 있어도 하루 2회+ 투어 여지가 있어 선택 가능.
+  // 예약 불가(blocked)·과거만 예약 불가. 프로그램이 있어도 하루 2회+ 투어 여지가 있어 선택 가능.
   const pick = (key: string, evs: ScheduleItem[]) => {
-    if (selectable && onSelectDate && !evs.some((e) => e.status === 'closed') && key >= todayKey) {
+    if (selectable && onSelectDate && !evs.some((e) => e.status === 'blocked') && key >= todayKey) {
       onSelectDate(key, evs);
     }
   };
@@ -158,18 +147,22 @@ export default function ScheduleCalendar({
           const evs = byDate.get(key) ?? [];
           const isToday = key === todayKey;
           const isSelected = selectedKey === key;
-          // 휴무(closed) 또는 과거만 차단. 프로그램(예약가능/마감)이 있어도 다른 투어 예약 여지가 있으므로 선택 가능.
-          const hasClosed = evs.some((e) => e.status === 'closed');
-          const canBook = selectable && !hasClosed && key >= todayKey;
-          // 연속 휴무: 구간 전체를 가로지르는 막대로 표시. 라벨은 구간 시작에만, 막대는 이어짐.
-          const isClosedRunStart = hasClosed && !closedSet.has(prevKey(key));
-          const isClosedRunEnd = hasClosed && !closedSet.has(nextKey(key));
+          // 예약 불가(blocked) 또는 과거만 차단. 프로그램이 있어도 다른 투어 예약 여지가 있으므로 선택 가능.
+          const blockedEvs = evs.filter((e) => e.status === 'blocked');
+          const hasBlocked = blockedEvs.length > 0;
+          const canBook = selectable && !hasBlocked && key >= todayKey;
+          // 연속 예약 불가: 구간 전체를 가로지르는 막대로 표시.
+          // 라벨은 각 항목의 시작일마다(장기출장→휴무처럼 이어져도 각각 원문 표기), 막대는 이어짐.
+          const isBlockedRunStart = hasBlocked && !blockedSet.has(prevKey(key));
+          const isBlockedRunEnd = hasBlocked && !blockedSet.has(nextKey(key));
+          const startingBlocked =
+            blockedEvs.find((e) => e.date === key) ?? (isBlockedRunStart ? blockedEvs[0] : undefined);
           const col = i % 7; // 0=일 … 6=토 — 주 경계에서도 모서리 둥글게
-          const roundL = isClosedRunStart || col === 0;
-          const roundR = isClosedRunEnd || col === 6;
-          const closedRound =
+          const roundL = isBlockedRunStart || col === 0;
+          const roundR = isBlockedRunEnd || col === 6;
+          const blockedRound =
             roundL && roundR ? 'rounded-md' : roundL ? 'rounded-l-md' : roundR ? 'rounded-r-md' : '';
-          const nonClosed = evs.filter((e) => e.status !== 'closed');
+          const nonBlocked = evs.filter((e) => e.status !== 'blocked');
 
           const dayNum = (
             <span
@@ -181,31 +174,32 @@ export default function ScheduleCalendar({
             </span>
           );
 
-          const eventList = (hasClosed || nonClosed.length > 0) && (
+          const eventList = (hasBlocked || nonBlocked.length > 0) && (
             <div className="mt-1 space-y-1">
-              {hasClosed && (
-                // 셀 좌우 패딩을 음수마진으로 뚫어 칸 끝까지 → 연속 휴무가 막대로 이어져 보임
+              {hasBlocked && (
+                // 셀 좌우 패딩을 음수마진으로 뚫어 칸 끝까지 → 연속 구간이 막대로 이어져 보임
                 <div
-                  className={`-mx-1.5 truncate bg-rose-400/20 px-1.5 py-0.5 text-[10px] font-bold leading-tight text-rose-100 sm:-mx-2 sm:text-[11px] ${closedRound}`}
+                  className={`-mx-1.5 truncate bg-rose-400/20 px-1.5 py-0.5 text-[10px] font-bold leading-tight text-rose-100 sm:-mx-2 sm:text-[11px] ${blockedRound}`}
+                  title={startingBlocked?.program}
                 >
-                  {isClosedRunStart ? (
+                  {startingBlocked ? (
                     <>
                       <span className="hidden sm:inline">🚫 </span>
-                      {statusLabel.closed}
+                      {startingBlocked.program}
                     </>
                   ) : (
-                    '\u00a0'
+                    ' '
                   )}
                 </div>
               )}
-              {nonClosed.map((e, j) => (
+              {nonBlocked.map((e, j) => (
                 <div key={j} className="flex items-center gap-1">
-                  <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS[e.status].dot}`} />
+                  <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${KIND[e.status].dot}`} />
                   <span
-                    className={`truncate text-[10px] leading-tight sm:text-[11px] ${STATUS[e.status].text}`}
-                    title={evLabel(e)}
+                    className={`truncate text-[10px] leading-tight sm:text-[11px] ${KIND[e.status].text}`}
+                    title={e.program}
                   >
-                    {evLabel(e)}
+                    {e.program}
                   </span>
                 </div>
               ))}
@@ -213,12 +207,12 @@ export default function ScheduleCalendar({
           );
 
           // 모든 칸을 상단 정렬(flex-col) — button/div 혼용 시 세로 정렬이 달라지는 문제 방지.
-          // 휴무는 셀 배경도 붉은 톤으로 구분해 한눈에 보이게.
+          // 예약 불가는 셀 배경도 붉은 톤으로 구분해 한눈에 보이게.
           const base = `flex min-h-[72px] flex-col p-1.5 text-left sm:min-h-[96px] sm:p-2 ${
-            hasClosed ? 'bg-rose-950/30' : evs.length ? 'bg-[#0e2c46]/80' : 'bg-[#061522]/70'
+            hasBlocked ? 'bg-rose-950/30' : evs.length ? 'bg-[#0e2c46]/80' : 'bg-[#061522]/70'
           }`;
 
-          // 예약 가능(휴무·과거 제외) → 클릭. 빈 날짜는 '+예약' 힌트, 프로그램 날짜는 일정 표시 + 호버 강조.
+          // 예약 가능(예약 불가·과거 제외) → 클릭. 빈 날짜는 '+예약' 힌트, 프로그램 날짜는 일정 표시 + 호버 강조.
           if (canBook) {
             return (
               <button
@@ -245,7 +239,7 @@ export default function ScheduleCalendar({
             );
           }
 
-          // 휴무(closed) 또는 과거 → 클릭 불가(정보 표시)
+          // 예약 불가(blocked) 또는 과거 → 클릭 불가(정보 표시)
           return (
             <div key={i} className={base}>
               {dayNum}
@@ -255,12 +249,11 @@ export default function ScheduleCalendar({
         })}
       </div>
 
-      {/* 범례 — 운영자가 실제로 지정하는 상태(휴무·오전 가능·오후 가능)만 표시.
-          예약 가능=기본값, 예약 많음=자동이라 셀에 별도로 찍히지 않으므로 범례에서 제외. */}
+      {/* 범례 — 구분 3종(투어·프로그램/특별 일정/예약 불가). 텍스트는 입력한 그대로 표시된다. */}
       <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55">
-        {(['closed', 'morning', 'afternoon'] as Status[]).map((s) => (
+        {(['tour', 'special', 'blocked'] as Status[]).map((s) => (
           <span key={s} className="inline-flex items-center gap-1.5">
-            <span className={`h-2 w-2 rounded-full ${STATUS[s].dot}`} />
+            <span className={`h-2 w-2 rounded-full ${KIND[s].dot}`} />
             {statusLabel[s]}
           </span>
         ))}

@@ -1,8 +1,8 @@
 import { getInquiryStore } from '@/lib/inquiries';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
-import { getSchedule, type ScheduleItem } from '@/lib/content';
+import { getSchedule } from '@/lib/content';
 import { parseTourPrices } from '@/lib/tour-pricing';
-import { closedDateSet } from '@/lib/schedule-range';
+import { normalizeScheduleItems, blockedDateLabels } from '@/lib/schedule-range';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import AdminShell from '@/components/admin/AdminShell';
 import MonthBoard from '@/components/admin/MonthBoard';
@@ -15,14 +15,13 @@ export default async function AdminBoardPage() {
   const inquiries = await store.list();
   const prices = enabled ? parseTourPrices(await getSiteContent(CONTENT_KEYS.tourPrices)) : {};
 
-  // 휴무일(공개 일정표와 동일 출처) — 보드에도 표시
+  // 예약 불가일(공개 일정표와 동일 출처) — 보드에도 입력 원문 라벨로 표시
   const schedVal = enabled ? await getSiteContent(CONTENT_KEYS.schedule) : null;
-  const schedItems = (
-    Array.isArray((schedVal as { items?: unknown } | null)?.items)
-      ? ((schedVal as { items: ScheduleItem[] }).items)
-      : getSchedule()
-  ) as ScheduleItem[];
-  const closedDates = [...closedDateSet(schedItems)]; // 기간 휴무는 모든 날짜로 전개
+  const overrideItems = (schedVal as { items?: unknown } | null)?.items;
+  const schedItems = Array.isArray(overrideItems)
+    ? normalizeScheduleItems(overrideItems)
+    : getSchedule();
+  const blockedDates = blockedDateLabels(schedItems); // 기간 일정은 모든 날짜로 전개
 
   // 오늘(오키나와 JST) 기준 — 서버/클라 동일 문자열 보장
   const todayKey = new Intl.DateTimeFormat('en-CA', {
@@ -39,7 +38,7 @@ export default async function AdminBoardPage() {
         들어갑니다. 카드를 다른 날짜로 끌어 옮길 수도 있어요. 예상매출은 단가×인원으로{' '}
         <strong>고객에게 보이지 않습니다.</strong>
       </p>
-      <MonthBoard inquiries={inquiries} prices={prices} todayKey={todayKey} closedDates={closedDates} />
+      <MonthBoard inquiries={inquiries} prices={prices} todayKey={todayKey} blockedDates={blockedDates} />
     </AdminShell>
   );
 }

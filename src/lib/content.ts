@@ -3,6 +3,7 @@ import path from 'node:path';
 import matter from 'gray-matter';
 import { z } from 'zod';
 import { routing, type Locale } from '@/i18n/routing';
+import { normalizeScheduleItems, type ScheduleItem } from './schedule-range';
 
 /**
  * 콘텐츠 레이어 — 상품 정보를 코드가 아닌 마크다운 파일에서 읽는다.
@@ -183,20 +184,11 @@ export function getGallery(): GalleryItem[] {
   }
 }
 
-// ── 일정표 (예약 가능 일정) ───────────────────────────────────────────
-// content/schedule.json (로케일 공유). status로 상태 표시.
+// ── 일정표 ───────────────────────────────────────────────────────────
+// content/schedule.json (로케일 공유). 모델·정규화는 schedule-range.ts 참조.
+// 구분(tour/special/blocked)별 색으로 표시되며 입력한 텍스트가 그대로 노출된다.
 
-const ScheduleItemSchema = z.object({
-  date: z.string(), // 시작일(ISO YYYY-MM-DD) 또는 표시용 문자열
-  endDate: z.string().optional(), // 종료일(기간 지정 시). 없으면 단일 날짜.
-  program: z.string(),
-  // available 예약가능(기본) · full 예약많음 · closed 휴무 · booked 확정예약(1건)
-  // morning 오전만 가능 · afternoon 오후만 가능 (운영자 지정 — 시간대 제한)
-  status: z
-    .enum(['available', 'full', 'closed', 'booked', 'morning', 'afternoon'])
-    .default('available')
-});
-export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
+export type { ScheduleItem, ScheduleStatus } from './schedule-range';
 
 // (확정 예약은 공개 일정표에 연동하지 않음 — 운영자는 어드민 운영 보드/예약 관리에서만 본다.)
 
@@ -204,8 +196,7 @@ export function getSchedule(): ScheduleItem[] {
   const file = path.join(CONTENT_ROOT, 'schedule.json');
   if (!fs.existsSync(file)) return [];
   try {
-    const items = z.array(ScheduleItemSchema).parse(JSON.parse(fs.readFileSync(file, 'utf8')));
-    return items.sort((a, b) => a.date.localeCompare(b.date));
+    return normalizeScheduleItems(JSON.parse(fs.readFileSync(file, 'utf8')));
   } catch {
     return [];
   }
