@@ -61,14 +61,16 @@ export async function getGoogleReviews(
   try {
     const lang = LANG[locale] ?? 'ko';
     const res = await fetch(
-      `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?languageCode=${lang}`,
+      `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?languageCode=${lang}&regionCode=JP`,
       {
         headers: {
           'X-Goog-Api-Key': key,
           // 필요한 필드만 명시 — '*' 는 최고가 SKU 과금이 되므로 금지
           'X-Goog-FieldMask': 'rating,userRatingCount,googleMapsUri,reviews'
         },
-        next: { revalidate: 86400 } // 24시간 캐시 — 후기 저장(DB 영속)은 하지 않는다
+        // 6시간 캐시 — 새 후기 반영 지연 최소화. 로케일 3개 × 하루 4회 = 월 ~360콜(무료 1,000콜 내).
+        // 후기 저장(DB 영속)은 하지 않는다.
+        next: { revalidate: 21600 }
       }
     );
     if (!res.ok) return null;
