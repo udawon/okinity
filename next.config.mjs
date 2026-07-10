@@ -20,6 +20,7 @@ const nextConfig = {
     const isDev = process.env.NODE_ENV !== 'production';
     // CSP — 실제 사용 origin에 맞춤:
     //  · 이미지/비디오: 로컬(self) + data:/blob: + Supabase Storage 공개 URL
+    //    + 구글 후기 작성자 프로필 사진(lh3 등 *.googleusercontent.com)
     //  · 스타일: 인라인 다수(framer-motion style=, style={}) → 'unsafe-inline'
     //  · 스크립트: Next 부트스트랩 인라인 → 'unsafe-inline' (dev는 HMR용 eval 추가)
     //  · connect: Supabase + (dev) HMR 웹소켓
@@ -28,7 +29,7 @@ const nextConfig = {
       "default-src 'self'",
       `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.supabase.co",
+      "img-src 'self' data: blob: https://*.supabase.co https://*.googleusercontent.com",
       "font-src 'self' data:",
       "media-src 'self' blob: https://*.supabase.co",
       `connect-src 'self' https://*.supabase.co${isDev ? ' ws: http://localhost:*' : ''}`,
