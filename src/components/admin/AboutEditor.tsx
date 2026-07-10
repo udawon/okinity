@@ -14,9 +14,12 @@ const cardCls = 'rounded-card border border-line bg-surface p-5 sm:p-6';
 
 export default function AboutEditor({
   defaults,
+  lang = 'ko',
   disabled = false
 }: {
   defaults: AboutContent;
+  /** 편집 대상 언어(ko/en/ja) — 언어별 키에 저장된다. */
+  lang?: string;
   disabled?: boolean;
 }) {
   const router = useRouter();
@@ -43,19 +46,22 @@ export default function AboutEditor({
 
   async function save() {
     setSaving(true);
-    const res = await saveAbout({
-      eyebrow,
-      title,
-      intro,
-      heroImage,
-      body,
-      strengths: strengths.filter((s) => s.title.trim() || s.desc.trim()),
-      instructorName,
-      instructorRole,
-      instructorPhoto,
-      instructorCerts,
-      instructorBody
-    });
+    const res = await saveAbout(
+      {
+        eyebrow,
+        title,
+        intro,
+        heroImage,
+        body,
+        strengths: strengths.filter((s) => s.title.trim() || s.desc.trim()),
+        instructorName,
+        instructorRole,
+        instructorPhoto,
+        instructorCerts,
+        instructorBody
+      },
+      lang
+    );
     setSaving(false);
     if (res.error) show(res.error, 'err');
     else {

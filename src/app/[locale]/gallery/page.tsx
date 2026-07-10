@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getGallery, type GalleryItem } from '@/lib/content';
-import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
+import { getLocalizedSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { cdnMedia } from '@/lib/media';
 import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
@@ -33,7 +33,8 @@ export default async function GalleryPage({
   const t = await getTranslations('gallery');
 
   // 홈과 동일하게 어드민 갤러리(gallery 키) 업로드를 우선 사용, 없으면 시드(content/gallery.json).
-  const override = await getSiteContent(CONTENT_KEYS.gallery);
+  // 캡션 번역: gallery:en/:ja 키가 있으면 우선(없으면 한국어 폴백).
+  const override = await getLocalizedSiteContent(CONTENT_KEYS.gallery, locale);
   const overrideItems = (override as { items?: unknown } | null)?.items;
   const items: GalleryItem[] = Array.isArray(overrideItems)
     ? (overrideItems as GalleryItem[]).filter(

@@ -3,7 +3,7 @@ import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import Container from '@/components/Container';
-import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
+import { getLocalizedSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import {
   getTourCatalogEntry,
   resolveTourDetail,
@@ -30,9 +30,12 @@ export async function generateMetadata({
   const tNav = await getTranslations({ locale, namespace: 'nav' });
   const navKey = TOUR_NAME_NAV_KEY[slug];
   const tourName = navKey ? tNav(navKey) : entry.name;
-  const detail = resolveTourDetail(slug, await getSiteContent(CONTENT_KEYS.tour(slug)));
-  const description =
-    detail.summary?.trim() || `${tourName} — 오키나와 현지 OKINITY 투어. 일정·가격·예약 안내.`;
+  const detail = resolveTourDetail(
+    slug,
+    await getLocalizedSiteContent(CONTENT_KEYS.tour(slug), locale)
+  );
+  const t = await getTranslations({ locale, namespace: 'tourDetail' });
+  const description = detail.summary?.trim() || t('metaFallback', { name: tourName });
   return {
     title: tourName,
     description,
@@ -58,14 +61,14 @@ export default async function TourDetailPage({
   const tourName = navKey ? tNav(navKey) : entry.name;
   const categoryName = tNav(entry.categoryId);
 
-  const value = await getSiteContent(CONTENT_KEYS.tour(slug));
+  const value = await getLocalizedSiteContent(CONTENT_KEYS.tour(slug), locale);
   const detail = resolveTourDetail(slug, value);
   const showDetail = detail.published;
   const included = splitLines(detail.included);
   const showClasses = tourHasClasses(slug); // 낚시 투어 → 클래스(미들/럭셔리) 탭 노출
   // 클래스는 낚시 공통(단일 키) — 모든 낚시 투어가 동일한 미들/럭셔리 콘텐츠를 공유.
   const fishingClasses = showClasses
-    ? parseFishingClasses(await getSiteContent(CONTENT_KEYS.fishingClasses))
+    ? parseFishingClasses(await getLocalizedSiteContent(CONTENT_KEYS.fishingClasses, locale))
     : null;
   // 카테고리 허브 페이지가 없으므로(diving·padi는 대표 투어로 redirect) 모든 투어가
   // 홈의 액티비티 섹션으로 일관되게 복귀한다. (이전: 카테고리별로 행선지가 제각각이었음)

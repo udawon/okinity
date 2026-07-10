@@ -21,7 +21,14 @@ export type NavItem = {
   children?: NavLeaf[];
   /** 이 항목 뒤에 그룹 구분선을 그린다(헤더 시각 그룹핑). */
   groupEnd?: boolean;
+  /** 한국어 전용 콘텐츠(블로그·공지) — EN/JA 메뉴에서 숨긴다. */
+  koOnly?: boolean;
 };
+
+/** 로케일별 표시 메뉴 — 한국어 전용 항목(koOnly)은 ko에서만 노출. */
+export function navForLocale(locale: string): NavItem[] {
+  return locale === 'ko' ? NAV : NAV.filter((item) => !item.koOnly);
+}
 
 export const NAV: NavItem[] = [
   { key: 'about', href: '/about', groupEnd: true },
@@ -69,6 +76,6 @@ export const NAV: NavItem[] = [
       { tKey: 'tours.yacht.middle', href: '/tours/middle-yacht-cruise' }
     ]
   },
-  { key: 'notice', href: '/notice' },
-  { key: 'blog', href: '/blog' }
+  { key: 'notice', href: '/notice', koOnly: true },
+  { key: 'blog', href: '/blog', koOnly: true }
 ];

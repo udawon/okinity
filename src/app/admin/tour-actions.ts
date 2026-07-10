@@ -3,7 +3,12 @@
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { ADMIN_COOKIE, verifySession } from '@/lib/admin-auth';
-import { setSiteContent, CONTENT_KEYS } from '@/lib/site-content';
+import {
+  setSiteContent,
+  CONTENT_KEYS,
+  localizedContentKey,
+  isContentLocale
+} from '@/lib/site-content';
 import {
   TourDetailSchema,
   TourClassesSchema,
@@ -21,14 +26,19 @@ async function requireAdmin(): Promise<void> {
 
 export type TourActionState = { ok?: boolean; error?: string };
 
-/** 투어 상세 저장(slug 별 단일 키 upsert). 목록은 코드 카탈로그 고정이라 생성/삭제 없음. */
-export async function saveTour(slug: string, input: TourDetail): Promise<TourActionState> {
+/** 투어 상세 저장(slug·언어별 키 upsert). 목록은 코드 카탈로그 고정이라 생성/삭제 없음. */
+export async function saveTour(
+  slug: string,
+  input: TourDetail,
+  lang: string = 'ko'
+): Promise<TourActionState> {
   await requireAdmin();
   if (!getTourCatalogEntry(slug)) return { error: '존재하지 않는 투어입니다.' };
+  if (!isContentLocale(lang)) return { error: '지원하지 않는 언어입니다.' };
   const parsed = TourDetailSchema.safeParse(input);
   if (!parsed.success) return { error: '입력 형식이 올바르지 않습니다.' };
   try {
-    await setSiteContent(CONTENT_KEYS.tour(slug), parsed.data);
+    await setSiteContent(localizedContentKey(CONTENT_KEYS.tour(slug), lang), parsed.data);
     revalidatePath('/', 'layout'); // /tours/[slug]·홈 카드 무효화
     return { ok: true };
   } catch (e) {
@@ -40,12 +50,16 @@ export async function saveTour(slug: string, input: TourDetail): Promise<TourAct
  * 낚시 공통 클래스(미들/럭셔리) 저장 — 단일 키 upsert.
  * 한 번 저장하면 4개 낚시 투어 상세에 모두 반영된다(동기화). 어느 낚시 투어 편집 화면에서 저장해도 동일.
  */
-export async function saveFishingClasses(input: TourClasses): Promise<TourActionState> {
+export async function saveFishingClasses(
+  input: TourClasses,
+  lang: string = 'ko'
+): Promise<TourActionState> {
   await requireAdmin();
+  if (!isContentLocale(lang)) return { error: '지원하지 않는 언어입니다.' };
   const parsed = TourClassesSchema.safeParse(input);
   if (!parsed.success) return { error: '입력 형식이 올바르지 않습니다.' };
   try {
-    await setSiteContent(CONTENT_KEYS.fishingClasses, parsed.data);
+    await setSiteContent(localizedContentKey(CONTENT_KEYS.fishingClasses, lang), parsed.data);
     revalidatePath('/', 'layout'); // 모든 낚시 /tours/[slug] 무효화
     return { ok: true };
   } catch (e) {

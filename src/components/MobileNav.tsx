@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, type Locale } from '@/i18n/routing';
-import { NAV } from '@/config/nav.config';
+import { navForLocale } from '@/config/nav.config';
 import LocaleSwitcher from './LocaleSwitcher';
 
 function MenuIcon({ open }: { open: boolean }) {
@@ -74,7 +74,7 @@ export default function MobileNav({ current }: { current: Locale }) {
       {open && (
         <div className="absolute left-0 right-0 top-16 max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-white/10 bg-[#061522]/95 backdrop-blur-md sm:top-[111px]">
           <nav className="flex flex-col px-5 py-4 text-sm font-medium text-white/80" aria-label="주요 메뉴">
-            {NAV.map((item) =>
+            {navForLocale(current).map((item) =>
               item.children ? (
                 <div key={item.key} className="border-b border-white/10">
                   <button

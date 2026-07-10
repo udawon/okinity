@@ -33,6 +33,30 @@ export const CONTENT_KEYS = {
   product: (slug: string) => `product:${slug}`
 } as const;
 
+// ── 콘텐츠 다국어 ─────────────────────────────────────────────────────
+// ko(기본)는 무접미사 키, en/ja는 `${key}:${locale}` 키에 저장한다.
+// 조회는 로케일 키 우선 → 없으면 기본(ko) 키로 폴백 — 미번역 콘텐츠는 한국어가 보인다.
+
+export const CONTENT_LOCALES = ['ko', 'en', 'ja'] as const;
+export type ContentLocale = (typeof CONTENT_LOCALES)[number];
+
+export function isContentLocale(v: unknown): v is ContentLocale {
+  return typeof v === 'string' && (CONTENT_LOCALES as readonly string[]).includes(v);
+}
+
+/** 로케일별 저장 키. ko는 기존 키 그대로(하위 호환). */
+export function localizedContentKey(key: string, locale: string): string {
+  return locale === 'ko' ? key : `${key}:${locale}`;
+}
+
+/** 로케일 우선 조회 — `${key}:${locale}` 값이 있으면 그것을, 없으면 기본(ko) 키 값으로 폴백. */
+export async function getLocalizedSiteContent(key: string, locale: string): Promise<Json | null> {
+  if (locale === 'ko') return getSiteContent(key);
+  const localized = localizedContentKey(key, locale);
+  const map = await getSiteContentMap([key, localized]);
+  return (map[localized] ?? map[key] ?? null) as Json | null;
+}
+
 /** 여러 키를 한 번에 조회(메인 페이지용). 키 생략 시 전체. */
 export async function getSiteContentMap(keys?: string[]): Promise<Record<string, Json>> {
   const sb = getSupabaseAdmin();

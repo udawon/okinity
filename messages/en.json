@@ -253,7 +253,8 @@
     "classTitle": "Class",
     "classMiddle": "Middle Class",
     "classLuxury": "Luxury Class",
-    "classPreparing": "Details for this class are being prepared. Please get in touch using the button below."
+    "classPreparing": "Details for this class are being prepared. Please get in touch using the button below.",
+    "metaFallback": "{name} — a local OKINITY tour in Okinawa. Schedule, pricing, and booking info."
   },
   "medical": {
     "title": "Medical Check",

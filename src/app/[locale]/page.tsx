@@ -49,11 +49,14 @@ export default async function HomePage({
   const tSchedule = await getTranslations('schedule');
   const overrides = await getSiteContentMap();
 
-  // 블로그("오늘의 오키니티") — 공개글 최신순
-  const posts = publishedSorted(parseBlogItems(overrides[CONTENT_KEYS.blog]?.items)).slice(
-    0,
-    BLOG_CAROUSEL_LIMIT
-  );
+  // 블로그("오늘의 오키니티") — 공개글 최신순. 한국어 콘텐츠 전용이라 EN/JA 홈에서는 섹션 숨김.
+  const posts =
+    locale === 'ko'
+      ? publishedSorted(parseBlogItems(overrides[CONTENT_KEYS.blog]?.items)).slice(
+          0,
+          BLOG_CAROUSEL_LIMIT
+        )
+      : [];
 
   // 일정표 — 어드민이 지정한 일정/휴무만(확정 예약은 공개 일정표에 연동하지 않음).
   // 과거 저장분(구 status 체계)은 normalize에서 현재 구분으로 변환된다.

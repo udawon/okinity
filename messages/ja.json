@@ -253,7 +253,8 @@
     "classTitle": "クラス",
     "classMiddle": "ミドルクラス",
     "classLuxury": "ラグジュアリークラス",
-    "classPreparing": "このクラスの詳細は準備中です。下のボタンよりお問い合わせください。"
+    "classPreparing": "このクラスの詳細は準備中です。下のボタンよりお問い合わせください。",
+    "metaFallback": "{name} — 沖縄現地OKINITYのツアー。日程・料金・予約のご案内。"
   },
   "medical": {
     "title": "メディカルチェック",
