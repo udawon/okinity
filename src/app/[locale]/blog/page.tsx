@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Locale } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
@@ -29,6 +30,8 @@ export default async function BlogListPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  // 블로그·공지는 한국어 콘텐츠 전용 — EN/JA에서는 홈으로 보낸다(메뉴에서도 숨김).
+  if (locale !== 'ko') redirect(`/${locale}`);
   setRequestLocale(locale);
   const t = await getTranslations('blog');
 

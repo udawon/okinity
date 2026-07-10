@@ -19,9 +19,12 @@ const CLASS_LABEL: Record<FishingClassKey, string> = { middle: '미들 클래스
  */
 export default function FishingClassesForm({
   initial,
+  lang = 'ko',
   disabled = false
 }: {
   initial: TourClasses;
+  /** 편집 대상 언어(ko/en/ja) — 언어별 키에 저장된다. */
+  lang?: string;
   disabled?: boolean;
 }) {
   const router = useRouter();
@@ -34,7 +37,7 @@ export default function FishingClassesForm({
 
   async function save() {
     setSaving(true);
-    const res = await saveFishingClasses(classes);
+    const res = await saveFishingClasses(classes, lang);
     setSaving(false);
     if (res.error) show(res.error, 'err');
     else {

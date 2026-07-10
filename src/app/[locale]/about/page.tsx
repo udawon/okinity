@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import Container from '@/components/Container';
-import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
+import { getLocalizedSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseAbout, resolveAbout, splitList } from '@/lib/about';
 import { cdnMedia } from '@/lib/media';
 import { localeAlternates } from '@/lib/seo';
@@ -30,7 +30,10 @@ export default async function AboutPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const about = resolveAbout(parseAbout(await getSiteContent(CONTENT_KEYS.about)));
+  // 로케일 키(about:en 등) 우선, 없으면 한국어(about)로 폴백
+  const about = resolveAbout(
+    parseAbout(await getLocalizedSiteContent(CONTENT_KEYS.about, locale))
+  );
   const titleLines = about.title.split('\n');
   const bodyParas = about.body.split('\n').filter((p) => p.trim());
   const certs = splitList(about.instructorCerts);

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems, excerptOf } from '@/lib/blog';
@@ -42,6 +42,8 @@ export default async function BlogPostPage({
   params: Promise<{ locale: string; id: string }>;
 }) {
   const { locale, id } = await params;
+  // 블로그·공지는 한국어 콘텐츠 전용 — EN/JA에서는 홈으로 보낸다(메뉴에서도 숨김).
+  if (locale !== 'ko') redirect(`/${locale}`);
   setRequestLocale(locale);
 
   const post = await loadPost(id);

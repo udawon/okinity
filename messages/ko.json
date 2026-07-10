@@ -253,7 +253,8 @@
     "classTitle": "클래스",
     "classMiddle": "미들 클래스",
     "classLuxury": "럭셔리 클래스",
-    "classPreparing": "이 클래스의 상세 정보를 준비 중입니다. 아래 버튼으로 문의해 주세요."
+    "classPreparing": "이 클래스의 상세 정보를 준비 중입니다. 아래 버튼으로 문의해 주세요.",
+    "metaFallback": "{name} — 오키나와 현지 OKINITY 투어. 일정·가격·예약 안내."
   },
   "medical": {
     "title": "메디컬 체크",

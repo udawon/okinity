@@ -1015,7 +1015,8 @@ export default function OceanHome({
       <WaveDivider />
       <ActivitiesSection tourImages={media?.tours} copy={content?.tours} />
       <AssuranceSection data={content?.assurances} />
-      <BlogSection posts={posts} locale={locale} />
+      {/* 블로그는 한국어 콘텐츠 전용 — 글이 없으면(EN/JA 홈 포함) 섹션 자체를 숨긴다. ko는 빈 상태 노출 유지. */}
+      {(locale === 'ko' || posts.length > 0) && <BlogSection posts={posts} locale={locale} />}
       <GallerySection images={media?.gallery} />
       <Testimonials data={content?.testimonials} google={googleReviews} />
       <WaveDivider flip />

@@ -1,9 +1,9 @@
 'use client';
 
 import { Fragment, useRef, useState, useId, type KeyboardEvent } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { NAV, type NavItem } from '@/config/nav.config';
+import { navForLocale, type NavItem } from '@/config/nav.config';
 
 function Caret({ open }: { open: boolean }) {
   return (
@@ -114,10 +114,11 @@ function NavDropdown({ item }: { item: NavItem }) {
 
 export default function DesktopNav() {
   const t = useTranslations('nav');
+  const locale = useLocale();
   return (
     <nav className="hidden xl:block" aria-label="주요 메뉴">
       <ul className="flex items-center gap-x-4 text-sm font-medium text-white/70 2xl:gap-x-6">
-        {NAV.map((item) => (
+        {navForLocale(locale).map((item) => (
           <Fragment key={item.key}>
             {item.children ? (
               <NavDropdown item={item} />

@@ -15,10 +15,13 @@ const inputCls =
 export default function TourEditor({
   slug,
   detail,
+  lang = 'ko',
   disabled = false
 }: {
   slug: string;
   detail: TourDetail;
+  /** 편집 대상 언어(ko/en/ja) — 언어별 키에 저장된다. */
+  lang?: string;
   disabled?: boolean;
 }) {
   const router = useRouter();
@@ -34,15 +37,19 @@ export default function TourEditor({
 
   async function save() {
     setSaving(true);
-    const res = await saveTour(slug, {
-      published,
-      summary,
-      heroImage,
-      duration,
-      price,
-      included,
-      body
-    });
+    const res = await saveTour(
+      slug,
+      {
+        published,
+        summary,
+        heroImage,
+        duration,
+        price,
+        included,
+        body
+      },
+      lang
+    );
     setSaving(false);
     if (res.error) show(res.error, 'err');
     else {
