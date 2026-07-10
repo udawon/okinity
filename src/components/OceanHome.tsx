@@ -19,6 +19,7 @@ import type {
   TourCardCopy
 } from '@/lib/home-content';
 import { type ScheduleItem } from '@/lib/content';
+import type { GoogleReviewsData } from '@/lib/google-reviews';
 import BlogCard from '@/components/BlogCard';
 import ReservePlanner from '@/components/ReservePlanner';
 import {
@@ -783,9 +784,9 @@ function GallerySection({ images }: { images?: string[] }) {
 /* ────────────────────────────────────────────────────────────
    TESTIMONIALS
    ──────────────────────────────────────────────────────────── */
-function Testimonials({ data }: { data?: HomeTestimonials }) {
+function Testimonials({ data, google }: { data?: HomeTestimonials; google?: GoogleReviewsData | null }) {
   const t = useTranslations('ocean');
-  // 어드민 오버라이드(내용 있는 항목)가 있으면 그것을, 없으면 i18n 샘플 후기를 렌더.
+  // 우선순위: 구글맵 후기(연동 시) → 어드민 오버라이드 → i18n 샘플 후기.
   const ovItems = (data?.items ?? []).filter((it) => it.quote?.trim() || it.name?.trim());
   const list =
     ovItems.length > 0
@@ -796,6 +797,7 @@ function Testimonials({ data }: { data?: HomeTestimonials }) {
           tour: t(`t${i + 1}Tour`),
           quote: t(`t${i + 1}Quote`)
         }));
+  const useGoogle = !!google && google.reviews.length > 0;
   return (
     <section className="relative py-24 sm:py-28">
       <div className="mx-auto max-w-container px-6">
@@ -808,39 +810,113 @@ function Testimonials({ data }: { data?: HomeTestimonials }) {
               {data?.sectionTitle?.trim() || t('testimonialsTitle')}
             </h2>
           </R>
+          {useGoogle && (
+            <R delay={0.1} className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-white/70">
+              <span className="inline-flex items-center gap-1 font-semibold text-amber-300">
+                <Star className="h-4 w-4" /> {google.rating.toFixed(1)}
+              </span>
+              <span>· {t('googleReviewCount', { count: google.count })}</span>
+              {google.placeUri && (
+                <a
+                  href={google.placeUri}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline decoration-white/30 underline-offset-4 transition-colors hover:text-white"
+                >
+                  {t('googleSeeAll')}
+                </a>
+              )}
+            </R>
+          )}
         </div>
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {list.map((item, i) => (
-            <R key={i} delay={i * 0.1}>
-              <figure className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.04] p-7">
-                <div className="flex gap-0.5 text-amber-300" aria-label={t('ratingAria')}>
-                  {Array.from({ length: 5 }).map((_, s) => (
-                    <Star key={s} className="h-4 w-4" />
-                  ))}
-                </div>
-                <blockquote className="mt-4 flex-1 whitespace-pre-line text-[15px] leading-relaxed text-white/80">
-                  “{item.quote}”
-                </blockquote>
-                <figcaption className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
-                  <span
-                    className="grid h-10 w-10 place-items-center rounded-full bg-cyan-300/15 text-sm font-bold text-cyan-100"
-                    aria-hidden
-                  >
-                    {item.name.slice(0, 1)}
-                  </span>
-                  <span className="text-sm">
-                    <span className="block font-semibold text-white">
-                      {item.name}
-                      {item.city ? ` · ${item.city}` : ''}
+        {useGoogle ? (
+          <div className="mt-14 grid gap-6 lg:grid-cols-3">
+            {google.reviews.map((r, i) => (
+              <R key={i} delay={i * 0.1}>
+                <figure className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.04] p-7">
+                  <div className="flex gap-0.5 text-amber-300" aria-label={t('ratingAria')}>
+                    {Array.from({ length: r.rating }).map((_, s) => (
+                      <Star key={s} className="h-4 w-4" />
+                    ))}
+                  </div>
+                  <blockquote className="mt-4 flex-1 whitespace-pre-line text-[15px] leading-relaxed text-white/80">
+                    {/* 정책: 후기 텍스트는 수정 없이 그대로. 길면 줄임(전문은 구글맵 링크) */}
+                    <span className="line-clamp-6">“{r.text}”</span>
+                  </blockquote>
+                  <figcaption className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
+                    {r.authorPhoto ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- 외부(구글) 프로필 이미지
+                      <img
+                        src={r.authorPhoto}
+                        alt=""
+                        referrerPolicy="no-referrer"
+                        className="h-10 w-10 rounded-full"
+                      />
+                    ) : (
+                      <span
+                        className="grid h-10 w-10 place-items-center rounded-full bg-cyan-300/15 text-sm font-bold text-cyan-100"
+                        aria-hidden
+                      >
+                        {r.authorName.slice(0, 1)}
+                      </span>
+                    )}
+                    <span className="text-sm">
+                      <a
+                        href={r.reviewUri ?? r.authorUri}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block font-semibold text-white hover:underline"
+                      >
+                        {r.authorName}
+                      </a>
+                      <span className="text-white/65">{r.relativeTime}</span>
                     </span>
-                    <span className="text-white/65">{item.tour}</span>
-                  </span>
-                </figcaption>
-              </figure>
-            </R>
-          ))}
-        </div>
+                  </figcaption>
+                </figure>
+              </R>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-14 grid gap-6 lg:grid-cols-3">
+            {list.map((item, i) => (
+              <R key={i} delay={i * 0.1}>
+                <figure className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.04] p-7">
+                  <div className="flex gap-0.5 text-amber-300" aria-label={t('ratingAria')}>
+                    {Array.from({ length: 5 }).map((_, s) => (
+                      <Star key={s} className="h-4 w-4" />
+                    ))}
+                  </div>
+                  <blockquote className="mt-4 flex-1 whitespace-pre-line text-[15px] leading-relaxed text-white/80">
+                    “{item.quote}”
+                  </blockquote>
+                  <figcaption className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
+                    <span
+                      className="grid h-10 w-10 place-items-center rounded-full bg-cyan-300/15 text-sm font-bold text-cyan-100"
+                      aria-hidden
+                    >
+                      {item.name.slice(0, 1)}
+                    </span>
+                    <span className="text-sm">
+                      <span className="block font-semibold text-white">
+                        {item.name}
+                        {item.city ? ` · ${item.city}` : ''}
+                      </span>
+                      <span className="text-white/65">{item.tour}</span>
+                    </span>
+                  </figcaption>
+                </figure>
+              </R>
+            ))}
+          </div>
+        )}
+
+        {useGoogle && (
+          <p className="mt-6 text-center text-xs text-white/45">
+            {/* 정책: 출처(Google) 명시 + 필터 기준 공지 */}
+            {t('googleFilterNote', { min: google.minRating })}
+          </p>
+        )}
       </div>
     </section>
   );
@@ -919,13 +995,16 @@ export default function OceanHome({
   locale,
   schedule,
   media,
-  content
+  content,
+  googleReviews
 }: {
   posts: BlogPost[];
   locale: string;
   schedule: ScheduleData;
   media?: HomeMedia;
   content?: HomeContent;
+  /** 구글맵 후기(서버에서 조회). 있으면 후기 섹션이 이것을 우선 표시. */
+  googleReviews?: GoogleReviewsData | null;
 }) {
   return (
     <div className="relative text-white">
@@ -938,7 +1017,7 @@ export default function OceanHome({
       <AssuranceSection data={content?.assurances} />
       <BlogSection posts={posts} locale={locale} />
       <GallerySection images={media?.gallery} />
-      <Testimonials data={content?.testimonials} />
+      <Testimonials data={content?.testimonials} google={googleReviews} />
       <WaveDivider flip />
       <ReserveSection schedule={schedule} locale={locale} />
     </div>

@@ -40,20 +40,9 @@ export default function ReservePlanner({
       }).format(new Date(selectedKey))
     : '';
 
-  // 선택한 날짜의 확정 예약(booked/full)만 컨텍스트로 전달. '마감'(full)만 뱃지.
-  const scheduled = selected?.events
-    .filter((e) => e.status === 'booked' || e.status === 'full')
-    .map((e) => ({
-      program: e.program,
-      badge: e.status === 'full' ? statusLabel.full : undefined
-    }));
-
-  // 운영자가 지정한 시간대 제한(오전만/오후만) → 예약 폼의 희망 시간대 옵션 제한.
-  const timeRestriction = selected?.events.some((e) => e.status === 'morning')
-    ? 'morning'
-    : selected?.events.some((e) => e.status === 'afternoon')
-      ? 'afternoon'
-      : undefined;
+  // 선택한 날짜에 이미 잡혀 있는 일정(예약 불가 제외 — 그런 날짜는 선택 자체가 안 됨)을
+  // 폼에 정보로 전달. 입력 원문 그대로 보여준다.
+  const scheduled = selected?.events.map((e) => ({ program: e.program }));
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(330px,400px)]">
@@ -90,7 +79,6 @@ export default function ReservePlanner({
               lockedDateKey={selectedKey ?? undefined}
               lockedDateLabel={dateLong}
               scheduled={scheduled}
-              timeRestriction={timeRestriction}
               initialSlug={initialSlug}
               onReset={() => setSelected(null)}
             />
