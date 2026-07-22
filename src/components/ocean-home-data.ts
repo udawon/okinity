@@ -73,7 +73,8 @@ export const ACTIVITIES: Activity[] = [
       { slug: 'specialty-course', name: '스페셜티 라이센스 코스' }
     ],
     image: '/images/ph-4.svg',
-    accent: '#2dd4bf'
+    // 브랜드 스카이블루 — 터콰이즈(#2dd4bf)는 팔레트 결정(2026-06-04, 포카리)상 사용 금지
+    accent: '#5fc6ef'
   },
   {
     id: 'fishing',

@@ -447,7 +447,7 @@ function ActivityCard({ a, image, copy }: { a: Activity; image: string; copy?: T
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#02101e]/75 via-transparent to-transparent" />
         <span
-          className="absolute left-4 top-4 rounded-full bg-[#02101e]/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider backdrop-blur-sm"
+          className="absolute left-4 top-4 rounded-full bg-[#02101e]/55 px-3 py-1 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm"
           style={{ color: a.accent, boxShadow: `inset 0 0 0 1px ${a.accent}66` }}
         >
           {a.kicker}
@@ -467,7 +467,7 @@ function ActivityCard({ a, image, copy }: { a: Activity; image: string; copy?: T
         <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-white/65">{desc}</p>
 
         {/* 하위 투어 */}
-        <p className="mb-1 mt-5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-white/65">
+        <p className="mb-1 mt-5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/65">
           {t('toursLabel')}
           <span
             className="rounded-full px-1.5 py-0.5 text-[10px] tabular-nums"
