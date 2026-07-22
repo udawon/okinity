@@ -42,6 +42,14 @@ export default function ScheduleCalendar({
 }) {
   const t = useTranslations('reservation');
 
+  // EN/JA 표시 라벨 — 운영자 일정 텍스트(program)는 한국어 단일 입력이라, 한글이 포함된
+  // 텍스트는 비한국어 로케일에서 상태별 번역 라벨(statusLabel)로 대체한다. "태풍 휴무" 같은
+  // 안전·운영 정보가 외국인에게 전달되지 않던 문제 해결(2026-07-22 QA ISSUE-001).
+  // 운영자가 영문 등 비한글로 입력하면 그대로 노출된다.
+  const hasHangul = /[가-힣]/;
+  const displayLabel = (e: ScheduleItem) =>
+    locale !== 'ko' && hasHangul.test(e.program) ? statusLabel[e.status] : e.program;
+
   // 날짜별 이벤트 맵 — 기간 항목(endDate)은 모든 날짜로 전개.
   const byDate = useMemo(() => {
     const map = new Map<string, ScheduleItem[]>();
@@ -180,12 +188,12 @@ export default function ScheduleCalendar({
                 // 셀 좌우 패딩을 음수마진으로 뚫어 칸 끝까지 → 연속 구간이 막대로 이어져 보임
                 <div
                   className={`-mx-1.5 truncate bg-rose-400/20 px-1.5 py-0.5 text-[10px] font-bold leading-tight text-rose-100 sm:-mx-2 sm:text-[11px] ${blockedRound}`}
-                  title={startingBlocked?.program}
+                  title={startingBlocked ? displayLabel(startingBlocked) : undefined}
                 >
                   {startingBlocked ? (
                     <>
                       <span className="hidden sm:inline">🚫 </span>
-                      {startingBlocked.program}
+                      {displayLabel(startingBlocked)}
                     </>
                   ) : (
                     ' '
@@ -197,9 +205,9 @@ export default function ScheduleCalendar({
                   <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${KIND[e.status].dot}`} />
                   <span
                     className={`truncate text-[10px] leading-tight sm:text-[11px] ${KIND[e.status].text}`}
-                    title={e.program}
+                    title={displayLabel(e)}
                   >
-                    {e.program}
+                    {displayLabel(e)}
                   </span>
                 </div>
               ))}

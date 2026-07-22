@@ -3,9 +3,10 @@
 import { useEffect, useId, useRef, useState, useTransition } from 'react';
 import { usePathname, useRouter, routing, type Locale } from '@/i18n/routing';
 
+// 선택지 라벨은 언어 이름으로 통일(한국어/English/日本語) — 코드·이름 혼용 방지.
 const LABELS: Record<Locale, string> = {
   ko: '한국어',
-  en: 'EN',
+  en: 'English',
   ja: '日本語'
 };
 // 컴팩트 트리거용 짧은 코드(데스크탑 헤더 폭 절약).

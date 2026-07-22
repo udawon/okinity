@@ -41,8 +41,12 @@ export default function ReservePlanner({
     : '';
 
   // 선택한 날짜에 이미 잡혀 있는 일정(예약 불가 제외 — 그런 날짜는 선택 자체가 안 됨)을
-  // 폼에 정보로 전달. 입력 원문 그대로 보여준다.
-  const scheduled = selected?.events.map((e) => ({ program: e.program }));
+  // 폼에 정보로 전달. 한국어(ko)는 입력 원문 그대로, EN/JA는 한글 포함 텍스트를 상태별
+  // 번역 라벨로 대체(달력 표시 규칙과 동일 — ScheduleCalendar 참조).
+  const scheduled = selected?.events.map((e) => ({
+    program:
+      locale !== 'ko' && /[가-힣]/.test(e.program) ? statusLabel[e.status] : e.program
+  }));
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(330px,400px)]">
