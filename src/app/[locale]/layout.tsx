@@ -66,15 +66,17 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'hero' });
+  const t = await getTranslations({ locale, namespace: 'meta' });
 
   return {
     metadataBase: new URL(site.url),
     title: {
-      default: `${site.name} — ${t('eyebrow')}`,
+      default: t('title'),
       template: `%s | ${site.name}`
     },
-    description: t('subtitle'),
+    description: t('description'),
+    // og:title/description은 명시하지 않는다 — Next가 각 페이지의 최종 title/description을
+    // 폴백으로 쓰므로, 여기 고정하면 하위 페이지 공유 미리보기가 홈 제목으로 오염된다.
     openGraph: {
       type: 'website',
       siteName: site.name,
