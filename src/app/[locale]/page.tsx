@@ -148,11 +148,13 @@ export default async function HomePage({
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: site.name,
+    // 한글·일문 표기 병기 — "오키니티" 검색어와 브랜드를 연결하는 신호
+    alternateName: ['오키니티', 'オキニティ', 'Okinity'],
     url: site.url,
     image: `${site.url}/og-image.png`,
     logo: `${site.url}/icon.png`,
     description:
-      '오키나와 케라마 블루에서 즐기는 현지 체험 다이빙·스노클링·낚시·PADI 투어. OKINITY.',
+      '오키나와 현지 다이빙&투어샵 오키니티(OKINITY). 스노클링·체험다이빙·펀다이빙·라이센스 강습·낚시 투어.',
     telephone: site.phone,
     email: site.contact.email,
     address: {

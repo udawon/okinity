@@ -20,7 +20,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     for (const p of staticPaths) {
       entries.push({
         url: `${site.url}/${locale}${p}`,
-        lastModified: new Date()
+        lastModified: new Date(),
+        // 언어별 대체 URL — 페이지 <head>의 hreflang과 동일한 신호를 사이트맵에도 제공
+        alternates: {
+          languages: Object.fromEntries(
+            routing.locales.map((l) => [l, `${site.url}/${l}${p}`])
+          )
+        }
       });
     }
   }
