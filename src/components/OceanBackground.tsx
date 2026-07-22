@@ -102,9 +102,35 @@ function OceanAmbient() {
 export default function OceanBackground({ videos }: { videos?: OceanVideos }) {
   const pathname = usePathname();
   const [depth, setDepth] = useState(0);
+  // 영상 로드 정책 — 첫 페인트(SSR HTML)에는 <video>를 넣지 않는다. 배경 영상 4개(~26MB)가
+  // 브라우저 프리로드 스캐너에 잡혀 스크롤 전에 전량 다운로드되는 문제 방지
+  // (2026-07-22 벤치마크: 홈 첫 로드 27.6MB 중 영상 21.8MB, 모바일도 동일).
+  // 클라이언트에서 환경 판정 후:
+  //  - 모바일(<768px)·데이터 절약 모드: 영상 미사용('off') — 깊이별 틴트만으로 하강 연출.
+  //    배경 영상은 히어로 자체 영상과 유리 카드 아래 깔려 모바일에서 시각 기여가 작다.
+  //  - 데스크톱: 스크롤로 도달한 깊이까지만 점진 로드('on' + maxDepth). 첫 로드는 surface 1개.
+  const [videoMode, setVideoMode] = useState<'pending' | 'off' | 'on'>('pending');
+  // 도달한 최대 깊이 — 한 번 활성화한 레이어는 언마운트하지 않는다(크로스페이드·역스크롤 대비).
+  const [maxDepth, setMaxDepth] = useState(0);
 
   // 홈(로케일 루트, 예: /ko)만 영상 배경. 그 외 서브 페이지는 정적 앰비언트.
   const isHome = pathname.split('/').filter(Boolean).length <= 1;
+
+  useEffect(() => {
+    if (!isHome) return;
+    const mq = window.matchMedia('(max-width: 767px)');
+    const saveData = Boolean(
+      (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData
+    );
+    const decide = () => setVideoMode(mq.matches || saveData ? 'off' : 'on');
+    decide();
+    mq.addEventListener('change', decide);
+    return () => mq.removeEventListener('change', decide);
+  }, [isHome]);
+
+  useEffect(() => {
+    setMaxDepth((m) => (depth > m ? depth : m));
+  }, [depth]);
 
   useEffect(() => {
     if (!isHome) return; // 서브 페이지는 깊이 스크롤 추적 불필요
@@ -114,7 +140,10 @@ export default function OceanBackground({ videos }: { videos?: OceanVideos }) {
     let raf = 0;
     const compute = () => {
       raf = 0;
-      const secs = Array.from(main.querySelectorAll(':scope > section')) as HTMLElement[];
+      // 주의: ':scope > section'(직계)이 아니라 후손 전체에서 찾는다 — 홈 마크업은
+      // main > (jsonLd script + OceanHome 루트 div) > section 구조라 직계 셀렉터는 항상
+      // 0개를 반환해 깊이 전환이 동작하지 않았다(2026-07-22 수정).
+      const secs = Array.from(main.querySelectorAll('section')) as HTMLElement[];
       if (secs.length === 0) return;
       // 뷰포트 상단에서 40% 지점을 넘은 마지막 섹션을 "현재 섹션"으로 본다.
       const line = window.scrollY + window.innerHeight * 0.4;
@@ -146,22 +175,44 @@ export default function OceanBackground({ videos }: { videos?: OceanVideos }) {
 
   return (
     <div className="fixed inset-0 -z-10 bg-[#061522]" aria-hidden>
-      {layers.map((src, i) =>
-        src ? (
-          <video
-            key={i}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-in-out ${
-              i === depth ? 'opacity-100' : 'opacity-0'
-            }`}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-          >
-            <source src={src} type="video/mp4" />
-          </video>
-        ) : null
+      {/* 활성화(도달)된 깊이까지만 마운트 — 새 깊이 진입 직후 버퍼링 동안에는
+          아래 틴트·배경색이 대신 보이고, 1200ms 크로스페이드가 로드 지연을 가린다. */}
+      {videoMode === 'on' &&
+        layers.map((src, i) =>
+          src && i <= maxDepth ? (
+            <video
+              key={i}
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-in-out ${
+                i === depth ? 'opacity-100' : 'opacity-0'
+              }`}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+            >
+              <source src={src} type="video/mp4" />
+            </video>
+          ) : null
+        )}
+
+      {/* 영상 미사용(모바일·데이터 절약) — 빛기둥·코스틱으로 질감 보강(순수 CSS, 추가 전송량 0).
+          공기방울 입자는 모바일 배터리를 고려해 생략. */}
+      {videoMode === 'off' && (
+        <>
+          <div
+            className="ocean-rays absolute -top-1/4 left-1/2 h-[150%] w-[72%] -translate-x-1/2 mix-blend-screen"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(150,240,255,0.18) 0%, rgba(120,220,240,0.05) 45%, transparent 80%)',
+              filter: 'blur(10px)'
+            }}
+          />
+          <div
+            className="ocean-caustics absolute inset-0 opacity-[0.08] mix-blend-screen"
+            style={{ backgroundImage: CAUSTICS_SVG, backgroundSize: '220px 220px' }}
+          />
+        </>
       )}
 
       {/* 바다색 틴트 (영상 위 / 영상 없을 때 배경) — 깊이별 색 + 부드러운 전환 */}
