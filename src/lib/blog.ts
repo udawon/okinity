@@ -5,7 +5,7 @@ import { z } from 'zod';
  * server-only 의존이 없어 서버 페이지·액션과 클라이언트 에디터 양쪽에서 import 가능.
  *
  * 저장: site_content 키 'blog' → { items: BlogPost[] } (언어 공유, JSONB).
- * 본문은 텍스트/이미지 블록의 순서 배열.
+ * 본문은 텍스트/이미지/영상 블록의 순서 배열.
  */
 
 export const BlogBlockSchema = z.discriminatedUnion('type', [
@@ -13,6 +13,13 @@ export const BlogBlockSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('image'),
     url: z.string().default(''),
+    caption: z.string().optional().default('')
+  }),
+  z.object({
+    type: z.literal('video'),
+    url: z.string().default(''),
+    /** 첫 프레임에서 자동 생성한 썸네일. 있으면 방문자는 재생 전까지 영상을 내려받지 않는다. */
+    poster: z.string().optional().default(''),
     caption: z.string().optional().default('')
   })
 ]);
@@ -64,6 +71,19 @@ export function sortByDateDesc(posts: BlogPost[]): BlogPost[] {
 /** 공개글만 최신순. */
 export function publishedSorted(posts: BlogPost[]): BlogPost[] {
   return sortByDateDesc(posts.filter((p) => p.published));
+}
+
+/**
+ * 카드/목록용 대표 이미지 — 지정 썸네일이 없으면 본문에서 찾는다.
+ * 영상 블록은 원본이 아니라 포스터(첫 프레임)를 쓴다 — 목록에서 영상을 내려받지 않기 위해.
+ */
+export function coverOf(post: BlogPost): string {
+  if (post.thumbnail) return post.thumbnail;
+  for (const b of post.blocks) {
+    if (b.type === 'image' && b.url) return b.url;
+    if (b.type === 'video' && b.poster) return b.poster;
+  }
+  return '';
 }
 
 /** 카드/목록용 본문 요약 — 첫 텍스트 블록을 잘라서. */
