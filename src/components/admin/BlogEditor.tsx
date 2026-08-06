@@ -6,10 +6,17 @@ import { useRouter } from 'next/navigation';
 import { saveBlogPost } from '@/app/admin/blog-actions';
 import { type BlogPost, type BlogBlock } from '@/lib/blog';
 import MediaInput from './MediaInput';
+import { VIDEO_UPLOAD_HINT } from '@/lib/upload-client';
 
 const inputCls =
   'w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted';
 const ctrlBtn = 'rounded border border-line px-2 py-1 text-xs text-muted hover:text-ink disabled:opacity-30';
+
+const BLOCK_LABEL: Record<BlogBlock['type'], string> = {
+  text: '텍스트',
+  image: '이미지',
+  video: '영상'
+};
 
 /** 블로그 글 작성/편집 — 제목·대표이미지·날짜·공개토글 + 텍스트/이미지 블록 에디터. */
 export default function BlogEditor({
@@ -40,6 +47,7 @@ export default function BlogEditor({
   };
   const addText = () => setBlocks([...blocks, { type: 'text', value: '' }]);
   const addImage = () => setBlocks([...blocks, { type: 'image', url: '', caption: '' }]);
+  const addVideo = () => setBlocks([...blocks, { type: 'video', url: '', poster: '', caption: '' }]);
 
   async function save() {
     setSaving(true);
@@ -113,7 +121,7 @@ export default function BlogEditor({
           <div key={i} className="rounded-card border border-line bg-bg/40 p-3">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-xs font-medium uppercase tracking-wide text-muted">
-                {b.type === 'text' ? '텍스트' : '이미지'} #{i + 1}
+                {BLOCK_LABEL[b.type]} #{i + 1}
               </span>
               <div className="flex items-center gap-1">
                 <button type="button" onClick={() => moveBlock(i, -1)} disabled={disabled || i === 0} className={ctrlBtn}>
@@ -147,12 +155,12 @@ export default function BlogEditor({
                 disabled={disabled}
                 className={`${inputCls} resize-y !rounded-card`}
               />
-            ) : (
+            ) : b.type === 'image' ? (
               <div className="space-y-2">
                 <MediaInput
                   prefix="blog"
                   accept="image/*"
-                  defaultUrl={b.url}
+                  value={b.url}
                   disabled={disabled}
                   onChange={(url) => patchBlock(i, { url })}
                 />
@@ -164,6 +172,25 @@ export default function BlogEditor({
                   className={inputCls}
                 />
               </div>
+            ) : (
+              <div className="space-y-2">
+                <MediaInput
+                  prefix="blog"
+                  accept="video/*"
+                  value={b.url}
+                  posterValue={b.poster ?? ''}
+                  disabled={disabled}
+                  onChange={(url, meta) => patchBlock(i, { url, poster: meta?.poster ?? '' })}
+                />
+                <input
+                  value={b.caption ?? ''}
+                  onChange={(e) => patchBlock(i, { caption: e.target.value })}
+                  placeholder="영상 설명 (선택)"
+                  disabled={disabled}
+                  className={inputCls}
+                />
+                <p className="text-xs text-muted">{VIDEO_UPLOAD_HINT}</p>
+              </div>
             )}
           </div>
         ))}
@@ -174,6 +201,9 @@ export default function BlogEditor({
           </button>
           <button type="button" onClick={addImage} disabled={disabled} className={`${ctrlBtn} px-4 py-2 text-sm`}>
             + 이미지
+          </button>
+          <button type="button" onClick={addVideo} disabled={disabled} className={`${ctrlBtn} px-4 py-2 text-sm`}>
+            + 영상
           </button>
         </div>
       </div>

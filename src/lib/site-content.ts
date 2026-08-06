@@ -90,25 +90,31 @@ export async function setSiteContent(key: string, value: Json): Promise<void> {
 }
 
 /**
- * 미디어(이미지·동영상) 업로드 → 공개 URL 반환. 어드민 서버액션 전용.
- * pathPrefix 예) 'hero', 'products', 'gallery'
+ * 미디어(이미지·동영상) 업로드용 서명 URL 발급 → 브라우저가 Supabase로 직접 PUT 한다.
+ * 어드민 서버액션 전용. pathPrefix 예) 'hero', 'blog', 'notice'
+ *
+ * 파일 본문을 서버액션으로 받지 않는 이유: Vercel 서버리스 함수의 요청 본문 한도(4.5MB)에
+ * 걸려 영상은 사실상 업로드가 불가능하다(next.config 의 bodySizeLimit 을 올려도 플랫폼 한도가
+ * 우선). 서명 URL은 토큰이 쿼리에 실려 있어 브라우저에 API 키를 노출하지 않는다.
+ *
+ * 파일명은 매 업로드 고유(타임스탬프-랜덤)라 내용이 불변 — /cdn 프록시가 1년 immutable 캐시를
+ * 입혀도 안전하다(교체 시 새 URL이 생긴다).
  */
-export async function uploadMedia(file: File, pathPrefix: string): Promise<string> {
+export async function createSignedUpload(
+  filename: string,
+  pathPrefix: string
+): Promise<{ uploadUrl: string; publicUrl: string }> {
   const sb = getSupabaseAdmin();
   if (!sb) throw new Error('Supabase가 설정되지 않았습니다.');
-  const safeExt = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '');
-  const objectPath = `${pathPrefix}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${safeExt}`;
-  const { error } = await sb.storage
-    .from(MEDIA_BUCKET)
-    // 파일명이 매 업로드 고유(타임스탬프-랜덤)라 immutable — 1년 캐시로 재방문·재렌더 시 즉시 표시.
-    // (콘텐츠 교체 시엔 새 URL이 생기므로 캐시가 갱신을 막지 않는다.)
-    .upload(objectPath, file, {
-      upsert: false,
-      contentType: file.type || undefined,
-      cacheControl: '31536000'
-    });
-  if (error) throw new Error(`업로드 실패: ${error.message}`);
-  return sb.storage.from(MEDIA_BUCKET).getPublicUrl(objectPath).data.publicUrl;
+  const safeExt = (filename.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const safePrefix = pathPrefix.replace(/[^a-z0-9/_-]/gi, '') || 'misc';
+  const objectPath = `${safePrefix}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${safeExt}`;
+  const { data, error } = await sb.storage.from(MEDIA_BUCKET).createSignedUploadUrl(objectPath);
+  if (error || !data) throw new Error(`업로드 URL 발급 실패: ${error?.message ?? '알 수 없는 오류'}`);
+  return {
+    uploadUrl: data.signedUrl,
+    publicUrl: sb.storage.from(MEDIA_BUCKET).getPublicUrl(objectPath).data.publicUrl
+  };
 }
 
 /** value에서 비어있지 않은 필드만 추려 base 위에 머지(빈 문자열/undefined는 무시). */

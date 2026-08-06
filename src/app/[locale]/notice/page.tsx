@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
-import { parseNoticeItems, publishedNotices, excerptOf } from '@/lib/notice';
+import { parseNoticeItems, publishedNotices, excerptOf, mediaLabel } from '@/lib/notice';
 import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
 
@@ -69,6 +69,12 @@ export default async function NoticeListPage({
                       </span>
                     )}
                     <span>{formatDate(p.date, locale)}</span>
+                    {/* 첨부 여부만 표시 — 목록에서는 미디어를 로드하지 않는다(전송량 0). */}
+                    {mediaLabel(p) && (
+                      <span className="rounded-full border border-white/15 px-2 py-0.5 text-xs text-white/55">
+                        {mediaLabel(p)}
+                      </span>
+                    )}
                   </div>
                   <h2 className="mt-1.5 font-serif text-xl text-white transition-colors group-hover:text-[#a6e0fb] sm:text-2xl">
                     {p.title || '(제목 없음)'}

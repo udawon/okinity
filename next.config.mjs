@@ -10,10 +10,11 @@ const nextConfig = {
     remotePatterns: []
   },
   experimental: {
-    // 미디어 업로드는 Server Action 본문으로 전송된다. 기본 1MB 한도를 상향(12MB).
-    // 이미지는 클라이언트에서 WebP로 자동 압축되어 보통 1MB 미만이라 충분.
-    // 12MB를 넘는 큰 동영상은 어드민의 'URL 직접 입력'으로 외부 호스팅 링크를 사용한다.
-    serverActions: { bodySizeLimit: '12mb' }
+    // 미디어 파일 본문은 더 이상 Server Action 으로 전송되지 않는다(브라우저 → Supabase 직행,
+    // lib/upload-client). Vercel 서버리스 함수의 요청 본문 한도(4.5MB)가 bodySizeLimit 보다
+    // 우선하므로, 예전 방식으로는 영상 업로드가 애초에 불가능했다.
+    // 지금 Server Action 이 나르는 것은 글 본문·블록 URL 같은 JSON 뿐이라 2MB면 충분하다.
+    serverActions: { bodySizeLimit: '2mb' }
   },
   // 보안 응답 헤더 — 모든 경로에 적용.
   async headers() {

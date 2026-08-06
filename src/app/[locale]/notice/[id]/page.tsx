@@ -6,6 +6,7 @@ import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseNoticeItems, excerptOf } from '@/lib/notice';
 import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
+import MediaFigure from '@/components/MediaFigure';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,6 +77,14 @@ export default async function NoticePostPage({
         <div className="mt-10 whitespace-pre-wrap text-base leading-relaxed text-white/85">
           {post.body}
         </div>
+
+        {post.media.length > 0 && (
+          <div className="mt-10 space-y-6">
+            {post.media.map((m, i) => (
+              <MediaFigure key={i} type={m.type} url={m.url} poster={m.poster} caption={m.caption} />
+            ))}
+          </div>
+        )}
       </Container>
     </article>
   );
