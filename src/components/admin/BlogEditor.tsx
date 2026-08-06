@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { saveBlogPost } from '@/app/admin/blog-actions';
 import { type BlogPost, type BlogBlock } from '@/lib/blog';
 import MediaInput from './MediaInput';
+import PreviewLink from './PreviewLink';
 import { VIDEO_UPLOAD_HINT } from '@/lib/upload-client';
 
 const inputCls =
@@ -218,6 +219,7 @@ export default function BlogEditor({
         >
           {saving ? '저장 중…' : '글 저장'}
         </button>
+        <PreviewLink href={`/ko/blog/${post.id}`} />
         <SaveStatusBadge status={status} />
       </div>
     </div>
