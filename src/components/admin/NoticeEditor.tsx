@@ -7,6 +7,7 @@ import { saveNotice } from '@/app/admin/notice-actions';
 import { type NoticePost, type NoticeMedia } from '@/lib/notice';
 import { VIDEO_UPLOAD_HINT } from '@/lib/upload-client';
 import MediaInput from './MediaInput';
+import PreviewLink from './PreviewLink';
 
 const labelCls = 'block text-sm font-medium text-ink';
 const inputCls =
@@ -212,7 +213,7 @@ export default function NoticeEditor({
         )}
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
           onClick={save}
@@ -221,6 +222,7 @@ export default function NoticeEditor({
         >
           {saving ? '저장 중…' : '공지 저장'}
         </button>
+        <PreviewLink href={`/ko/notice/${post.id}`} />
         <SaveStatusBadge status={status} />
       </div>
     </div>

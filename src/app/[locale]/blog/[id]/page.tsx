@@ -5,8 +5,10 @@ import { Link } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems, excerptOf } from '@/lib/blog';
 import { localeAlternates } from '@/lib/seo';
+import { isAdminPreview } from '@/lib/admin-preview';
 import Container from '@/components/Container';
 import MediaFigure from '@/components/MediaFigure';
+import DraftNotice from '@/components/DraftNotice';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,9 +19,16 @@ function formatDate(date: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' }).format(d);
 }
 
+/**
+ * 초안(비공개)은 어드민 로그인 상태에서만 열린다 — 공개 전 미리보기용.
+ * 그 외에는 지금까지와 동일하게 없는 글로 취급한다.
+ */
 async function loadPost(id: string) {
   const value = await getSiteContent(CONTENT_KEYS.blog);
-  return parseBlogItems(value?.items).find((p) => p.id === id && p.published) ?? null;
+  const post = parseBlogItems(value?.items).find((p) => p.id === id) ?? null;
+  if (!post) return null;
+  if (post.published) return post;
+  return (await isAdminPreview()) ? post : null;
 }
 
 export async function generateMetadata({
@@ -32,6 +41,8 @@ export async function generateMetadata({
   return {
     title: post?.title || '블로그',
     description: post ? excerptOf(post) : undefined,
+    // 초안은 어드민에게만 보이지만, 색인 대상이 아님을 명시해 둔다.
+    ...(post && !post.published ? { robots: { index: false, follow: false } } : {}),
     alternates: localeAlternates(locale, `/blog/${id}`)
   };
 }
@@ -52,6 +63,8 @@ export default async function BlogPostPage({
   return (
     <article className="py-16 sm:py-24">
       <Container className="max-w-2xl">
+        {!post.published && <DraftNotice editHref={`/admin/blog/${post.id}`} />}
+
         <Link href="/blog" className="text-sm text-white/55 transition-colors hover:text-white">
           ← 오늘의 오키니티
         </Link>
