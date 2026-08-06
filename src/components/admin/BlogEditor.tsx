@@ -50,15 +50,18 @@ export default function BlogEditor({
   const addImage = () => setBlocks([...blocks, { type: 'image', url: '', caption: '' }]);
   const addVideo = () => setBlocks([...blocks, { type: 'video', url: '', poster: '', caption: '' }]);
 
-  async function save() {
+  /** 저장 성공 여부를 반환한다 — 미리보기가 저장 성공했을 때만 새 탭을 열기 위해. */
+  async function save(): Promise<boolean> {
     setSaving(true);
     const res = await saveBlogPost(post);
     setSaving(false);
-    if (res.error) show(res.error, 'err');
-    else {
-      show('저장되었습니다.');
-      router.refresh();
+    if (res.error) {
+      show(res.error, 'err');
+      return false;
     }
+    show('저장되었습니다.');
+    router.refresh();
+    return true;
   }
 
   return (
@@ -219,7 +222,11 @@ export default function BlogEditor({
         >
           {saving ? '저장 중…' : '글 저장'}
         </button>
-        <PreviewLink href={`/ko/blog/${post.id}`} />
+        <PreviewLink
+          href={`/ko/blog/${post.id}`}
+          onBeforeOpen={save}
+          disabled={disabled || saving}
+        />
         <SaveStatusBadge status={status} />
       </div>
     </div>
