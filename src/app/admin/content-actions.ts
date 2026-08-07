@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { ADMIN_COOKIE, verifySession } from '@/lib/admin-auth';
 import { setSiteContent, createSignedUpload, type Json } from '@/lib/site-content';
+import { UPLOAD_LIMITS } from '@/lib/upload-limits';
 
 /** 서버액션 2차 방어 — 미들웨어 외에 세션 재검증. */
 async function requireAdmin(): Promise<void> {
@@ -28,17 +29,6 @@ export async function saveContent(key: string, value: Json): Promise<SaveState> 
 }
 
 export type SignedUploadState = { uploadUrl?: string; publicUrl?: string; error?: string };
-
-/**
- * 업로드 상한 — 파일 본문이 서버를 거치지 않으므로 플랫폼 한도가 아니라 "방문자 부담" 기준.
- * 영상 50MB: Supabase 프로젝트 기본 파일 상한과도 일치하고, 1080p 1~2분 클립이 들어가는 크기.
- * 그보다 큰 영상은 방문자(특히 모바일)에게 전송량 부담이 커 애초에 올리지 않는 편이 낫다.
- */
-// ('use server' 모듈은 async 함수만 export 할 수 있어 내부 상수로 둔다)
-const UPLOAD_LIMITS = {
-  image: 20 * 1024 * 1024,
-  video: 50 * 1024 * 1024
-} as const;
 
 /**
  * 브라우저 직행 업로드용 서명 URL 발급.
