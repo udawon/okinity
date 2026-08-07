@@ -1,6 +1,8 @@
 'use client';
 
 import { createUploadUrlAction } from '@/app/admin/content-actions';
+import { UPLOAD_LIMITS } from '@/lib/upload-limits';
+import { compressVideoFile } from '@/lib/video-compress';
 
 /**
  * 어드민 미디어 업로드 — 브라우저에서 Supabase Storage 로 직접 전송한다.
@@ -15,7 +17,7 @@ import { createUploadUrlAction } from '@/app/admin/content-actions';
 
 /** 어드민 영상 업로드 안내 — 방문자 전송량을 고려한 권장 사양. */
 export const VIDEO_UPLOAD_HINT =
-  '최대 50MB · 1080p, 1~2분 이내를 권장합니다. 업로드하면 첫 프레임으로 썸네일이 자동 생성되고, 방문자는 재생 버튼을 눌러야 영상을 내려받습니다.';
+  '용량 제한 없이 올릴 수 있습니다 — 50MB를 넘는 영상은 브라우저에서 자동 압축됩니다(화질을 위해 3분 이내 권장). 썸네일은 첫 프레임으로 자동 생성되고, 방문자는 재생 버튼을 눌러야 영상을 내려받습니다.';
 
 /** 이미지 업로드 전 축소·압축(canvas, 무의존). 긴 변을 maxDim으로 제한하고 WebP로 인코딩. */
 export async function compressImage(file: File, maxDim = 2000, quality = 0.82): Promise<File> {
@@ -79,33 +81,49 @@ export async function captureVideoPoster(file: File): Promise<File | null> {
   }
 }
 
-export type UploadResult = { url: string; poster?: string };
+export type UploadResult = { url: string; poster?: string; warning?: string };
+export type UploadStage = 'compress' | 'upload';
 
 /**
  * 파일 하나를 업로드하고 공개 URL을 돌려준다.
  * 이미지는 압축 후 업로드, 영상은 원본 + 자동 생성 포스터를 함께 업로드한다.
+ * 업로드 한도를 넘는 영상은 브라우저에서 자동 압축한다(video-compress.ts) — 몇 분 걸릴 수 있어
+ * onStage 로 "압축 중/업로드 중"을 구분해 알린다.
  *
- * @param onProgress 0~1. 영상+포스터인 경우 영상 전송 진행률을 기준으로 한다.
+ * @param onProgress 0~1. 압축·업로드 각 단계에서 0부터 다시 시작한다(onStage 로 단계 구분).
+ * @param onStage 단계 전환 알림 — 압축이 필요 없는 파일이면 'upload' 만 호출된다.
  */
 export async function uploadMediaFile(
   raw: File,
   prefix: string,
-  onProgress?: (ratio: number) => void
+  onProgress?: (ratio: number) => void,
+  onStage?: (stage: UploadStage) => void
 ): Promise<UploadResult> {
   const isVideo = raw.type.startsWith('video/');
-  const file = isVideo ? raw : await compressImage(raw);
 
-  // 포스터는 영상 업로드와 무관하게 먼저 만들어 둔다(실패해도 영상 업로드는 계속).
+  // 포스터는 영상 압축·업로드와 무관하게 먼저 만들어 둔다(실패해도 영상 업로드는 계속).
   const posterFile = isVideo ? await captureVideoPoster(raw) : null;
 
+  let file = raw;
+  let warning: string | undefined;
+  if (isVideo && raw.size > UPLOAD_LIMITS.video) {
+    onStage?.('compress');
+    const compressed = await compressVideoFile(raw, UPLOAD_LIMITS.video, onProgress);
+    file = compressed.file;
+    warning = compressed.warning;
+  } else if (!isVideo) {
+    file = await compressImage(raw);
+  }
+
+  onStage?.('upload');
   const url = await putFile(file, prefix, onProgress);
-  if (!posterFile) return { url };
+  if (!posterFile) return { url, warning };
 
   try {
     const poster = await putFile(posterFile, `${prefix}/poster`);
-    return { url, poster };
+    return { url, poster, warning };
   } catch {
-    return { url }; // 포스터 실패는 치명적이지 않다 — 영상만으로 진행
+    return { url, warning }; // 포스터 실패는 치명적이지 않다 — 영상만으로 진행
   }
 }
 
