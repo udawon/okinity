@@ -460,8 +460,9 @@ function ActivityCard({ a, image, copy }: { a: Activity; image: string; copy?: T
         </span>
       </div>
 
-      {/* 본문 */}
-      <div className="flex flex-1 flex-col p-6">
+      {/* 본문 — data-nosnippet: 구글이 카드 문구("…투어 구성2" 등 UI 조각)를 검색 스니펫으로
+          발췌하지 않게 막아 meta description이 노출되게 한다(2026-08 스니펫 오염 대응). */}
+      <div data-nosnippet="" className="flex flex-1 flex-col p-6">
         <h3 className="text-balance font-serif text-2xl text-white">{categoryName}</h3>
         <p className="mt-1.5 text-sm font-medium text-white/70">{tagline}</p>
         <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-white/65">{desc}</p>
