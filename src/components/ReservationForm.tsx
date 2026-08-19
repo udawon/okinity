@@ -30,6 +30,7 @@ export default function ReservationForm({
   lockedDateLabel,
   scheduled,
   initialSlug,
+  tourTimes,
   onReset
 }: {
   lockedDateKey?: string;
@@ -38,6 +39,8 @@ export default function ReservationForm({
   scheduled?: { program: string }[];
   /** 투어 상세에서 넘어온 슬러그 — 대분류·중분류를 사전 선택(없거나 매칭 실패 시 빈 값). */
   initialSlug?: string;
+  /** 투어별 가능 시간대(어드민 tour_times 설정, slug → 텍스트 배열). 미설정 투어는 '개별 문의' 안내. */
+  tourTimes?: Record<string, string[]>;
   /** 성공 후 동작(예: 플래너에서 날짜 선택 해제). 없으면 폼 내부에서 새 문의로 초기화. */
   onReset?: () => void;
 }) {
@@ -56,6 +59,8 @@ export default function ReservationForm({
   const formRef = useRef<HTMLFormElement>(null);
 
   const cat = ACTIVITIES.find((a) => a.id === catId);
+  // 선택한 투어의 시간대 옵션 — '개별 문의'는 항상 마지막에 붙는 고정 옵션과 값이 겹치므로 목록에서 제외.
+  const timeOpts = (slug && tourTimes?.[slug]?.filter((tm) => tm !== '개별 문의')) || [];
   const isFishing = cat?.id === 'fishing';
   // 낚시·요트 크루징은 메디컬 체크 불필요(다이빙·스노클링·PADI만 필수).
   const needsMedical = !!cat && cat.id !== 'fishing' && cat.id !== 'yacht';
@@ -258,20 +263,44 @@ export default function ReservationForm({
         </div>
       )}
 
-      {/* 희망 시간대 */}
-      <div className="mt-4">
-        <label htmlFor="rf-time" className={labelCls}>
-          {t('time')}
-        </label>
-        {/* option value는 한국어 고정(운영자가 읽는 값), 표시 라벨만 번역 */}
-        <select id="rf-time" name="time" defaultValue="" className={`mt-1.5 ${inputCls} app-select app-select-dark [&>option]:text-ink`}>
-          <option value="">{t('timePlaceholder')}</option>
-          <option value="오전">{t('timeMorning')}</option>
-          <option value="오후">{t('timeAfternoon')}</option>
-          <option value="종일">{t('timeAllDay')}</option>
-          <option value="시간 무관">{t('timeAny')}</option>
-        </select>
-      </div>
+      {/* 희망 시간대 — 세부 프로그램 선택 후에만 노출. 어드민 설정(tour_times) 시간대가 선택지가 된다 */}
+      {slug && (
+        <div className="mt-4">
+          {timeOpts.length > 0 ? (
+            <>
+              <label htmlFor="rf-time" className={labelCls}>
+                {t('time')}
+              </label>
+              {/* option value는 입력 원문/한국어 고정(운영자가 읽는 값), '개별 문의' 라벨만 번역.
+                  key={slug}로 투어 변경 시 이전 선택이 남지 않게 리셋 */}
+              <select
+                key={slug}
+                id="rf-time"
+                name="time"
+                defaultValue=""
+                className={`mt-1.5 ${inputCls} app-select app-select-dark [&>option]:text-ink`}
+              >
+                <option value="">{t('timePlaceholder')}</option>
+                {timeOpts.map((tm) => (
+                  <option key={tm} value={tm}>
+                    {tm}
+                  </option>
+                ))}
+                <option value="개별 문의">{t('timeAsk')}</option>
+              </select>
+            </>
+          ) : (
+            <>
+              {/* 시간대 미설정 투어 — 개별 안내 문구 + 고정값 전송 */}
+              <span className={labelCls}>{t('time')}</span>
+              <p className="mt-1.5 rounded-button border border-white/15 bg-white/5 px-3 py-2.5 text-sm text-white/70">
+                {t('timeIndividual')}
+              </p>
+              <input type="hidden" name="time" value="개별 문의" />
+            </>
+          )}
+        </div>
+      )}
 
       {/* 인원 */}
       <div className="mt-4">

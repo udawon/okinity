@@ -7,6 +7,7 @@ import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { normalizeScheduleItems } from '@/lib/schedule-range';
 import { getGoogleReviews } from '@/lib/google-reviews';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
+import { parseTourTimes } from '@/lib/tour-times';
 import { parseBlogItems, publishedSorted, BLOG_CAROUSEL_LIMIT } from '@/lib/blog';
 import {
   HOME_CONTENT_KEYS,
@@ -73,6 +74,9 @@ export default async function HomePage({
       blocked: tSchedule('kindBlocked')
     }
   };
+
+  // 투어별 가능 시간대(어드민 설정) — 홈 예약 섹션 폼의 시간대 선택지.
+  const tourTimes = parseTourTimes(overrides[CONTENT_KEYS.tourTimes]);
 
   // 어드민 편집 가능한 미디어(배경영상·투어 카드·갤러리). 비우면 기본값 사용.
   const heroOv = overrides[CONTENT_KEYS.hero] as
@@ -185,6 +189,7 @@ export default async function HomePage({
         media={media}
         content={content}
         googleReviews={googleReviews}
+        tourTimes={tourTimes}
       />
     </>
   );

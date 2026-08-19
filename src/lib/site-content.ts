@@ -30,6 +30,8 @@ export const CONTENT_KEYS = {
   about: 'about',
   /** 투어별 기준 단가(운영 보드 예상매출용, 고객 비노출). value: { prices: { [slug]: number } } */
   tourPrices: 'tour_prices',
+  /** 투어별 가능 시간대(예약 폼 선택지). value: { times: { [slug]: string[] } }. 비면 '개별 문의' 안내. */
+  tourTimes: 'tour_times',
   product: (slug: string) => `product:${slug}`
 } as const;
 

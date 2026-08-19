@@ -5,7 +5,8 @@ import { updateInquiry } from '@/app/admin/actions';
 import { ACTIVITIES } from '@/components/ocean-home-data';
 import { splitMedical, MEDICAL_MARKER, type Inquiry } from '@/lib/inquiries/types';
 
-const TIME_OPTS = ['오전', '오후', '종일', '시간 무관'];
+// 자유 입력 보조 제안 목록 — 과거 표준 옵션 + 투어 시간대 미설정 시 기본값('개별 문의').
+const TIME_SUGGESTIONS = ['개별 문의', '오전', '오후', '종일', '시간 무관'];
 
 /** 기존 product 문자열("대분류 · 세부") → 대분류 id + 세부 slug 역매핑. */
 function parseProduct(product?: string): { catId: string; slug: string } {
@@ -35,10 +36,6 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
 
   // 메디컬 표식을 요청사항과 분리 — textarea엔 순수 요청만, 메디컬은 읽기전용 배지로.
   const { medicalChecked, request } = splitMedical(inquiry.message);
-
-  // 기존 시간값이 표준 옵션에 없으면(직접 입력 등) 보존용으로 추가
-  const timeOptions =
-    inquiry.time && !TIME_OPTS.includes(inquiry.time) ? [inquiry.time, ...TIME_OPTS] : TIME_OPTS;
 
   function save(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -154,19 +151,23 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
                   <label htmlFor="ei-time" className={labelCls}>
                     희망 시간대
                   </label>
-                  <select
+                  {/* 투어별 시간대가 자유 텍스트라 고정 선택 대신 자유 입력(제안 목록 제공).
+                      maxLength는 NewInquirySchema time 상한(40)과 일치 — 초과 시 수정 요청이 검증에 걸린다 */}
+                  <input
                     id="ei-time"
                     name="time"
+                    type="text"
                     defaultValue={inquiry.time ?? ''}
-                    className={`${inputCls} app-select app-select-light`}
-                  >
-                    <option value="">선택 안 함</option>
-                    {timeOptions.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
+                    list="ei-time-suggestions"
+                    maxLength={40}
+                    placeholder="예: 08:00, 개별 문의"
+                    className={inputCls}
+                  />
+                  <datalist id="ei-time-suggestions">
+                    {TIME_SUGGESTIONS.map((t) => (
+                      <option key={t} value={t} />
                     ))}
-                  </select>
+                  </datalist>
                 </div>
               </div>
 

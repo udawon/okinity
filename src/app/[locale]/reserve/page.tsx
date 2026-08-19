@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { normalizeScheduleItems } from '@/lib/schedule-range';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
+import { parseTourTimes } from '@/lib/tour-times';
 import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
 import ReservePlanner from '@/components/ReservePlanner';
@@ -41,6 +42,9 @@ export default async function ReservePage({
     ? normalizeScheduleItems(overrideItems)
     : getSchedule();
 
+  // 투어별 가능 시간대(어드민 설정) — 예약 폼의 시간대 선택지.
+  const tourTimes = parseTourTimes(await getSiteContent(CONTENT_KEYS.tourTimes));
+
   const statusLabel: Record<ScheduleItem['status'], string> = {
     tour: t('kindTour'),
     special: t('kindSpecial'),
@@ -57,6 +61,7 @@ export default async function ReservePage({
             items={items}
             locale={locale}
             statusLabel={statusLabel}
+            tourTimes={tourTimes}
           />
         </div>
       </Container>

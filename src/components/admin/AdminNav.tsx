@@ -10,6 +10,7 @@ const TABS: Tab[] = [
   { href: '/admin', label: '예약 관리', group: 'schedule' },
   { href: '/admin/board', label: '운영 보드', group: 'schedule' },
   { href: '/admin/schedule', label: '일정·휴무', group: 'schedule' },
+  { href: '/admin/tour-times', label: '투어 시간대', group: 'schedule' },
   // 사이트 편집
   { href: '/admin/content', label: '사이트 편집', group: 'site' },
   // 상세 콘텐츠
