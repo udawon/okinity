@@ -17,11 +17,14 @@ type Status = ScheduleItem['status'];
 export default function ReservePlanner({
   items,
   locale,
-  statusLabel
+  statusLabel,
+  tourTimes
 }: {
   items: ScheduleItem[];
   locale: string;
   statusLabel: Record<Status, string>;
+  /** 투어별 가능 시간대(어드민 tour_times 설정) — 예약 폼 시간대 선택지로 전달. */
+  tourTimes?: Record<string, string[]>;
 }) {
   const t = useTranslations('reservation');
   const [selected, setSelected] = useState<{ key: string; events: ScheduleItem[] } | null>(null);
@@ -84,6 +87,7 @@ export default function ReservePlanner({
               lockedDateLabel={dateLong}
               scheduled={scheduled}
               initialSlug={initialSlug}
+              tourTimes={tourTimes}
               onReset={() => setSelected(null)}
             />
           )}

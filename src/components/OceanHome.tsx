@@ -460,8 +460,9 @@ function ActivityCard({ a, image, copy }: { a: Activity; image: string; copy?: T
         </span>
       </div>
 
-      {/* 본문 */}
-      <div className="flex flex-1 flex-col p-6">
+      {/* 본문 — data-nosnippet: 구글이 카드 문구("…투어 구성2" 등 UI 조각)를 검색 스니펫으로
+          발췌하지 않게 막아 meta description이 노출되게 한다(2026-08 스니펫 오염 대응). */}
+      <div data-nosnippet="" className="flex flex-1 flex-col p-6">
         <h3 className="text-balance font-serif text-2xl text-white">{categoryName}</h3>
         <p className="mt-1.5 text-sm font-medium text-white/70">{tagline}</p>
         <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-white/65">{desc}</p>
@@ -925,7 +926,15 @@ function Testimonials({ data, google }: { data?: HomeTestimonials; google?: Goog
 /* ────────────────────────────────────────────────────────────
    RESERVE — 일정표(실제 데이터, 본 사이트 P4) + 예약 CTA 통합. 마지막 섹션.
    ──────────────────────────────────────────────────────────── */
-function ReserveSection({ schedule, locale }: { schedule: ScheduleData; locale: string }) {
+function ReserveSection({
+  schedule,
+  locale,
+  tourTimes
+}: {
+  schedule: ScheduleData;
+  locale: string;
+  tourTimes?: Record<string, string[]>;
+}) {
   const t = useTranslations('ocean');
   return (
     <section className="relative overflow-hidden py-28 sm:py-32">
@@ -959,6 +968,7 @@ function ReserveSection({ schedule, locale }: { schedule: ScheduleData; locale: 
             items={schedule.items}
             locale={locale}
             statusLabel={schedule.statusLabel}
+            tourTimes={tourTimes}
           />
         </R>
       </div>
@@ -996,7 +1006,8 @@ export default function OceanHome({
   schedule,
   media,
   content,
-  googleReviews
+  googleReviews,
+  tourTimes
 }: {
   posts: BlogPost[];
   locale: string;
@@ -1005,6 +1016,8 @@ export default function OceanHome({
   content?: HomeContent;
   /** 구글맵 후기(서버에서 조회). 있으면 후기 섹션이 이것을 우선 표시. */
   googleReviews?: GoogleReviewsData | null;
+  /** 투어별 가능 시간대(어드민 tour_times 설정) — 예약 섹션 폼의 시간대 선택지. */
+  tourTimes?: Record<string, string[]>;
 }) {
   return (
     <div className="relative text-white">
@@ -1020,7 +1033,7 @@ export default function OceanHome({
       <GallerySection images={media?.gallery} />
       <Testimonials data={content?.testimonials} google={googleReviews} />
       <WaveDivider flip />
-      <ReserveSection schedule={schedule} locale={locale} />
+      <ReserveSection schedule={schedule} locale={locale} tourTimes={tourTimes} />
     </div>
   );
 }
