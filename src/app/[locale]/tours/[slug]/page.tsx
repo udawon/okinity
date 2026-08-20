@@ -3,18 +3,25 @@ import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import Container from '@/components/Container';
-import { getLocalizedSiteContent, CONTENT_KEYS } from '@/lib/site-content';
+import {
+  getLocalizedSiteContent,
+  getSiteContentMap,
+  localizedContentKey,
+  CONTENT_KEYS
+} from '@/lib/site-content';
 import {
   getTourCatalogEntry,
   resolveTourDetail,
   parseFishingClasses,
   splitLines,
   tourHasClasses,
+  tourImages,
   TOUR_NAME_NAV_KEY
 } from '@/lib/tour';
 import { cdnMedia } from '@/lib/media';
 import { localeAlternates } from '@/lib/seo';
 import TourClassTabs from '@/components/TourClassTabs';
+import TourPhotoCarousel from '@/components/TourPhotoCarousel';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,8 +68,15 @@ export default async function TourDetailPage({
   const tourName = navKey ? tNav(navKey) : entry.name;
   const categoryName = tNav(entry.categoryId);
 
-  const value = await getLocalizedSiteContent(CONTENT_KEYS.tour(slug), locale);
-  const detail = resolveTourDetail(slug, value);
+  // ko 키와 로케일 키를 한 쿼리로 조회 — 텍스트는 로케일 우선(없으면 ko 폴백, 기존 동작),
+  // 사진(images)은 언어 중립 자산이라 항상 ko 키 값에서 해석한다(ko에서 교체하면 전 언어 즉시 반영).
+  const tourKey = CONTENT_KEYS.tour(slug);
+  const localizedKey = localizedContentKey(tourKey, locale);
+  const contentMap = await getSiteContentMap(
+    locale === 'ko' ? [tourKey] : [tourKey, localizedKey]
+  );
+  const detail = resolveTourDetail(slug, contentMap[localizedKey] ?? contentMap[tourKey] ?? null);
+  const images = tourImages(resolveTourDetail(slug, contentMap[tourKey] ?? null));
   const showDetail = detail.published;
   const included = splitLines(detail.included);
   const showClasses = tourHasClasses(slug); // 낚시 투어 → 클래스(미들/럭셔리) 탭 노출
@@ -86,15 +100,8 @@ export default async function TourDetailPage({
           ← {categoryName}
         </Link>
 
-        {showDetail && detail.heroImage && (
-          <div className="mt-6 overflow-hidden rounded-card border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={cdnMedia(detail.heroImage)}
-              alt={tourName}
-              className="aspect-[16/9] w-full object-cover"
-            />
-          </div>
+        {showDetail && images.length > 0 && (
+          <TourPhotoCarousel images={images.map(cdnMedia)} alt={tourName} />
         )}
 
         <header className="mt-7">

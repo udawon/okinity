@@ -104,7 +104,8 @@ export function parseFishingClasses(raw: unknown): TourClasses {
  */
 export const TourDetailSchema = z.object({
   summary: z.string().default(''), // 상단 한 줄 요약
-  heroImage: z.string().default(''), // 상세 상단 이미지 URL
+  heroImage: z.string().default(''), // (구) 단일 상단 이미지 — images 폴백·어드민 목록 판정용. 저장 시 images[0]과 동기화
+  images: z.array(z.string()).default([]), // 상세 갤러리 사진 URL 목록(첫 장 = 대표). 언어 중립 — 공개 페이지는 ko 키 값만 사용
   duration: z.string().default(''), // 소요 시간
   price: z.string().default(''), // 가격 안내
   included: z.string().default(''), // 포함 사항(줄바꿈 구분)
@@ -117,12 +118,19 @@ export function emptyTourDetail(): TourDetail {
   return {
     summary: '',
     heroImage: '',
+    images: [],
     duration: '',
     price: '',
     included: '',
     body: '',
     published: false
   };
+}
+
+/** 표시용 사진 목록 해석 — images 우선, 비어 있으면 heroImage 1장 폴백(구 데이터 하위 호환). */
+export function tourImages(detail: TourDetail): string[] {
+  if (detail.images.length > 0) return detail.images;
+  return detail.heroImage ? [detail.heroImage] : [];
 }
 
 /** site_content 값을 안전 파싱(실패 시 빈 상세). */
