@@ -37,8 +37,14 @@ export async function saveTour(
   if (!isContentLocale(lang)) return { error: '지원하지 않는 언어입니다.' };
   const parsed = TourDetailSchema.safeParse(input);
   if (!parsed.success) return { error: '입력 형식이 올바르지 않습니다.' };
+  // 대표 사진 동기화 — heroImage 는 구 소비처(어드민 목록 판정·구 데이터 폴백)용으로 images[0] 을 따른다.
+  // 사진은 언어 중립(공개 페이지가 ko 키만 읽음)이라 ko 저장에서만 동기화하고 en/ja 값은 그대로 둔다.
+  const value =
+    lang === 'ko' && parsed.data.images.length > 0
+      ? { ...parsed.data, heroImage: parsed.data.images[0] }
+      : parsed.data;
   try {
-    await setSiteContent(localizedContentKey(CONTENT_KEYS.tour(slug), lang), parsed.data);
+    await setSiteContent(localizedContentKey(CONTENT_KEYS.tour(slug), lang), value);
     revalidatePath('/', 'layout'); // /tours/[slug]·홈 카드 무효화
     return { ok: true };
   } catch (e) {
