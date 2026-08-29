@@ -30,6 +30,7 @@ export default function ReservationForm({
   lockedDateLabel,
   scheduled,
   initialSlug,
+  initialClass,
   tourTimes,
   onReset
 }: {
@@ -39,6 +40,8 @@ export default function ReservationForm({
   scheduled?: { program: string }[];
   /** 투어 상세에서 넘어온 슬러그 — 대분류·중분류를 사전 선택(없거나 매칭 실패 시 빈 값). */
   initialSlug?: string;
+  /** 투어 상세에서 고른 낚시 클래스 — 슬러그가 낚시 투어일 때만 클래스 사전 선택. */
+  initialClass?: FishingClassKey;
   /** 투어별 가능 시간대(어드민 tour_times 설정, slug → 텍스트 배열). 미설정 투어는 '개별 문의' 안내. */
   tourTimes?: Record<string, string[]>;
   /** 성공 후 동작(예: 플래너에서 날짜 선택 해제). 없으면 폼 내부에서 새 문의로 초기화. */
@@ -52,7 +55,9 @@ export default function ReservationForm({
     : undefined;
   const [catId, setCatId] = useState(presetCat?.id ?? '');
   const [slug, setSlug] = useState(presetCat ? (initialSlug as string) : '');
-  const [fishingClass, setFishingClass] = useState<FishingClassKey | ''>('');
+  const [fishingClass, setFishingClass] = useState<FishingClassKey | ''>(
+    presetCat?.id === 'fishing' ? (initialClass ?? '') : ''
+  );
   const [state, setState] = useState<SubmitState>('idle');
   const [done, setDone] = useState<{ product: string; dateLabel: string } | null>(null);
   const [medOpen, setMedOpen] = useState(false);
