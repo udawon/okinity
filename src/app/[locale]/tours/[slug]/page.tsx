@@ -10,6 +10,7 @@ import {
   CONTENT_KEYS
 } from '@/lib/site-content';
 import {
+  classPrice,
   getTourCatalogEntry,
   resolveTourDetail,
   parseFishingClasses,
@@ -20,7 +21,8 @@ import {
 } from '@/lib/tour';
 import { cdnMedia } from '@/lib/media';
 import { localeAlternates } from '@/lib/seo';
-import TourClassTabs from '@/components/TourClassTabs';
+import ReserveCta from '@/components/ReserveCta';
+import TourClassSection from '@/components/TourClassSection';
 import TourPhotoCarousel from '@/components/TourPhotoCarousel';
 
 export const dynamic = 'force-dynamic';
@@ -93,6 +95,34 @@ export default async function TourDetailPage({
     detail.price && { label: t('priceLabel'), value: detail.price }
   ].filter(Boolean) as { label: string; value: string }[];
 
+  // 공통 본문(포함 사항 + 상세 본문) — 낚시는 클래스 구획의 children, 비낚시는 본문 흐름에 그대로.
+  const commonSections = (
+    <>
+      {showDetail && included.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-serif text-xl text-white">{t('includesTitle')}</h2>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {included.map((it) => (
+              <li key={it} className="flex items-center gap-2 text-sm text-white/80">
+                <span
+                  className="h-1.5 w-1.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: entry.accent }}
+                />
+                {it}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {showDetail && detail.body && (
+        <div className="mt-8 whitespace-pre-wrap text-[15px] leading-relaxed text-white/80">
+          {detail.body}
+        </div>
+      )}
+    </>
+  );
+
   return (
     <article className="py-14 sm:py-20">
       <Container className="max-w-3xl [text-shadow:0_2px_14px_rgba(0,0,0,0.55)]">
@@ -119,67 +149,56 @@ export default async function TourDetailPage({
           )}
         </header>
 
-        {showDetail && meta.length > 0 && (
-          <div className="mt-7 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/10 pt-5">
-            {meta.map((m) => (
-              <div key={m.label}>
-                <div className="text-[11px] uppercase tracking-wider text-white/55">{m.label}</div>
-                <div className="mt-0.5 text-sm font-semibold text-white">{m.value}</div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {showDetail && included.length > 0 && (
-          <div className="mt-8">
-            <h2 className="font-serif text-xl text-white">{t('includesTitle')}</h2>
-            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-              {included.map((it) => (
-                <li key={it} className="flex items-center gap-2 text-sm text-white/80">
-                  <span
-                    className="h-1.5 w-1.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: entry.accent }}
-                  />
-                  {it}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {showDetail && detail.body ? (
-          <div className="mt-8 whitespace-pre-wrap text-[15px] leading-relaxed text-white/80">
-            {detail.body}
-          </div>
-        ) : (
-          // 낚시 투어는 아래 클래스 탭이 본문 역할을 하므로 일반 '준비 중' 문구는 생략.
-          !showClasses && (
-            <p className="mt-8 text-[15px] leading-relaxed text-white/65">{t('preparing')}</p>
-          )
-        )}
-
-        {/* 낚시 클래스(소분류) 탭 — 미들/럭셔리. 별도 페이지 없이 각 낚시 상세에 상시 노출(공개 여부 무관). */}
-        {showClasses && fishingClasses && (
-          <TourClassTabs
+        {showClasses && fishingClasses ? (
+          // 낚시: 클래스 선택(미들/럭셔리)이 최상단 — 가격 메타·요트 사진+스펙이 선택에 따라
+          // 전환되고, 선택은 예약 CTA(?class=)까지 이어진다. 구획 자체는 공개 여부 무관 상시 노출.
+          <TourClassSection
             classes={fishingClasses}
+            prices={{
+              middle: classPrice(detail, 'middle'),
+              luxury: classPrice(detail, 'luxury'),
+              fallback: detail.price
+            }}
+            duration={detail.duration}
+            showMeta={showDetail}
+            slug={slug}
             accent={entry.accent}
             labels={{
               title: t('classTitle'),
               middle: t('classMiddle'),
               luxury: t('classLuxury'),
-              preparing: t('classPreparing')
+              preparing: t('classPreparing'),
+              durationLabel: t('durationLabel'),
+              priceLabel: t('priceLabel'),
+              reserveCta: t('reserveCta')
             }}
-          />
-        )}
-
-        <div className="mt-10">
-          <Link
-            href={`/reserve?tour=${slug}`}
-            className="inline-flex items-center gap-2 rounded-full bg-amber-400 px-8 py-4 text-sm font-bold text-[#06202f] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-colors hover:bg-amber-300"
           >
-            {t('reserveCta')}
-          </Link>
-        </div>
+            {commonSections}
+          </TourClassSection>
+        ) : (
+          <>
+            {showDetail && meta.length > 0 && (
+              <div className="mt-7 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/10 pt-5">
+                {meta.map((m) => (
+                  <div key={m.label}>
+                    <div className="text-[11px] uppercase tracking-wider text-white/55">
+                      {m.label}
+                    </div>
+                    <div className="mt-0.5 text-sm font-semibold text-white">{m.value}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {commonSections}
+
+            {!(showDetail && detail.body) && (
+              <p className="mt-8 text-[15px] leading-relaxed text-white/65">{t('preparing')}</p>
+            )}
+
+            <ReserveCta href={`/reserve?tour=${slug}`} label={t('reserveCta')} />
+          </>
+        )}
       </Container>
     </article>
   );

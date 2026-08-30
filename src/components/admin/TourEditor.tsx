@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { saveTour } from '@/app/admin/tour-actions';
-import { type TourDetail } from '@/lib/tour';
+import { tourHasClasses, type TourDetail } from '@/lib/tour';
 import MediaInput from './MediaInput';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
 
@@ -33,6 +33,10 @@ export default function TourEditor({
   );
   const [duration, setDuration] = useState(detail.duration);
   const [price, setPrice] = useState(detail.price);
+  // 낚시 전용 — 클래스별 가격(입력 시 상세 페이지 가격이 클래스 선택에 따라 전환된다).
+  const hasClasses = tourHasClasses(slug);
+  const [priceMiddle, setPriceMiddle] = useState(detail.priceMiddle);
+  const [priceLuxury, setPriceLuxury] = useState(detail.priceLuxury);
   const [included, setIncluded] = useState(detail.included);
   const [body, setBody] = useState(detail.body);
   const [saving, setSaving] = useState(false);
@@ -65,6 +69,8 @@ export default function TourEditor({
         images: lang === 'ko' ? cleanImages : detail.images,
         duration,
         price,
+        priceMiddle,
+        priceLuxury,
         included,
         body
       },
@@ -211,6 +217,43 @@ export default function TourEditor({
             />
           </div>
         </div>
+
+        {hasClasses && (
+          <div className="mt-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className={labelCls} htmlFor="tour-price-middle">
+                  미들 클래스 가격
+                </label>
+                <input
+                  id="tour-price-middle"
+                  value={priceMiddle}
+                  onChange={(e) => setPriceMiddle(e.target.value)}
+                  placeholder="예) 100,000엔"
+                  disabled={disabled}
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label className={labelCls} htmlFor="tour-price-luxury">
+                  럭셔리 클래스 가격
+                </label>
+                <input
+                  id="tour-price-luxury"
+                  value={priceLuxury}
+                  onChange={(e) => setPriceLuxury(e.target.value)}
+                  placeholder="예) 200,000엔"
+                  disabled={disabled}
+                  className={inputCls}
+                />
+              </div>
+            </div>
+            <p className="mt-2 text-xs text-muted">
+              입력 시 상세 페이지 가격이 클래스 선택에 따라 전환됩니다. 비워 두면 위 가격 안내가
+              그대로 노출됩니다.
+            </p>
+          </div>
+        )}
 
         <div className="mt-4">
           <label className={labelCls} htmlFor="tour-included">
