@@ -194,7 +194,7 @@
     "t3City": "Daegu",
     "t3Tour": "8hr Big Game Trolling",
     "reserveTitle": "Check the schedule and book",
-    "reserveIntro": "Check available dates and send an inquiry — we'll reply within 24 hours with a tailored plan and quote."
+    "reserveIntro": "Check available dates and send an inquiry. Add our KakaoTalk channel to receive your tailored plan and quote via KakaoTalk."
   },
   "reservation": {
     "metaTitle": "Reservation",
@@ -236,7 +236,8 @@
     "errorMsg": "Sending failed. Please try again in a moment.",
     "freeConsult": "Pre-booking consultation is free · An inquiry alone does not confirm your reservation",
     "successTitle": "Your inquiry has been received",
-    "successBody": "We'll reply within 24 hours with a tailored plan and quote.",
+    "successBody": "Add our KakaoTalk channel to receive your booking confirmation and quote via KakaoTalk.",
+    "successKakao": "Add KakaoTalk Channel",
     "successAnotherDate": "View another date",
     "successNew": "Write a new inquiry",
     "dateTbd": "Date TBD",
@@ -253,7 +254,7 @@
     "prevPhoto": "Previous photo",
     "nextPhoto": "Next photo",
     "goToPhoto": "View photo {num}",
-    "preparing": "Details are being prepared. Please use the button below to ask about dates and a quote — we'll get back to you within 24 hours.",
+    "preparing": "Details are being prepared. Please use the button below to ask about dates and a quote. Add our KakaoTalk channel and we'll get back to you via KakaoTalk.",
     "reserveCta": "Ask about this tour →",
     "classTitle": "Class",
     "classMiddle": "Middle Class",
