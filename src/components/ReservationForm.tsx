@@ -6,6 +6,7 @@ import { ACTIVITIES } from './ocean-home-data';
 import { TOUR_NAME_NAV_KEY, FISHING_CLASS_KEYS, type FishingClassKey } from '@/lib/tour';
 import { MEDICAL_MARKER } from '@/lib/inquiries/types';
 import MedicalCheckModal from './MedicalCheckModal';
+import { site } from '@/config/site.config';
 
 // 문의 내역(product)에 실리는 클래스 표기 — 운영자가 읽는 한국어 고정값(표시 라벨만 i18n).
 const FISHING_CLASS_PRODUCT: Record<FishingClassKey, string> = {
@@ -146,10 +147,23 @@ export default function ReservationForm({
           <br />
           {t('successBody')}
         </p>
+        {site.contact.kakaoChannel && (
+          <a
+            href={site.contact.kakaoChannel}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#FEE500] px-5 py-2.5 text-sm font-semibold text-[#3C1E1E] transition-opacity hover:opacity-90"
+          >
+            <svg viewBox="0 0 24 24" fill="#3C1E1E" className="h-4 w-4" aria-hidden="true">
+              <path d="M12 4.3C6.9 4.3 2.75 7.5 2.75 11.46c0 2.54 1.7 4.77 4.27 6.03-.19.64-.67 2.3-.77 2.66-.12.45.17.44.35.32.14-.09 2.23-1.5 3.13-2.11.74.11 1.5.16 2.27.16 5.1 0 9.25-3.2 9.25-7.16S17.1 4.3 12 4.3z" />
+            </svg>
+            {t('successKakao')}
+          </a>
+        )}
         <button
           type="button"
           onClick={() => (onReset ? onReset() : reset())}
-          className="mt-6 rounded-full border border-white/20 px-5 py-2 text-sm text-white/80 transition-colors hover:border-white/45 hover:text-white"
+          className="mt-3 rounded-full border border-white/20 px-5 py-2 text-sm text-white/80 transition-colors hover:border-white/45 hover:text-white"
         >
           {onReset ? t('successAnotherDate') : t('successNew')}
         </button>
