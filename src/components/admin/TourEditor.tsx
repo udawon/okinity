@@ -15,6 +15,7 @@ import {
 } from '@/lib/tour';
 import { isRuleSection, parseTourBody } from '@/lib/tour-body';
 import { TOUR_NOTICE_IDS, type TourNoticeId } from '@/lib/tour-notices';
+import { newOptionKey, type TourOption } from '@/lib/tour-options';
 import MediaInput from './MediaInput';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
 
@@ -44,6 +45,9 @@ function toNumber(v: string): number | null {
   return v.trim() && Number.isFinite(n) && n >= 0 ? n : null;
 }
 
+/** 옵션 편집 행 — 숫자 칸은 입력 중 문자열로 들고 있다가 저장할 때 숫자로 바꾼다. */
+type OptionRow = { key: string; name: string; description: string; price: string; min: string };
+
 /**
  * 투어 상세 편집 폼. (목록은 코드 고정)
  * 언어별로 저장되는 글(요약·소요·가격 글·연령·진행 순서·본문 등)과, 한국어 탭에서만 고치는
@@ -53,10 +57,13 @@ export default function TourEditor({
   slug,
   detail,
   lang = 'ko',
+  baseOptions,
   disabled = false
 }: {
   slug: string;
   detail: TourDetail;
+  /** 한국어 저장본의 옵션 — en/ja 탭에서 옵션 목록(요금·순서)의 기준. 이 탭에선 이름·설명만 번역한다. */
+  baseOptions?: TourOption[];
   /** 편집 대상 언어(ko/en/ja) — 언어별 키에 저장된다. */
   lang?: string;
   disabled?: boolean;
@@ -85,6 +92,21 @@ export default function TourEditor({
     detail.priceTiers.map((t) => ({ cls: t.cls, maxPeople: String(t.maxPeople), price: String(t.price) }))
   );
   const [notices, setNotices] = useState<string[]>(detail.notices);
+  // 선택 옵션 — ko 탭은 전부 편집, en/ja 탭은 한국어 옵션 목록 기준으로 이름·설명만 번역.
+  const [options, setOptions] = useState<OptionRow[]>(() =>
+    (isKo ? detail.options : (baseOptions ?? [])).map((o) => {
+      const local = isKo ? o : detail.options.find((x) => x.key === o.key);
+      return {
+        key: o.key,
+        name: local?.name ?? '',
+        description: local?.description ?? '',
+        price: o.pricePerPerson?.toString() ?? '',
+        min: o.minPeople?.toString() ?? ''
+      };
+    })
+  );
+  const patchOption = (i: number, patch: Partial<OptionRow>) =>
+    setOptions((a) => a.map((o, j) => (j === i ? { ...o, ...patch } : o)));
   const [steps, setSteps] = useState<TourStepInput[]>(detail.steps);
   const [included, setIncluded] = useState(detail.included);
   const [body, setBody] = useState(detail.body);
@@ -123,6 +145,28 @@ export default function TourEditor({
       show('요금 구간의 최대 인원과 요금을 숫자로 모두 입력해 주세요.', 'err');
       return;
     }
+    // 옵션: 이름은 필수, 1인 요금·최소 인원은 비우거나 숫자로
+    const optionError = isKo
+      ? options.some((o) => !o.name.trim())
+        ? '옵션 이름을 모두 입력해 주세요. 쓰지 않는 옵션은 삭제해 주세요.'
+        : options.some((o) => o.price.trim() && toNumber(o.price) == null)
+          ? '옵션의 1인 요금은 숫자로 입력해 주세요.'
+          : options.some((o) => o.min.trim() && !/^([1-9]|[1-4]\d|50)$/.test(o.min.trim()))
+            ? '옵션의 최소 인원은 1~50 사이 숫자로 입력해 주세요.'
+            : null
+      : null;
+    if (optionError) {
+      show(optionError, 'err');
+      return;
+    }
+    const cleanOptions: TourOption[] = options.map((o) => ({
+      key: o.key,
+      name: o.name.trim(),
+      description: o.description.trim(),
+      // 요금·최소 인원은 언어 공통(한국어 저장본만 사용) — 번역 탭에는 비워 둔다.
+      pricePerPerson: isKo ? toNumber(o.price) : null,
+      minPeople: isKo && o.min.trim() ? Number(o.min.trim()) : null
+    }));
     setSaving(true);
     const cleanImages = images.map((u) => u.trim()).filter(Boolean);
     const res = await saveTour(
@@ -138,6 +182,7 @@ export default function TourEditor({
         priceSolo: isKo ? toNumber(priceSolo) : detail.priceSolo,
         priceTiers: isKo ? cleanTiers : detail.priceTiers,
         notices: isKo ? notices : detail.notices,
+        options: cleanOptions,
         duration,
         age,
         people,
@@ -441,6 +486,127 @@ export default function TourEditor({
             <p className={hintCls}>요금 숫자는 한국어 탭에서 관리합니다. 모든 언어에 공통으로 적용됩니다.</p>
           )}
         </div>
+
+        {!hasClasses && (
+          <div className="mt-5 rounded-card border border-line bg-bg/40 p-4">
+            <p className="text-sm font-semibold text-ink">
+              선택 옵션 <span className="font-normal text-muted">(선택 입력)</span>
+            </p>
+            <p className={hintCls}>
+              한 투어를 방식별로 나눠 손님이 고르게 해요(예: 일반 / 프라이빗). <b>2개 이상</b> 넣으면 투어 페이지에 옵션
+              카드가, 예약 폼에 옵션 칸이 생겨요. 옵션에 1인 요금을 넣으면 예약 카드는 위 요금 방식 대신
+              “옵션 1인 요금 × 인원”으로 계산하고, 최소 인원보다 적게는 고를 수 없어요. 맨 위 옵션이 처음에 선택돼 있어요.
+            </p>
+            {!isKo && (
+              <p className={hintCls}>
+                이 탭에서는 옵션 이름·설명만 번역해요. 옵션 추가·삭제·순서·요금·최소 인원은 한국어 탭에서 합니다.
+              </p>
+            )}
+            <div className="mt-3 space-y-3">
+              {options.map((o, i) => (
+                <div key={o.key} className="rounded-card border border-line bg-surface p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-ink">
+                      옵션 {i + 1}
+                      {!isKo && baseOptions?.[i] && (
+                        <span className="ml-2 text-xs font-normal text-muted">한국어: {baseOptions[i].name}</span>
+                      )}
+                    </span>
+                    {isKo && (
+                      <div className="flex items-center gap-2">
+                        <button type="button" onClick={() => setOptions((a) => move(a, i, -1))} disabled={disabled || i === 0} aria-label="위로" className={smallBtn}>
+                          ↑
+                        </button>
+                        <button type="button" onClick={() => setOptions((a) => move(a, i, 1))} disabled={disabled || i === options.length - 1} aria-label="아래로" className={smallBtn}>
+                          ↓
+                        </button>
+                        <button type="button" onClick={() => setOptions((a) => a.filter((_, j) => j !== i))} disabled={disabled} className="text-sm text-red-600 hover:underline disabled:opacity-50">
+                          삭제
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className={`mt-2 grid gap-3 ${isKo ? 'sm:grid-cols-[minmax(0,1fr)_8rem_6rem]' : ''}`}>
+                    <div>
+                      <label className="block text-xs font-medium text-muted" htmlFor={`opt-name-${o.key}`}>
+                        이름
+                      </label>
+                      <input
+                        id={`opt-name-${o.key}`}
+                        value={o.name}
+                        onChange={(e) => patchOption(i, { name: e.target.value })}
+                        placeholder={isKo ? '예) 일반' : baseOptions?.[i]?.name}
+                        disabled={disabled}
+                        className={inputCls}
+                      />
+                    </div>
+                    {isKo && (
+                      <>
+                        <div>
+                          <label className="block text-xs font-medium text-muted" htmlFor={`opt-price-${o.key}`}>
+                            1인 요금(엔)
+                          </label>
+                          <input
+                            id={`opt-price-${o.key}`}
+                            inputMode="numeric"
+                            value={o.price}
+                            onChange={(e) => patchOption(i, { price: e.target.value })}
+                            placeholder="6000"
+                            disabled={disabled}
+                            className={inputCls}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-muted" htmlFor={`opt-min-${o.key}`}>
+                            최소 인원
+                          </label>
+                          <input
+                            id={`opt-min-${o.key}`}
+                            inputMode="numeric"
+                            value={o.min}
+                            onChange={(e) => patchOption(i, { min: e.target.value })}
+                            placeholder="1"
+                            disabled={disabled}
+                            className={inputCls}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div className="mt-3">
+                    <label className="block text-xs font-medium text-muted" htmlFor={`opt-desc-${o.key}`}>
+                      설명 <span className="font-normal">(줄마다 한 항목)</span>
+                    </label>
+                    <textarea
+                      id={`opt-desc-${o.key}`}
+                      value={o.description}
+                      onChange={(e) => patchOption(i, { description: e.target.value })}
+                      placeholder={isKo ? '예) 다른 팀과 함께 탑승\n가장 합리적인 요금' : baseOptions?.[i]?.description}
+                      rows={2}
+                      disabled={disabled}
+                      className={`${inputCls} resize-y !rounded-card`}
+                    />
+                  </div>
+                </div>
+              ))}
+              {isKo && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setOptions((a) => [...a, { key: newOptionKey(a.map((o) => o.key)), name: '', description: '', price: '', min: '' }])
+                  }
+                  disabled={disabled}
+                  className="rounded-button border border-line bg-surface px-4 py-2 text-sm text-ink hover:border-brand disabled:opacity-50"
+                >
+                  + 옵션 추가
+                </button>
+              )}
+              {!isKo && options.length === 0 && (
+                <p className="text-xs text-muted">한국어 탭에 등록된 옵션이 없어요.</p>
+              )}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* ── 포함 사항 · 진행 순서 ── */}

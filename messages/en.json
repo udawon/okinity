@@ -245,7 +245,12 @@
     "classLabel": "Class",
     "classPlaceholder": "Select a class (Middle · Luxury)",
     "classMiddle": "Middle Class",
-    "classLuxury": "Luxury Class"
+    "classLuxury": "Luxury Class",
+    "optionLabel": "Option",
+    "optionPlaceholder": "Select an option",
+    "optionPerPerson": "{price} per person",
+    "optionFrom": "{n, plural, one {from # guest} other {from # guests}}",
+    "optionMinHint": "The {name} option needs at least {n} guests."
   },
   "tourDetail": {
     "includesTitle": "What's included",
@@ -295,7 +300,13 @@
     "bookCta": "Ask about this tour",
     "bookKakao": "Ask us on KakaoTalk",
     "bookNote": "Sending an inquiry does not confirm your booking. We will confirm via our KakaoTalk channel.",
-    "mobileCta": "Ask about booking"
+    "mobileCta": "Ask about booking",
+    "optionTitle": "Options",
+    "optionPick": "Choose your option",
+    "optionPerPerson": "{price} per person",
+    "optionFrom": "{n, plural, one {From # guest} other {From # guests}}",
+    "optionMinNote": "The {name} option needs at least {n} guests.",
+    "bookLabelOption": "Per person · {option}"
   },
   "medical": {
     "title": "Medical Check",

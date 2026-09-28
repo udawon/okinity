@@ -245,7 +245,12 @@
     "classLabel": "클래스",
     "classPlaceholder": "클래스 선택 (미들·럭셔리)",
     "classMiddle": "미들 클래스",
-    "classLuxury": "럭셔리 클래스"
+    "classLuxury": "럭셔리 클래스",
+    "optionLabel": "옵션",
+    "optionPlaceholder": "옵션 선택",
+    "optionPerPerson": "1인 {price}",
+    "optionFrom": "{n}명부터",
+    "optionMinHint": "{name} 옵션은 {n}명부터 예약할 수 있어요."
   },
   "tourDetail": {
     "includesTitle": "포함 사항",
@@ -295,7 +300,13 @@
     "bookCta": "이 투어 예약 문의하기",
     "bookKakao": "카카오톡으로 먼저 물어보기",
     "bookNote": "문의 접수만으로는 예약이 확정되지 않아요. 카카오톡 채널로 확정 안내를 드립니다.",
-    "mobileCta": "예약 문의하기"
+    "mobileCta": "예약 문의하기",
+    "optionTitle": "옵션",
+    "optionPick": "원하는 방식을 골라주세요",
+    "optionPerPerson": "1인 {price}",
+    "optionFrom": "{n}명부터",
+    "optionMinNote": "{name} 옵션은 {n}명부터 예약할 수 있어요.",
+    "bookLabelOption": "1인 요금 · {option}"
   },
   "medical": {
     "title": "메디컬 체크",

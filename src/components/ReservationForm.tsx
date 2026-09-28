@@ -1,9 +1,12 @@
 'use client';
 
 import { useRef, useState, type FormEvent } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { ACTIVITIES } from './ocean-home-data';
 import { TOUR_NAME_NAV_KEY, FISHING_CLASS_KEYS, type FishingClassKey } from '@/lib/tour';
+import { findOption, optionMinPeople, type ReserveOption } from '@/lib/tour-options';
+import { buildProduct } from '@/lib/inquiry-product';
+import { formatYen } from '@/lib/money';
 import { MEDICAL_MARKER } from '@/lib/inquiries/types';
 import MedicalCheckModal from './MedicalCheckModal';
 import { site } from '@/config/site.config';
@@ -33,7 +36,9 @@ export default function ReservationForm({
   initialSlug,
   initialClass,
   initialPeople,
+  initialOption,
   tourTimes,
+  tourOptions,
   onReset
 }: {
   lockedDateKey?: string;
@@ -46,13 +51,18 @@ export default function ReservationForm({
   initialClass?: FishingClassKey;
   /** 투어 상세 예약 카드에서 정한 인원 — 인원 입력칸 기본값(없으면 2명). */
   initialPeople?: number;
+  /** 투어 상세에서 고른 옵션 key — 그 투어의 옵션 목록에 있을 때만 사전 선택. */
+  initialOption?: string;
   /** 투어별 가능 시간대(어드민 tour_times 설정, slug → 텍스트 배열). 미설정 투어는 '개별 문의' 안내. */
   tourTimes?: Record<string, string[]>;
+  /** 투어별 선택 옵션(slug → 목록). 옵션 있는 투어를 고르면 옵션 칸이 필수로 나온다. */
+  tourOptions?: Record<string, ReserveOption[]>;
   /** 성공 후 동작(예: 플래너에서 날짜 선택 해제). 없으면 폼 내부에서 새 문의로 초기화. */
   onReset?: () => void;
 }) {
   const t = useTranslations('reservation');
   const tNav = useTranslations('nav');
+  const locale = useLocale();
   // 슬러그가 속한 대분류를 찾아 초기 선택값으로 사용(매칭 실패 시 빈 폼).
   const presetCat = initialSlug
     ? ACTIVITIES.find((a) => a.tours.some((t) => t.slug === initialSlug))
@@ -61,6 +71,9 @@ export default function ReservationForm({
   const [slug, setSlug] = useState(presetCat ? (initialSlug as string) : '');
   const [fishingClass, setFishingClass] = useState<FishingClassKey | ''>(
     presetCat?.id === 'fishing' ? (initialClass ?? '') : ''
+  );
+  const [optionKey, setOptionKey] = useState(
+    presetCat && findOption(tourOptions?.[initialSlug as string] ?? [], initialOption) ? (initialOption as string) : ''
   );
   const [state, setState] = useState<SubmitState>('idle');
   const [done, setDone] = useState<{ product: string; dateLabel: string } | null>(null);
@@ -71,6 +84,10 @@ export default function ReservationForm({
   // 선택한 투어의 시간대 옵션 — '개별 문의'는 항상 마지막에 붙는 고정 옵션과 값이 겹치므로 목록에서 제외.
   const timeOpts = (slug && tourTimes?.[slug]?.filter((tm) => tm !== '개별 문의')) || [];
   const isFishing = cat?.id === 'fishing';
+  // 선택 옵션(예: 일반/프라이빗) — 고른 옵션의 최소 인원이 인원 칸의 하한이 된다.
+  const options = (slug && tourOptions?.[slug]) || [];
+  const option = findOption(options, optionKey);
+  const minPeople = optionMinPeople(option);
   // 낚시·요트 크루징은 메디컬 체크 불필요(다이빙·스노클링·PADI만 필수).
   const needsMedical = !!cat && cat.id !== 'fishing' && cat.id !== 'yacht';
 
@@ -87,6 +104,7 @@ export default function ReservationForm({
     setCatId('');
     setSlug('');
     setFishingClass('');
+    setOptionKey('');
   }
 
   // 제출 버튼 클릭 — 필수값 검증 후, 낚시 외 투어는 메디컬 체크 모달로, 그 외는 바로 전송.
@@ -104,9 +122,7 @@ export default function ReservationForm({
     const fd = new FormData(form);
     const tourName = cat?.tours.find((t) => t.slug === slug)?.name ?? '';
     const classLabel = isFishing && fishingClass ? FISHING_CLASS_PRODUCT[fishingClass] : '';
-    const product = cat
-      ? `${cat.title}${tourName ? ' · ' + tourName : ''}${classLabel ? ' · ' + classLabel : ''}`
-      : '';
+    const product = cat ? buildProduct(cat.title, tourName, classLabel || option?.productLabel) : '';
     const date = lockedDateKey ?? (String(fd.get('date') || '') || undefined);
     const baseMsg = String(fd.get('message') || '');
     const message = medical
@@ -222,6 +238,7 @@ export default function ReservationForm({
             setCatId(e.target.value);
             setSlug('');
             setFishingClass('');
+            setOptionKey('');
           }}
           className={`mt-1.5 ${inputCls} app-select app-select-dark [&>option]:text-ink`}
         >
@@ -246,7 +263,10 @@ export default function ReservationForm({
           required
           value={slug}
           disabled={!cat}
-          onChange={(e) => setSlug(e.target.value)}
+          onChange={(e) => {
+            setSlug(e.target.value);
+            setOptionKey('');
+          }}
           className={`mt-1.5 ${inputCls} disabled:opacity-50 app-select app-select-dark [&>option]:text-ink`}
         >
           <option value="" disabled>
@@ -279,6 +299,43 @@ export default function ReservationForm({
             {FISHING_CLASS_KEYS.map((key) => (
               <option key={key} value={key}>
                 {key === 'middle' ? t('classMiddle') : t('classLuxury')}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* 선택 옵션 — 옵션을 등록한 투어(예: 스노클링 일반/프라이빗)만. 문의 내역에 한국어 이름으로 기록. */}
+      {options.length > 0 && (
+        <div className="mt-4">
+          <label htmlFor="rf-option" className={labelCls}>
+            {t('optionLabel')} *
+          </label>
+          <select
+            id="rf-option"
+            required
+            value={optionKey}
+            onChange={(e) => {
+              setOptionKey(e.target.value);
+              // 투어 상세 예약 카드와 같게 — 최소 인원보다 적으면 최소 인원으로 올린다.
+              const min = optionMinPeople(findOption(options, e.target.value));
+              const input = formRef.current?.elements.namedItem('people');
+              if (input instanceof HTMLInputElement && Number(input.value) < min) input.value = String(min);
+            }}
+            className={`mt-1.5 ${inputCls} app-select app-select-dark [&>option]:text-ink`}
+          >
+            <option value="" disabled>
+              {t('optionPlaceholder')}
+            </option>
+            {options.map((o) => (
+              <option key={o.key} value={o.key}>
+                {[
+                  o.label,
+                  o.pricePerPerson != null && t('optionPerPerson', { price: formatYen(o.pricePerPerson, locale) }),
+                  optionMinPeople(o) > 1 && t('optionFrom', { n: optionMinPeople(o) })
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
               </option>
             ))}
           </select>
@@ -329,7 +386,21 @@ export default function ReservationForm({
         <label htmlFor="rf-people" className={labelCls}>
           {t('people')}
         </label>
-        <input id="rf-people" name="people" type="number" min={1} max={50} defaultValue={initialPeople ?? 2} className={`mt-1.5 ${inputCls}`} />
+        <input
+          id="rf-people"
+          name="people"
+          type="number"
+          min={minPeople}
+          max={50}
+          defaultValue={Math.max(initialPeople ?? 2, minPeople)}
+          aria-describedby={option && minPeople > 1 ? 'rf-people-hint' : undefined}
+          className={`mt-1.5 ${inputCls}`}
+        />
+        {option && minPeople > 1 && (
+          <p id="rf-people-hint" className="mt-1.5 text-xs text-white/60">
+            {t('optionMinHint', { name: option.label, n: minPeople })}
+          </p>
+        )}
       </div>
 
       {/* 이름 */}

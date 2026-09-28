@@ -10,6 +10,7 @@ import {
   CONTENT_KEYS
 } from '@/lib/site-content';
 import {
+  bookableOptions,
   classPrice,
   extractAgeRange,
   getTourCatalogEntry,
@@ -38,6 +39,7 @@ import {
   MobileBookBar,
   TourBookingProvider,
   TourClassCards,
+  TourOptionCards,
   type BookingInfo
 } from '@/components/tour/TourBooking';
 
@@ -127,6 +129,8 @@ export default async function TourDetailPage({
     showClasses && (classPrice(detail, 'middle') || classPrice(detail, 'luxury'))
       ? { middle: classPrice(detail, 'middle'), luxury: classPrice(detail, 'luxury') }
       : null;
+  // 선택 옵션(예: 일반 / 프라이빗) — 요금은 한국어 저장본, 이름·설명은 이 언어 저장본.
+  const options = bookableOptions(slug, base, detail);
 
   // 원화 참고는 한국어 페이지에서만, 실시간 환율을 받았을 때만(폴백 환율은 오해 소지).
   const rate = locale === 'ko' ? await getJpyKrwRate() : null;
@@ -174,6 +178,7 @@ export default async function TourDetailPage({
     priceText: showDetail ? detail.price : '',
     classPrices: showDetail ? classPrices : null,
     hasClasses: showClasses,
+    options,
     times,
     startNote: showDetail ? detail.startNote : '',
     rate: rate?.live ? rate.jpyKrw : null,
@@ -183,6 +188,7 @@ export default async function TourDetailPage({
   // 모바일·태블릿 섹션 탭 — 실제로 보이는 섹션만(맨 앞 '개요'는 컴포넌트 호출부에서 추가)
   const toc = [
     fishingClasses && { id: 'class', label: t('classTitle') },
+    options.length > 0 && { id: 'option', label: t('optionTitle') },
     showDetail && steps.length > 0 && { id: 'steps', label: t('stepsTitle') },
     showDetail && included.length > 0 && { id: 'included', label: t('includesTitle') },
     ...mainSections.map((s, i) => ({ id: `s${i}`, label: s.title })),
@@ -191,7 +197,7 @@ export default async function TourDetailPage({
 
   return (
     <article className="break-keep pb-32 pt-6 sm:pt-10 lg:pb-24">
-      <TourBookingProvider>
+      <TourBookingProvider options={options}>
         <Container>
           <nav aria-label={t('crumbLabel')} className="flex items-center gap-2 text-sm text-white/60">
             <Link href="/#activities" className="transition-colors hover:text-white">
@@ -233,6 +239,13 @@ export default async function TourDetailPage({
                 <>
                   <SectionTitle id="class">{t('classPick')}</SectionTitle>
                   <TourClassCards classes={fishingClasses} classPrices={booking.classPrices} />
+                </>
+              )}
+
+              {options.length > 0 && (
+                <>
+                  <SectionTitle id="option">{t('optionPick')}</SectionTitle>
+                  <TourOptionCards options={options} />
                 </>
               )}
 
