@@ -28,6 +28,7 @@ import { cdnMedia } from '@/lib/media';
 import { localeAlternates } from '@/lib/seo';
 import { site } from '@/config/site.config';
 import TourGallery from '@/components/tour/TourGallery';
+import TourSectionNav from '@/components/tour/TourSectionNav';
 import TourFacts, { type TourFact } from '@/components/tour/TourFacts';
 import TourBlocks from '@/components/tour/TourBlocks';
 import TourSteps from '@/components/tour/TourSteps';
@@ -70,7 +71,7 @@ export async function generateMetadata({
 /** 섹션 제목 — 모바일 목차 칩이 id 로 이동한다(고정 헤더만큼 여백). */
 function SectionTitle({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <h2 id={id} className="mt-14 scroll-mt-28 font-serif text-2xl leading-snug text-white sm:text-[26px]">
+    <h2 id={id} className="mt-14 scroll-mt-[124px] font-serif text-2xl leading-snug text-white sm:scroll-mt-[172px] sm:text-[26px] lg:scroll-mt-32">
       {children}
     </h2>
   );
@@ -176,7 +177,7 @@ export default async function TourDetailPage({
     kakaoUrl: site.contact.kakaoChannel
   };
 
-  // 모바일 목차 — 실제로 보이는 섹션만
+  // 모바일·태블릿 섹션 탭 — 실제로 보이는 섹션만(맨 앞 '개요'는 컴포넌트 호출부에서 추가)
   const toc = [
     fishingClasses && { id: 'class', label: t('classTitle') },
     showDetail && detail.steps.length > 0 && { id: 'steps', label: t('stepsTitle') },
@@ -201,7 +202,7 @@ export default async function TourDetailPage({
 
           <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-14">
             <div className="min-w-0">
-              <header className="[text-shadow:0_2px_14px_rgba(0,0,0,0.55)]">
+              <header id="overview" className="scroll-mt-[124px] [text-shadow:0_2px_14px_rgba(0,0,0,0.55)] sm:scroll-mt-[172px] lg:scroll-mt-32">
                 <p className="text-xs font-bold uppercase tracking-[0.24em]" style={{ color: entry.accent }}>
                   {entry.categoryKicker}
                 </p>
@@ -215,21 +216,8 @@ export default async function TourDetailPage({
 
               <TourFacts facts={facts} />
 
-              {toc.length > 2 && (
-                <nav
-                  aria-label={t('tocLabel')}
-                  className="-mx-5 mt-6 flex gap-2 overflow-x-auto px-5 [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden"
-                >
-                  {toc.map((item) => (
-                    <a
-                      key={item.id}
-                      href={`#${item.id}`}
-                      className="shrink-0 rounded-full border border-white/15 bg-[#061522]/60 px-4 py-2 text-sm text-white/85 backdrop-blur-md"
-                    >
-                      {item.label}
-                    </a>
-                  ))}
-                </nav>
+              {toc.length >= 2 && (
+                <TourSectionNav items={[{ id: 'overview', label: t('tocOverview') }, ...toc]} label={t('tocLabel')} />
               )}
 
               {parsed.intro.length > 0 && (
