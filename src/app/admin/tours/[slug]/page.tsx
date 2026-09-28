@@ -52,7 +52,7 @@ export default async function AdminTourEditPage({
     : null;
 
   return (
-    <AdminShell title="투어 5종 편집" back={{ href: '/admin/tours', label: '투어 5종 목록' }}>
+    <AdminShell title="투어 상세 편집" back={{ href: '/admin/tours', label: '투어 상세 목록' }}>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-sm text-muted">

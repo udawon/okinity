@@ -1,20 +1,25 @@
 import Link from 'next/link';
-import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
+import { getSiteContentMap, CONTENT_KEYS, localizedContentKey } from '@/lib/site-content';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import { ACTIVITIES } from '@/components/ocean-home-data';
-import { resolveTourDetail } from '@/lib/tour';
+import { resolveTourDetail, tourImages, TOUR_CATALOG } from '@/lib/tour';
 import AdminShell from '@/components/admin/AdminShell';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminToursPage() {
   const enabled = isSupabaseEnabled();
-  // 모든 투어 상세를 한 번에 조회
-  const keys = ACTIVITIES.flatMap((a) => a.tours.map((t) => CONTENT_KEYS.tour(t.slug)));
+  // 모든 투어 상세(한·영·일)를 한 번에 조회
+  const keys = ACTIVITIES.flatMap((a) =>
+    a.tours.flatMap((t) => {
+      const k = CONTENT_KEYS.tour(t.slug);
+      return [k, localizedContentKey(k, 'en'), localizedContentKey(k, 'ja')];
+    })
+  );
   const map = enabled ? await getSiteContentMap(keys) : {};
 
   return (
-    <AdminShell title="투어 5종">
+    <AdminShell title={`투어 상세 · ${TOUR_CATALOG.length}개`}>
       <p className="mb-6 text-sm text-muted">
         투어 목록은 고정되어 있고, 각 투어를 눌러 상세 내용을 등록합니다. 공개된 상세는{' '}
         <code>/tours/&#123;slug&#125;</code> 페이지에 표시됩니다.
@@ -28,8 +33,11 @@ export default async function AdminToursPage() {
             </h2>
             <ul className="mt-3 divide-y divide-line rounded-card border border-line">
               {a.tours.map((t) => {
-                const detail = resolveTourDetail(t.slug, map[CONTENT_KEYS.tour(t.slug)]);
+                const k = CONTENT_KEYS.tour(t.slug);
+                const detail = resolveTourDetail(t.slug, map[k]);
                 const hasContent = detail.summary || detail.body || detail.heroImage;
+                const photos = tourImages(detail).length;
+                const langs = [map[localizedContentKey(k, 'en')] && 'EN', map[localizedContentKey(k, 'ja')] && 'JA'].filter(Boolean);
                 return (
                   <li key={t.slug}>
                     <Link
@@ -38,6 +46,9 @@ export default async function AdminToursPage() {
                     >
                       <span className="font-medium text-ink">{t.name}</span>
                       <span className="flex items-center gap-3">
+                        <span className="hidden text-xs text-muted sm:inline">
+                          사진 {photos}장 · {langs.length ? langs.join('·') : '번역 없음'}
+                        </span>
                         {detail.published ? (
                           <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                             공개

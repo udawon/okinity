@@ -32,6 +32,7 @@ export default function ReservationForm({
   scheduled,
   initialSlug,
   initialClass,
+  initialPeople,
   tourTimes,
   onReset
 }: {
@@ -43,6 +44,8 @@ export default function ReservationForm({
   initialSlug?: string;
   /** 투어 상세에서 고른 낚시 클래스 — 슬러그가 낚시 투어일 때만 클래스 사전 선택. */
   initialClass?: FishingClassKey;
+  /** 투어 상세 예약 카드에서 정한 인원 — 인원 입력칸 기본값(없으면 2명). */
+  initialPeople?: number;
   /** 투어별 가능 시간대(어드민 tour_times 설정, slug → 텍스트 배열). 미설정 투어는 '개별 문의' 안내. */
   tourTimes?: Record<string, string[]>;
   /** 성공 후 동작(예: 플래너에서 날짜 선택 해제). 없으면 폼 내부에서 새 문의로 초기화. */
@@ -326,7 +329,7 @@ export default function ReservationForm({
         <label htmlFor="rf-people" className={labelCls}>
           {t('people')}
         </label>
-        <input id="rf-people" name="people" type="number" min={1} max={50} defaultValue={2} className={`mt-1.5 ${inputCls}`} />
+        <input id="rf-people" name="people" type="number" min={1} max={50} defaultValue={initialPeople ?? 2} className={`mt-1.5 ${inputCls}`} />
       </div>
 
       {/* 이름 */}
