@@ -20,7 +20,7 @@ import {
   tourImages,
   TOUR_NAME_NAV_KEY
 } from '@/lib/tour';
-import { parseTourBody, isRuleSection, type BodyBlock, type ParsedBody } from '@/lib/tour-body';
+import { parseTourBody, isRuleSection, withoutFlowBlocks, type BodyBlock, type ParsedBody } from '@/lib/tour-body';
 import { activeNoticeIds, parseTourNotices, sectionCoveredByNotice } from '@/lib/tour-notices';
 import { parseTourTimes } from '@/lib/tour-times';
 import { getJpyKrwRate } from '@/lib/exchange-rate';
@@ -132,7 +132,10 @@ export default async function TourDetailPage({
   const rate = locale === 'ko' ? await getJpyKrwRate() : null;
 
   // ── 본문 자동 서식 + 공통 안내 ──
-  const parsed = showDetail ? parseTourBody(detail.body) : { intro: [], sections: [] };
+  // 진행 순서 칸을 채웠으면 본문의 "A -> B" 흐름 그림은 빼서 같은 그림이 두 번 나오지 않게 한다.
+  const steps = detail.steps.filter((s) => s.name.trim());
+  const body = showDetail ? parseTourBody(detail.body) : { intro: [], sections: [] };
+  const parsed = steps.length ? withoutFlowBlocks(body) : body;
   const active = showDetail ? activeNoticeIds(base.notices) : [];
   const notices = active.length ? parseTourNotices(contentMap[noticesKey], locale) : null;
   const bodySections = parsed.sections.filter((s) => !sectionCoveredByNotice(s.title, active));
@@ -180,7 +183,7 @@ export default async function TourDetailPage({
   // 모바일·태블릿 섹션 탭 — 실제로 보이는 섹션만(맨 앞 '개요'는 컴포넌트 호출부에서 추가)
   const toc = [
     fishingClasses && { id: 'class', label: t('classTitle') },
-    showDetail && detail.steps.length > 0 && { id: 'steps', label: t('stepsTitle') },
+    showDetail && steps.length > 0 && { id: 'steps', label: t('stepsTitle') },
     showDetail && included.length > 0 && { id: 'included', label: t('includesTitle') },
     ...mainSections.map((s, i) => ({ id: `s${i}`, label: s.title })),
     rules.length > 0 && { id: 'rules', label: t('rulesTitle') }
@@ -233,11 +236,11 @@ export default async function TourDetailPage({
                 </>
               )}
 
-              {showDetail && detail.steps.length > 0 && (
+              {showDetail && steps.length > 0 && (
                 <>
                   <SectionTitle id="steps">{t('stepsTitle')}</SectionTitle>
                   <div className="mt-5 rounded-2xl border border-white/10 bg-[#061522]/60 px-4 py-5 backdrop-blur-md sm:px-6">
-                    <TourSteps steps={detail.steps.filter((s) => s.name.trim())} accent={entry.accent} />
+                    <TourSteps steps={steps} accent={entry.accent} />
                   </div>
                 </>
               )}

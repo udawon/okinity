@@ -462,7 +462,7 @@ export default function TourEditor({
           <div>
             <p className="text-sm font-semibold text-ink">진행 순서</p>
             <p className={hintCls}>
-              입력하면 “투어는 이렇게 진행돼요” 그림으로 보여요. 비워 두면 본문의 ‘→’ 흐름을 그 자리에 그대로 보여줘요.
+              입력하면 “투어는 이렇게 진행돼요” 그림으로 보여요(본문의 ‘→’ 흐름 그림은 자동으로 숨김). 비워 두면 본문의 ‘→’ 흐름을 그 자리에 그대로 보여줘요.
             </p>
           </div>
           {bodySteps.length > 0 && steps.length === 0 && (

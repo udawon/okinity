@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseTourBody, splitRow, isRuleSection, type BodyBlock } from './tour-body';
+import { parseTourBody, splitRow, isRuleSection, withoutFlowBlocks, type BodyBlock } from './tour-body';
 
 const blocksOf = (body: string) => parseTourBody(body);
 
@@ -233,5 +233,27 @@ describe('isRuleSection', () => {
     expect(isRuleSection('Refund Policy')).toBe(true);
     expect(isRuleSection('キャンセル規定')).toBe(true);
     expect(isRuleSection('투어 안내')).toBe(false);
+  });
+});
+
+describe('withoutFlowBlocks — 진행 순서 칸을 채운 투어', () => {
+  it('본문의 → 흐름 그림만 빼고 나머지 글은 그대로 둔다', () => {
+    const parsed = parseTourBody('소개 문장\n\n★예약가능시간★\n09:00 / 14:00\n\n집합 -> 이동(약 7분) -> 투어\n의 순서로 진행됩니다.');
+    const out = withoutFlowBlocks(parsed);
+    const kinds = out.sections[0].blocks.map((b) => b.type);
+    expect(kinds).not.toContain('steps');
+    expect(JSON.stringify(out)).toContain('09:00 / 14:00');
+    expect(JSON.stringify(out)).toContain('의 순서로 진행됩니다.');
+    expect(out.intro).toEqual(parsed.intro);
+  });
+
+  it('흐름 그림뿐이던 섹션은 제목만 남지 않도록 통째로 뺀다', () => {
+    const parsed = parseTourBody('★투어 흐름★\n집합 -> 이동 -> 투어\n\n★준비물★\n*수건');
+    expect(withoutFlowBlocks(parsed).sections.map((s) => s.title)).toEqual(['준비물']);
+  });
+
+  it('흐름이 없으면 원본과 같다', () => {
+    const parsed = parseTourBody('★안내★\n*항목');
+    expect(withoutFlowBlocks(parsed)).toEqual(parsed);
   });
 });

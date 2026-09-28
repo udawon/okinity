@@ -229,3 +229,17 @@ export function parseTourBody(body: string): ParsedBody {
       .filter((s) => s.blocks.length > 0 || s.title)
   };
 }
+
+/**
+ * 진행 순서 칸(구조화 steps)을 채운 투어용 — 본문의 "A -> B" 흐름 그림을 빼서 같은 그림이 두 번 나오지 않게 한다.
+ * 흐름 그림만 있던 섹션은 제목만 남지 않도록 통째로 뺀다. 다른 글은 그대로 둔다.
+ */
+export function withoutFlowBlocks(parsed: ParsedBody): ParsedBody {
+  const keep = (blocks: BodyBlock[]) => blocks.filter((b) => b.type !== 'steps');
+  return {
+    intro: keep(parsed.intro),
+    sections: parsed.sections
+      .map((s) => ({ ...s, blocks: keep(s.blocks) }))
+      .filter((s, i) => s.blocks.length > 0 || parsed.sections[i].blocks.length === 0)
+  };
+}
