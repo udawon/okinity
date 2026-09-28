@@ -72,7 +72,7 @@ export async function updateInquiryStatus(
   }
   const store = await getInquiryStore();
   await store.updateStatus(id, status as InquiryStatus);
-  revalidatePath('/admin');
+  revalidatePath('/admin', 'layout'); // 오늘·예약 관리 등 어드민 하위 전체
   revalidatePath('/admin/board');
 }
 
@@ -81,7 +81,7 @@ export async function updateInquiryNote(id: string, note: string): Promise<void>
   if (note.length > 2000) throw new Error('note too long');
   const store = await getInquiryStore();
   await store.updateNote(id, note);
-  revalidatePath('/admin');
+  revalidatePath('/admin', 'layout'); // 오늘·예약 관리 등 어드민 하위 전체
   revalidatePath('/admin/board');
 }
 
@@ -91,7 +91,7 @@ export async function updateScheduledTime(id: string, time: string): Promise<voi
   if (time && !/^([01]?\d|2[0-3]):[0-5]\d$/.test(time)) throw new Error('invalid time');
   const store = await getInquiryStore();
   await store.updateScheduledTime(id, time);
-  revalidatePath('/admin');
+  revalidatePath('/admin', 'layout'); // 오늘·예약 관리 등 어드민 하위 전체
   revalidatePath('/admin/board');
 }
 
@@ -101,7 +101,7 @@ export async function updateInquiry(id: string, input: unknown): Promise<void> {
   if (!parsed.success) throw new Error('invalid inquiry');
   const store = await getInquiryStore();
   await store.update(id, parsed.data);
-  revalidatePath('/admin');
+  revalidatePath('/admin', 'layout'); // 오늘·예약 관리 등 어드민 하위 전체
   revalidatePath('/admin/board');
 }
 
@@ -131,7 +131,7 @@ export async function saveInquirySettlement(id: string, input: unknown): Promise
     map[id] = next;
   }
   await setSiteContent(CONTENT_KEYS.inquirySettlement, { items: map });
-  revalidatePath('/admin');
+  revalidatePath('/admin', 'layout'); // 오늘·예약 관리 등 어드민 하위 전체
   revalidatePath('/admin/board');
 }
 
@@ -140,6 +140,6 @@ export async function deleteInquiry(id: string): Promise<void> {
   await requireAdmin();
   const store = await getInquiryStore();
   await store.delete(id);
-  revalidatePath('/admin');
+  revalidatePath('/admin', 'layout'); // 오늘·예약 관리 등 어드민 하위 전체
   revalidatePath('/admin/board');
 }
