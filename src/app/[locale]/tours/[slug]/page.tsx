@@ -20,7 +20,7 @@ import {
   tourImages,
   TOUR_NAME_NAV_KEY
 } from '@/lib/tour';
-import { parseTourBody, isRuleSection, type BodyBlock, type ParsedBody } from '@/lib/tour-body';
+import { parseTourBody, isRuleSection, withoutFlowBlocks, type BodyBlock, type ParsedBody } from '@/lib/tour-body';
 import { activeNoticeIds, parseTourNotices, sectionCoveredByNotice } from '@/lib/tour-notices';
 import { parseTourTimes } from '@/lib/tour-times';
 import { getJpyKrwRate } from '@/lib/exchange-rate';
@@ -28,6 +28,7 @@ import { cdnMedia } from '@/lib/media';
 import { localeAlternates } from '@/lib/seo';
 import { site } from '@/config/site.config';
 import TourGallery from '@/components/tour/TourGallery';
+import TourSectionNav from '@/components/tour/TourSectionNav';
 import TourFacts, { type TourFact } from '@/components/tour/TourFacts';
 import TourBlocks from '@/components/tour/TourBlocks';
 import TourSteps from '@/components/tour/TourSteps';
@@ -70,7 +71,7 @@ export async function generateMetadata({
 /** 섹션 제목 — 모바일 목차 칩이 id 로 이동한다(고정 헤더만큼 여백). */
 function SectionTitle({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <h2 id={id} className="mt-14 scroll-mt-28 font-serif text-2xl leading-snug text-white sm:text-[26px]">
+    <h2 id={id} className="mt-14 scroll-mt-[124px] font-serif text-2xl leading-snug text-white sm:scroll-mt-[172px] sm:text-[26px] lg:scroll-mt-32">
       {children}
     </h2>
   );
@@ -131,7 +132,10 @@ export default async function TourDetailPage({
   const rate = locale === 'ko' ? await getJpyKrwRate() : null;
 
   // ── 본문 자동 서식 + 공통 안내 ──
-  const parsed = showDetail ? parseTourBody(detail.body) : { intro: [], sections: [] };
+  // 진행 순서 칸을 채웠으면 본문의 "A -> B" 흐름 그림은 빼서 같은 그림이 두 번 나오지 않게 한다.
+  const steps = detail.steps.filter((s) => s.name.trim());
+  const body = showDetail ? parseTourBody(detail.body) : { intro: [], sections: [] };
+  const parsed = steps.length ? withoutFlowBlocks(body) : body;
   const active = showDetail ? activeNoticeIds(base.notices) : [];
   const notices = active.length ? parseTourNotices(contentMap[noticesKey], locale) : null;
   const bodySections = parsed.sections.filter((s) => !sectionCoveredByNotice(s.title, active));
@@ -176,10 +180,10 @@ export default async function TourDetailPage({
     kakaoUrl: site.contact.kakaoChannel
   };
 
-  // 모바일 목차 — 실제로 보이는 섹션만
+  // 모바일·태블릿 섹션 탭 — 실제로 보이는 섹션만(맨 앞 '개요'는 컴포넌트 호출부에서 추가)
   const toc = [
     fishingClasses && { id: 'class', label: t('classTitle') },
-    showDetail && detail.steps.length > 0 && { id: 'steps', label: t('stepsTitle') },
+    showDetail && steps.length > 0 && { id: 'steps', label: t('stepsTitle') },
     showDetail && included.length > 0 && { id: 'included', label: t('includesTitle') },
     ...mainSections.map((s, i) => ({ id: `s${i}`, label: s.title })),
     rules.length > 0 && { id: 'rules', label: t('rulesTitle') }
@@ -201,7 +205,7 @@ export default async function TourDetailPage({
 
           <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-14">
             <div className="min-w-0">
-              <header className="[text-shadow:0_2px_14px_rgba(0,0,0,0.55)]">
+              <header id="overview" className="scroll-mt-[124px] [text-shadow:0_2px_14px_rgba(0,0,0,0.55)] sm:scroll-mt-[172px] lg:scroll-mt-32">
                 <p className="text-xs font-bold uppercase tracking-[0.24em]" style={{ color: entry.accent }}>
                   {entry.categoryKicker}
                 </p>
@@ -215,21 +219,8 @@ export default async function TourDetailPage({
 
               <TourFacts facts={facts} />
 
-              {toc.length > 2 && (
-                <nav
-                  aria-label={t('tocLabel')}
-                  className="-mx-5 mt-6 flex gap-2 overflow-x-auto px-5 [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden"
-                >
-                  {toc.map((item) => (
-                    <a
-                      key={item.id}
-                      href={`#${item.id}`}
-                      className="shrink-0 rounded-full border border-white/15 bg-[#061522]/60 px-4 py-2 text-sm text-white/85 backdrop-blur-md"
-                    >
-                      {item.label}
-                    </a>
-                  ))}
-                </nav>
+              {toc.length >= 2 && (
+                <TourSectionNav items={[{ id: 'overview', label: t('tocOverview') }, ...toc]} label={t('tocLabel')} />
               )}
 
               {parsed.intro.length > 0 && (
@@ -245,11 +236,11 @@ export default async function TourDetailPage({
                 </>
               )}
 
-              {showDetail && detail.steps.length > 0 && (
+              {showDetail && steps.length > 0 && (
                 <>
                   <SectionTitle id="steps">{t('stepsTitle')}</SectionTitle>
                   <div className="mt-5 rounded-2xl border border-white/10 bg-[#061522]/60 px-4 py-5 backdrop-blur-md sm:px-6">
-                    <TourSteps steps={detail.steps.filter((s) => s.name.trim())} accent={entry.accent} />
+                    <TourSteps steps={steps} accent={entry.accent} />
                   </div>
                 </>
               )}
