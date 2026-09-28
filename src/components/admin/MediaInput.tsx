@@ -100,8 +100,9 @@ export default function MediaInput({
               controls
             />
           ) : (
+            // 미리보기는 자르지 않고 전체를 보여준다 — 세로 사진이 잘려 보여 못 쓰는 사진으로 오해하지 않게
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={url} alt="" className="h-40 w-full object-cover" />
+            <img src={url} alt="" className="h-40 w-full bg-bg object-contain" />
           )}
         </div>
       )}
