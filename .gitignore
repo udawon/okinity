@@ -40,3 +40,6 @@ next-env.d.ts
 
 # Hero 원본 4K 동영상(119MB) — 압축본(turtle-hero.mp4)만 커밋
 public/videos/turtle2.mp4
+
+# 디자인 시안(로컬 HTML·사진) — 용량이 커서 저장소에 올리지 않고 로컬에서만 보관
+docs/design-mockups/
