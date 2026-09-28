@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   approxKrw,
+  bookableOptions,
   parsePeopleParam,
   emptyTourDetail,
   estimateTotal,
@@ -30,6 +31,23 @@ describe('parseTourDetail — 하위 호환', () => {
     expect(d.steps).toEqual([]);
     expect(d.notices).toEqual([]);
     expect(d.age).toBe('');
+    expect(d.options).toEqual([]);
+  });
+
+  it('선택 옵션 — 형식이 틀린 항목만 빠지고 나머지 내용은 그대로', () => {
+    const d = parseTourDetail({
+      summary: '요약',
+      options: [
+        { key: 'o1', name: '일반', pricePerPerson: 6000, minPeople: 2 },
+        { name: 'key 없음' },
+        { key: 'o2', name: '프라이빗', pricePerPerson: 9000 }
+      ]
+    });
+    expect(d.summary).toBe('요약');
+    expect(d.options.map((o) => [o.key, o.name, o.pricePerPerson, o.minPeople])).toEqual([
+      ['o1', '일반', 6000, 2],
+      ['o2', '프라이빗', 9000, null]
+    ]);
   });
 
   it('새 필드 하나가 잘못돼도 나머지 내용은 살아남는다', () => {
@@ -154,5 +172,26 @@ describe('parsePeopleParam', () => {
     expect(parsePeopleParam('2.5')).toBeUndefined();
     expect(parsePeopleParam('abc')).toBeUndefined();
     expect(parsePeopleParam(null)).toBeUndefined();
+  });
+});
+
+describe('bookableOptions — 손님이 고를 수 있는 옵션', () => {
+  const options = [
+    { key: 'o1', name: '일반', description: '', pricePerPerson: 6000, minPeople: 2 },
+    { key: 'o2', name: '프라이빗', description: '', pricePerPerson: 9000, minPeople: null }
+  ];
+  const ko = detail({ published: true, options });
+  const en = detail({ published: true, options: [{ ...options[1], name: 'Private', pricePerPerson: null }] });
+
+  it('공개된 투어면 한국어 구조 + 그 언어 이름', () => {
+    expect(bookableOptions('blue-cave-snorkeling', ko, en).map((o) => [o.name, o.pricePerPerson])).toEqual([
+      ['일반', 6000],
+      ['Private', 9000]
+    ]);
+  });
+
+  it('비공개 투어·낚시(클래스로 고름)는 옵션 없음', () => {
+    expect(bookableOptions('blue-cave-snorkeling', ko, { ...en, published: false })).toEqual([]);
+    expect(bookableOptions('trial-fishing-4h', ko, ko)).toEqual([]);
   });
 });

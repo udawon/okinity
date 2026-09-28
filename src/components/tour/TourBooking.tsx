@@ -15,26 +15,41 @@ import {
   type TourClasses,
   type TourPricing
 } from '@/lib/tour';
+import { findOption, optionMinPeople, pricingWithOption, type TourOption } from '@/lib/tour-options';
 import Icon from './icons';
 
 /**
- * 투어 상세의 예약 영역 — 클래스(낚시)·인원 선택을 본문 카드·예약 카드·모바일 하단 바가 공유한다.
- * 날짜는 여기서 고르지 않는다(예약 달력 /reserve 의 역할). 선택값은 ?tour=&class=&people= 로 넘긴다.
+ * 투어 상세의 예약 영역 — 클래스(낚시)·옵션·인원 선택을 본문 카드·예약 카드·모바일 하단 바가 공유한다.
+ * 날짜는 여기서 고르지 않는다(예약 달력 /reserve 의 역할). 선택값은 ?tour=&class=&option=&people= 로 넘긴다.
  */
 
 type BookingState = {
   cls: FishingClassKey;
   setCls: (c: FishingClassKey) => void;
+  /** 고른 옵션(옵션이 없는 투어면 undefined). */
+  option: TourOption | undefined;
+  /** 옵션을 바꾸면 인원이 그 옵션의 최소 인원보다 적지 않게 올린다. */
+  selectOption: (key: string) => void;
   people: number;
   setPeople: (n: number) => void;
 };
 
 const BookingContext = createContext<BookingState | null>(null);
 
-export function TourBookingProvider({ children }: { children: ReactNode }) {
+export function TourBookingProvider({ options = [], children }: { options?: TourOption[]; children: ReactNode }) {
   const [cls, setCls] = useState<FishingClassKey>('middle');
-  const [people, setPeople] = useState(2);
-  const value = useMemo(() => ({ cls, setCls, people, setPeople }), [cls, people]);
+  const [optionKey, setOptionKey] = useState(options[0]?.key ?? '');
+  const [people, setPeople] = useState(() => Math.max(2, optionMinPeople(options[0])));
+  const value = useMemo(() => {
+    const option = findOption(options, optionKey);
+    const selectOption = (key: string) => {
+      const next = findOption(options, key);
+      if (!next) return;
+      setOptionKey(key);
+      setPeople((p) => Math.max(p, optionMinPeople(next)));
+    };
+    return { cls, setCls, option, selectOption, people, setPeople };
+  }, [cls, optionKey, options, people]);
   return <BookingContext.Provider value={value}>{children}</BookingContext.Provider>;
 }
 
@@ -53,6 +68,8 @@ export type BookingInfo = {
   /** 낚시 클래스별 가격 글(비었으면 null). */
   classPrices: Record<FishingClassKey, string> | null;
   hasClasses: boolean;
+  /** 선택 옵션(손님 언어 이름, 2개 이상일 때만 — 없으면 빈 배열). */
+  options: TourOption[];
   /** 투어 시간대(어드민 '투어 시간대'). */
   times: string[];
   /** 자유 출발형 등 출발 안내 글. */
@@ -66,10 +83,13 @@ export type BookingInfo = {
 function usePriceView(info: BookingInfo) {
   const t = useTranslations('tourDetail');
   const locale = useLocale();
-  const { cls, people } = useBooking();
+  const { cls, option, people } = useBooking();
   const clsKey = info.hasClasses ? cls : '';
   const clsLabel = cls === 'middle' ? t('classMiddle') : t('classLuxury');
-  const { pricing } = info;
+  // 옵션에 1인 요금이 있으면 그 요금 × 인원(투어 요금 방식 대신)
+  const pricing = pricingWithOption(info.pricing, option);
+  const optionPriced = option?.pricePerPerson != null;
+  const min = optionMinPeople(option);
 
   const from = startingPrice(pricing, clsKey);
   const total = estimateTotal(pricing, people, clsKey);
@@ -81,7 +101,7 @@ function usePriceView(info: BookingInfo) {
   if (pricing.priceMode === 'inquiry') {
     main = t('bookInquiry');
   } else if (pricing.priceMode === 'perPerson' && from != null) {
-    label = t('bookLabelPerPerson');
+    label = optionPriced ? t('bookLabelOption', { option: option!.name }) : t('bookLabelPerPerson');
     main = formatYen(from, locale);
   } else if (pricing.priceMode === 'boat' && from != null) {
     label = info.hasClasses ? t('bookLabelBoatClass', { cls: clsLabel }) : t('bookLabelBoat');
@@ -92,20 +112,25 @@ function usePriceView(info: BookingInfo) {
   }
 
   const krw = (yen: number) => (info.rate ? formatKrw(approxKrw(yen, info.rate)) : null);
-  return { label, main, from, total, max, calculable, krw, locale, clsLabel };
+  return { label, main, from, total, max, min, calculable, krw, locale, clsLabel, pricing };
 }
 
-function reserveHref(info: BookingInfo, cls: FishingClassKey, people: number, calculable: boolean) {
+function reserveHref(
+  info: BookingInfo,
+  sel: { cls: FishingClassKey; option: TourOption | undefined; people: number },
+  calculable: boolean
+) {
   const q = new URLSearchParams({ tour: info.slug });
-  if (info.hasClasses) q.set('class', cls);
-  if (calculable) q.set('people', String(people));
+  if (info.hasClasses) q.set('class', sel.cls);
+  if (sel.option) q.set('option', sel.option.key);
+  if (calculable) q.set('people', String(sel.people));
   return `/reserve?${q.toString()}`;
 }
 
 /** 오른쪽(모바일은 본문 끝) 예약 카드. */
 export function BookingCard({ info }: { info: BookingInfo }) {
   const t = useTranslations('tourDetail');
-  const { cls, setCls, people, setPeople } = useBooking();
+  const { cls, setCls, option, selectOption, people, setPeople } = useBooking();
   const v = usePriceView(info);
   // 구간 요금은 최대 인원 +1 까지 올려 '초과 시 문의' 안내를 보여주고, 제한이 없으면 20명까지.
   const cap = v.max != null ? v.max + 1 : 20;
@@ -123,11 +148,32 @@ export function BookingCard({ info }: { info: BookingInfo }) {
           {t('krwApprox', { krw: v.krw(v.from)!, rate: info.rate!.toFixed(2) })}
         </div>
       )}
-      {info.pricing.priceMode === 'perPerson' && info.pricing.priceSolo != null && (
+      {v.pricing.priceMode === 'perPerson' && v.pricing.priceSolo != null && (
         <div className="mt-3 flex justify-between border-t border-white/10 pt-3 text-sm text-white/75">
           <span>{t('bookSolo')}</span>
-          <strong className="text-white">{formatYen(info.pricing.priceSolo, v.locale)}</strong>
+          <strong className="text-white">{formatYen(v.pricing.priceSolo, v.locale)}</strong>
         </div>
+      )}
+
+      {info.options.length > 0 && (
+        <fieldset className="mt-5">
+          <legend className="mb-2 text-[13px] font-bold text-white/80">{t('optionTitle')}</legend>
+          <div className="grid grid-cols-2 gap-2">
+            {info.options.map((o) => (
+              <button
+                key={o.key}
+                type="button"
+                aria-pressed={option?.key === o.key}
+                onClick={() => selectOption(o.key)}
+                className={`min-h-11 rounded-xl border px-2 py-2 text-sm font-bold leading-tight transition-colors ${
+                  option?.key === o.key ? 'border-[#5fc6ef] bg-[#5fc6ef] text-[#06202f]' : 'border-white/15 text-white hover:border-white/40'
+                }`}
+              >
+                {o.name}
+              </button>
+            ))}
+          </div>
+        </fieldset>
       )}
 
       {info.hasClasses && (
@@ -175,8 +221,8 @@ export function BookingCard({ info }: { info: BookingInfo }) {
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setPeople(Math.max(1, people - 1))}
-                disabled={people <= 1}
+                onClick={() => setPeople(Math.max(v.min, people - 1))}
+                disabled={people <= v.min}
                 aria-label={t('peopleDec')}
                 className="grid h-10 w-10 place-items-center rounded-full border border-white/20 text-lg text-white transition-colors hover:border-white/50 disabled:opacity-30"
               >
@@ -196,6 +242,9 @@ export function BookingCard({ info }: { info: BookingInfo }) {
               </button>
             </div>
           </div>
+          {option && v.min > 1 && (
+            <p className="mt-2 text-right text-xs text-white/60">{t('optionMinNote', { name: option.name, n: v.min })}</p>
+          )}
           <div className="mt-4 flex items-end justify-between border-t border-white/10 pt-4">
             <span className="text-sm text-white/75">
               {t('bookTotal')}
@@ -213,7 +262,7 @@ export function BookingCard({ info }: { info: BookingInfo }) {
       )}
 
       <Link
-        href={reserveHref(info, cls, people, v.calculable)}
+        href={reserveHref(info, { cls, option, people }, v.calculable)}
         className="mt-6 flex h-14 items-center justify-center gap-2 rounded-full bg-amber-400 text-base font-bold text-[#06202f] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-colors hover:bg-amber-300"
       >
         {t('bookCta')}
@@ -238,7 +287,7 @@ export function BookingCard({ info }: { info: BookingInfo }) {
 /** 모바일 하단 고정 바 — 요금 요약 + 예약 버튼. 본문을 가리지 않도록 페이지가 하단 여백을 둔다. */
 export function MobileBookBar({ info }: { info: BookingInfo }) {
   const t = useTranslations('tourDetail');
-  const { cls, people } = useBooking();
+  const { cls, option, people } = useBooking();
   const v = usePriceView(info);
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t border-white/10 bg-[#061522]/95 px-5 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3 backdrop-blur-md lg:hidden">
@@ -247,7 +296,7 @@ export function MobileBookBar({ info }: { info: BookingInfo }) {
         <div className="truncate text-lg font-bold text-white">{v.main || t('bookInquiry')}</div>
       </div>
       <Link
-        href={reserveHref(info, cls, people, v.calculable)}
+        href={reserveHref(info, { cls, option, people }, v.calculable)}
         className="flex h-12 shrink-0 items-center rounded-full bg-amber-400 px-5 text-[15px] font-bold text-[#06202f]"
       >
         {t('mobileCta')}
@@ -315,6 +364,61 @@ export function TourClassCards({
                 <span className="text-sm text-white/60">{t('classPreparing')}</span>
               )}
             </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** 선택 옵션 카드(예: 일반 / 프라이빗) — 1인 요금·최소 인원·설명. 선택은 예약 카드와 공유. */
+export function TourOptionCards({ options }: { options: TourOption[] }) {
+  const t = useTranslations('tourDetail');
+  const locale = useLocale();
+  const { option, selectOption } = useBooking();
+  return (
+    <div role="radiogroup" aria-label={t('optionTitle')} className="mt-5 grid gap-4 sm:grid-cols-2">
+      {options.map((o) => {
+        const selected = option?.key === o.key;
+        const lines = o.description.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+        return (
+          <button
+            key={o.key}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            onClick={() => selectOption(o.key)}
+            className={`relative flex flex-col gap-3 rounded-2xl border bg-[#061522]/60 p-5 pr-14 text-left backdrop-blur-md transition-colors ${
+              selected ? 'border-amber-400 ring-1 ring-amber-400' : 'border-white/10 hover:border-white/30'
+            }`}
+          >
+            <span
+              aria-hidden
+              className={`absolute right-4 top-4 grid h-7 w-7 place-items-center rounded-full border-2 ${
+                selected ? 'border-amber-400 bg-amber-400 text-[#06202f]' : 'border-white/60 bg-[#061522]/70 text-transparent'
+              }`}
+            >
+              <Icon name="check" className="h-4 w-4" strokeWidth={3} />
+            </span>
+            <span className="text-lg font-bold text-white">{o.name}</span>
+            <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              {o.pricePerPerson != null && (
+                <span className="text-[15px] font-bold text-amber-300">
+                  {t('optionPerPerson', { price: formatYen(o.pricePerPerson, locale) })}
+                </span>
+              )}
+              <span className="text-sm text-white/70">{t('optionFrom', { n: optionMinPeople(o) })}</span>
+            </span>
+            {lines.length > 0 && (
+              <ul className="space-y-1 text-sm leading-relaxed text-white/75">
+                {lines.map((l, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span aria-hidden className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-white/50" />
+                    {l}
+                  </li>
+                ))}
+              </ul>
+            )}
           </button>
         );
       })}

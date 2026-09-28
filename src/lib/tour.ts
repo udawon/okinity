@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ACTIVITIES, type Activity } from '@/components/ocean-home-data';
+import { activeOptions, localizeOptions, parseTourOptions, type TourOption } from './tour-options';
 
 /**
  * 투어 상세 — 목록(어떤 투어가 있는지)은 코드 카탈로그(ACTIVITIES.tours)로 고정,
@@ -154,7 +155,8 @@ export const TourDetailSchema = z.object({
   people: z.string().default('').catch(''), // 인원 안내(예: 2인부터 · 1인 가능)
   startNote: z.string().default('').catch(''), // 출발 안내(자유 출발형 등) — 투어 시간대가 없을 때 표시
   steps: z.array(TourStepSchema).default([]).catch([]), // 진행 순서 — 비면 본문의 '->' 흐름 사용
-  notices: z.array(z.string()).default([]).catch([]) // 켜 둔 공통 안내 id(lib/tour-notices)
+  notices: z.array(z.string()).default([]).catch([]), // 켜 둔 공통 안내 id(lib/tour-notices)
+  options: z.unknown().transform(parseTourOptions) // 선택 옵션(lib/tour-options) — 형식이 틀린 항목만 건너뜀
 });
 export type TourDetail = z.infer<typeof TourDetailSchema>;
 
@@ -178,7 +180,8 @@ export function emptyTourDetail(): TourDetail {
     people: '',
     startNote: '',
     steps: [],
-    notices: []
+    notices: [],
+    options: []
   };
 }
 
@@ -226,6 +229,15 @@ export const TOUR_DETAIL_DEFAULTS: Record<string, TourDetail> = {
 export function resolveTourDetail(slug: string, raw: unknown): TourDetail {
   if (raw == null && TOUR_DETAIL_DEFAULTS[slug]) return TOUR_DETAIL_DEFAULTS[slug];
   return parseTourDetail(raw);
+}
+
+/**
+ * 손님이 고를 수 있는 옵션 — 요금·순서는 한국어 저장본(base), 이름·설명은 그 언어 저장본(local).
+ * 상세가 공개된 투어만, 낚시는 제외(미들/럭셔리 클래스로 고른다). 투어 페이지·예약 폼 공용.
+ */
+export function bookableOptions(slug: string, base: TourDetail, local: TourDetail): TourOption[] {
+  if (tourHasClasses(slug) || !local.published) return [];
+  return activeOptions(localizeOptions(base.options, local.options));
 }
 
 /** 줄바꿈/쉼표로 구분된 문자열을 리스트로(포함 사항 등). */

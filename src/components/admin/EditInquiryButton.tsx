@@ -4,18 +4,12 @@ import { useState, useTransition, type FormEvent } from 'react';
 import { updateInquiry } from '@/app/admin/actions';
 import { ACTIVITIES } from '@/components/ocean-home-data';
 import { splitMedical, MEDICAL_MARKER, type Inquiry } from '@/lib/inquiries/types';
+import { buildProduct, parseProduct } from '@/lib/inquiry-product';
 
 // 자유 입력 보조 제안 목록 — 과거 표준 옵션 + 투어 시간대 미설정 시 기본값('개별 문의').
 const TIME_SUGGESTIONS = ['개별 문의', '오전', '오후', '종일', '시간 무관'];
-
-/** 기존 product 문자열("대분류 · 세부") → 대분류 id + 세부 slug 역매핑. */
-function parseProduct(product?: string): { catId: string; slug: string } {
-  if (!product) return { catId: '', slug: '' };
-  const a = ACTIVITIES.find((x) => product.startsWith(x.title));
-  const namePart = product.includes(' · ') ? product.split(' · ').slice(1).join(' · ') : '';
-  const tour = a?.tours.find((t) => t.name === namePart);
-  return { catId: a?.id ?? '', slug: tour?.slug ?? '' };
-}
+// 옵션·클래스 제안 — 낚시 클래스(고정) + 자주 쓰는 투어 옵션. 투어별 옵션 이름은 자유 입력.
+const EXTRA_SUGGESTIONS = ['미들 클래스', '럭셔리 클래스', '일반', '프라이빗'];
 
 const inputCls =
   'mt-1 w-full rounded-button border border-line bg-bg px-3 py-2 text-sm text-ink focus:border-brand focus:outline-none';
@@ -41,7 +35,8 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const tourName = cat?.tours.find((t) => t.slug === slug)?.name ?? '';
-    const product = cat ? `${cat.title}${tourName ? ' · ' + tourName : ''}` : '';
+    // 옵션·클래스는 세부 프로그램이 있을 때만 붙인다(투어 없이 옵션만 남지 않게).
+    const product = cat ? buildProduct(cat.title, tourName, tourName ? String(fd.get('extra') || '') : '') : '';
     // 요청사항만 편집하고, 메디컬 표식은 보존(완료였던 건 다시 앞에 붙여 저장).
     const reqMsg = String(fd.get('message') || '').trim();
     const message = medicalChecked
@@ -132,6 +127,29 @@ export default function EditInquiryButton({ inquiry }: { inquiry: Inquiry }) {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label htmlFor="ei-extra" className={labelCls}>
+                  옵션 · 클래스
+                </label>
+                {/* 손님이 고른 옵션(예: 프라이빗)·낚시 클래스 — 상품명 끝에 그대로 붙어 저장된다 */}
+                <input
+                  id="ei-extra"
+                  name="extra"
+                  type="text"
+                  defaultValue={init.extra}
+                  list="ei-extra-suggestions"
+                  maxLength={30}
+                  disabled={!slug}
+                  placeholder={slug ? '없으면 비워 두세요' : '먼저 세부 프로그램 선택'}
+                  className={`${inputCls} disabled:opacity-50`}
+                />
+                <datalist id="ei-extra-suggestions">
+                  {EXTRA_SUGGESTIONS.map((x) => (
+                    <option key={x} value={x} />
+                  ))}
+                </datalist>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

@@ -245,7 +245,12 @@
     "classLabel": "クラス",
     "classPlaceholder": "クラスを選択（ミドル · ラグジュアリー）",
     "classMiddle": "ミドルクラス",
-    "classLuxury": "ラグジュアリークラス"
+    "classLuxury": "ラグジュアリークラス",
+    "optionLabel": "プラン",
+    "optionPlaceholder": "プランを選択",
+    "optionPerPerson": "お一人様 {price}",
+    "optionFrom": "{n}名様から",
+    "optionMinHint": "{name}は{n}名様からご予約いただけます。"
   },
   "tourDetail": {
     "includesTitle": "含まれるもの",
@@ -295,7 +300,13 @@
     "bookCta": "このツアーを問い合わせる",
     "bookKakao": "カカオトークで質問する",
     "bookNote": "お問い合わせの送信だけでは予約は確定しません。カカオトークチャンネルで確定のご案内をお送りします。",
-    "mobileCta": "予約を問い合わせる"
+    "mobileCta": "予約を問い合わせる",
+    "optionTitle": "プラン",
+    "optionPick": "プランをお選びください",
+    "optionPerPerson": "お一人様 {price}",
+    "optionFrom": "{n}名様から",
+    "optionMinNote": "{name}は{n}名様からご予約いただけます。",
+    "bookLabelOption": "お一人様 · {option}"
   },
   "medical": {
     "title": "メディカルチェック",

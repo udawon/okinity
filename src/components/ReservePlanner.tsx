@@ -7,6 +7,7 @@ import ScheduleCalendar from './ScheduleCalendar';
 import ReservationForm from './ReservationForm';
 import { FISHING_CLASS_KEYS, parsePeopleParam } from '@/lib/tour';
 import type { ScheduleItem } from '@/lib/content';
+import type { ReserveOption } from '@/lib/tour-options';
 
 type Status = ScheduleItem['status'];
 
@@ -19,13 +20,16 @@ export default function ReservePlanner({
   items,
   locale,
   statusLabel,
-  tourTimes
+  tourTimes,
+  tourOptions
 }: {
   items: ScheduleItem[];
   locale: string;
   statusLabel: Record<Status, string>;
   /** 투어별 가능 시간대(어드민 tour_times 설정) — 예약 폼 시간대 선택지로 전달. */
   tourTimes?: Record<string, string[]>;
+  /** 투어별 선택 옵션(어드민 투어 상세) — 예약 폼 옵션 칸. 옵션 없는 투어는 키 없음. */
+  tourOptions?: Record<string, ReserveOption[]>;
 }) {
   const t = useTranslations('reservation');
   const [selected, setSelected] = useState<{ key: string; events: ScheduleItem[] } | null>(null);
@@ -39,6 +43,8 @@ export default function ReservePlanner({
   const initialClass = FISHING_CLASS_KEYS.find((k) => k === rawClass);
   // 상세 예약 카드에서 정한 인원(?people=) → 폼 인원 기본값. 범위 밖이면 기본값(2명).
   const initialPeople = parsePeopleParam(searchParams.get('people'));
+  // 상세에서 고른 옵션(?option=) — 폼이 그 투어의 옵션 목록에 있는 값만 받는다.
+  const initialOption = searchParams.get('option') ?? undefined;
 
   const dateLong = selectedKey
     ? new Intl.DateTimeFormat(locale, {
@@ -95,7 +101,9 @@ export default function ReservePlanner({
               initialSlug={initialSlug}
               initialClass={initialClass}
               initialPeople={initialPeople}
+              initialOption={initialOption}
               tourTimes={tourTimes}
+              tourOptions={tourOptions}
               onReset={() => setSelected(null)}
             />
           )}

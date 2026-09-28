@@ -37,6 +37,11 @@ export default async function AdminTourEditPage({
       ? await getSiteContent(CONTENT_KEYS.tour(slug))
       : null;
   const detail = resolveTourDetail(slug, value ?? fallback);
+  // 번역 탭의 옵션 기준(요금·순서) = 한국어 저장본. 번역본이 없으면 fallback 이 이미 한국어 값이다.
+  const baseOptions =
+    lang === 'ko'
+      ? undefined
+      : resolveTourDetail(slug, fallback ?? (enabled ? await getSiteContent(CONTENT_KEYS.tour(slug)) : null)).options;
 
   // 낚시 투어면 공통 클래스(미들/럭셔리)도 함께 편집 — 단일 키라 4종 전체에 동기화.
   const showClasses = tourHasClasses(slug);
@@ -74,7 +79,7 @@ export default async function AdminTourEditPage({
       )}
 
       <div className="mt-5 space-y-5">
-        <TourEditor key={lang} slug={slug} detail={detail} lang={lang} disabled={!enabled} />
+        <TourEditor key={lang} slug={slug} detail={detail} lang={lang} baseOptions={baseOptions} disabled={!enabled} />
         {fishingClasses && (
           <FishingClassesForm key={`fc-${lang}`} initial={fishingClasses} lang={lang} disabled={!enabled} />
         )}

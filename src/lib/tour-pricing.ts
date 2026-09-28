@@ -5,17 +5,15 @@
  */
 
 import { ACTIVITIES } from '@/components/ocean-home-data';
-import { TOUR_CATALOG } from './tour';
+import { parseProduct } from './inquiry-product';
 
 export type TourPrices = Record<string, number>;
 
-/** 예약 product 표시문자열("대분류 · 세부") → 대분류 색 accent + 단가용 slug. */
+/** 예약 product 표시문자열("대분류 · 세부 · 옵션") → 대분류 색 accent + 단가용 slug. */
 export function tourMeta(product?: string): { accent: string; slug: string | null } {
-  if (!product) return { accent: '#64748b', slug: null };
-  const a = ACTIVITIES.find((x) => product.startsWith(x.title));
-  const namePart = product.includes(' · ') ? product.split(' · ').slice(1).join(' · ') : '';
-  const entry = TOUR_CATALOG.find((t) => t.name === namePart);
-  return { accent: a?.accent ?? '#64748b', slug: entry?.slug ?? null };
+  const { catId, slug } = parseProduct(product);
+  const a = ACTIVITIES.find((x) => x.id === catId);
+  return { accent: a?.accent ?? '#64748b', slug: slug || null };
 }
 
 /** site_content 값을 안전 파싱 → { slug: 단가 }. 음수·비정상 값은 제외. */
