@@ -40,7 +40,7 @@ export default async function AboutPage({
 
   return (
     <section className="py-14 sm:py-20">
-      <Container className="max-w-3xl [text-shadow:0_2px_14px_rgba(0,0,0,0.45)]">
+      <Container size="text" className="[text-shadow:0_2px_14px_rgba(0,0,0,0.45)]">
         {/* 상단 소개 */}
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200/80">
           {about.eyebrow}

@@ -66,7 +66,7 @@ export default async function NoticePostPage({
 
   return (
     <article className="py-16 sm:py-24">
-      <Container className="max-w-2xl">
+      <Container size="narrow">
         {!post.published && <DraftNotice editHref={`/admin/notice/${post.id}`} />}
 
         <Link href="/notice" className="text-sm text-white/55 transition-colors hover:text-white">

@@ -48,7 +48,7 @@ export default async function NoticeListPage({
 
   return (
     <section className="py-16 sm:py-24">
-      <Container className="max-w-3xl">
+      <Container size="text">
         <h1 className="font-serif text-3xl text-white sm:text-4xl">{t('title')}</h1>
         <p className="mt-3 max-w-xl text-white/60">{t('intro')}</p>
 
