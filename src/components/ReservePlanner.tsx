@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import ScheduleCalendar from './ScheduleCalendar';
 import ReservationForm from './ReservationForm';
-import { FISHING_CLASS_KEYS } from '@/lib/tour';
+import { FISHING_CLASS_KEYS, parsePeopleParam } from '@/lib/tour';
 import type { ScheduleItem } from '@/lib/content';
 
 type Status = ScheduleItem['status'];
@@ -37,6 +37,8 @@ export default function ReservePlanner({
   // 상세에서 고른 낚시 클래스(?class=) → 폼 클래스 사전 선택. 화이트리스트 외 값은 무시.
   const rawClass = searchParams.get('class');
   const initialClass = FISHING_CLASS_KEYS.find((k) => k === rawClass);
+  // 상세 예약 카드에서 정한 인원(?people=) → 폼 인원 기본값. 범위 밖이면 기본값(2명).
+  const initialPeople = parsePeopleParam(searchParams.get('people'));
 
   const dateLong = selectedKey
     ? new Intl.DateTimeFormat(locale, {
@@ -92,6 +94,7 @@ export default function ReservePlanner({
               scheduled={scheduled}
               initialSlug={initialSlug}
               initialClass={initialClass}
+              initialPeople={initialPeople}
               tourTimes={tourTimes}
               onReset={() => setSelected(null)}
             />

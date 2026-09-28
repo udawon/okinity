@@ -98,6 +98,38 @@ export function parseFishingClasses(raw: unknown): TourClasses {
 }
 
 /**
+ * 요금 방식 — 투어마다 계산법이 다르다.
+ *   text      : 가격 안내 글 그대로(계산 없음, 기본값 — 기존 데이터 전부)
+ *   perPerson : 1인당 요금(+1인 단독 요금) — 스노클링·체험다이빙
+ *   boat      : 배 1척 · 인원 구간별 — 낚시·요트
+ *   inquiry   : 가격 문의
+ * 숫자 요금이 있을 때만 예약 카드가 인원별 예상 합계를 계산한다.
+ */
+export const PRICE_MODES = ['text', 'perPerson', 'boat', 'inquiry'] as const;
+export type PriceMode = (typeof PRICE_MODES)[number];
+
+/** 배 1척 요금 구간 — "최대 maxPeople명까지 price엔". cls 빈 값 = 모든 클래스 공통. */
+export const PriceTierSchema = z.object({
+  cls: z.string().default(''),
+  maxPeople: z.number().int().positive(),
+  price: z.number().nonnegative()
+});
+export type PriceTier = z.infer<typeof PriceTierSchema>;
+
+/** 진행 순서 1단계. */
+export const TourStepSchema = z.object({
+  name: z.string().default(''),
+  time: z.string().default('')
+});
+export type TourStepInput = z.infer<typeof TourStepSchema>;
+
+/**
+ * 2026-09 추가 필드는 모두 선택 입력 + `.catch()` — 한 필드가 잘못 저장돼도 상세 전체가
+ * 빈 값으로 무너지지 않게 한다(parseTourDetail 은 실패 시 전체를 비우므로).
+ */
+const optionalNumber = z.number().nonnegative().nullable().default(null).catch(null);
+
+/**
  * 어드민이 등록하는 상세 콘텐츠. site_content `tour:{slug}` 의 value.
  * published=false 면 상세 본문은 비공개(페이지는 기본 정보 + 예약 문의만 노출).
  * (클래스(미들/럭셔리)는 투어별이 아닌 낚시 공통이므로 여기 포함하지 않는다 — fishing_classes 키 참조.)
@@ -111,8 +143,18 @@ export const TourDetailSchema = z.object({
   priceMiddle: z.string().default(''), // 낚시 미들 클래스 가격 — 입력 시 클래스 선택에 따라 전환 표시
   priceLuxury: z.string().default(''), // 낚시 럭셔리 클래스 가격
   included: z.string().default(''), // 포함 사항(줄바꿈 구분)
-  body: z.string().default(''), // 상세 본문(여러 단락)
-  published: z.boolean().default(false)
+  body: z.string().default(''), // 상세 본문(여러 단락) — 표기법은 lib/tour-body 참조
+  published: z.boolean().default(false),
+  // ── 2026-09 구조화 입력(모두 선택) ──
+  priceMode: z.enum(PRICE_MODES).default('text').catch('text'),
+  pricePerPerson: optionalNumber, // perPerson: 2인 이상 1인 요금(엔)
+  priceSolo: optionalNumber, // perPerson: 1인 단독 참가 요금(엔)
+  priceTiers: z.array(PriceTierSchema).default([]).catch([]), // boat: 인원 구간
+  age: z.string().default('').catch(''), // 참가 연령 표시 — 비면 본문에서 추출
+  people: z.string().default('').catch(''), // 인원 안내(예: 2인부터 · 1인 가능)
+  startNote: z.string().default('').catch(''), // 출발 안내(자유 출발형 등) — 투어 시간대가 없을 때 표시
+  steps: z.array(TourStepSchema).default([]).catch([]), // 진행 순서 — 비면 본문의 '->' 흐름 사용
+  notices: z.array(z.string()).default([]).catch([]) // 켜 둔 공통 안내 id(lib/tour-notices)
 });
 export type TourDetail = z.infer<typeof TourDetailSchema>;
 
@@ -127,7 +169,16 @@ export function emptyTourDetail(): TourDetail {
     priceLuxury: '',
     included: '',
     body: '',
-    published: false
+    published: false,
+    priceMode: 'text',
+    pricePerPerson: null,
+    priceSolo: null,
+    priceTiers: [],
+    age: '',
+    people: '',
+    startNote: '',
+    steps: [],
+    notices: []
   };
 }
 
@@ -183,4 +234,83 @@ export function splitLines(value: string): string[] {
     .split(/\r?\n|,/)
     .map((s) => s.trim())
     .filter(Boolean);
+}
+
+// ── 요약 타일 · 예약 카드용 도메인 계산 ──────────────────────────────
+
+export type AgeRange = { min: number; max: number };
+
+const AGE_PATTERNS = [
+  /만\s?(\d{1,2})\s?세\s?부터\s?만?\s?(\d{1,2})\s?세/, // ko: 만10세부터 만55세
+  /(\d{1,2})\s?歳から\s?(\d{1,2})\s?歳/, // ja: 10歳から55歳
+  /between\s+(\d{1,2})\s+and\s+(\d{1,2})\s+years?\s+old/i // en
+];
+
+/** 본문에서 참가 연령 범위를 찾는다(요약 타일의 폴백). 없으면 null. */
+export function extractAgeRange(body: string): AgeRange | null {
+  for (const re of AGE_PATTERNS) {
+    const m = re.exec(body ?? '');
+    if (m) {
+      const min = Number(m[1]);
+      const max = Number(m[2]);
+      if (min < max) return { min, max };
+    }
+  }
+  return null;
+}
+
+/** 예약 카드 계산에 필요한 요금 필드만 — 클라이언트로 상세 전체를 넘기지 않기 위해. */
+export type TourPricing = Pick<TourDetail, 'priceMode' | 'pricePerPerson' | 'priceSolo' | 'priceTiers'>;
+
+/** 선택 클래스에 적용되는 요금 구간(최대 인원 오름차순). */
+function tiersFor(detail: TourPricing, cls: string): PriceTier[] {
+  return detail.priceTiers
+    .filter((t) => !t.cls || t.cls === cls)
+    .sort((a, b) => a.maxPeople - b.maxPeople);
+}
+
+/**
+ * 인원별 예상 합계(엔). 숫자 요금이 없거나 계산할 수 없으면 null.
+ * perPerson: 1인이면 단독 요금(없으면 1인 요금), 2인 이상은 1인 요금 × 인원.
+ * boat: 인원을 담는 가장 작은 구간의 배 1척 요금. 최대 인원 초과면 null.
+ */
+export function estimateTotal(detail: TourPricing, people: number, cls: string = ''): number | null {
+  if (!Number.isFinite(people) || people < 1) return null;
+  if (detail.priceMode === 'perPerson') {
+    if (people === 1 && detail.priceSolo != null) return detail.priceSolo;
+    return detail.pricePerPerson == null ? null : detail.pricePerPerson * people;
+  }
+  if (detail.priceMode === 'boat') {
+    return tiersFor(detail, cls).find((t) => people <= t.maxPeople)?.price ?? null;
+  }
+  return null;
+}
+
+/** 표시용 시작가(엔). perPerson=1인 요금, boat=해당 클래스 최저 구간. */
+export function startingPrice(detail: TourPricing, cls: string = ''): number | null {
+  if (detail.priceMode === 'perPerson') return detail.pricePerPerson ?? detail.priceSolo;
+  if (detail.priceMode === 'boat') {
+    const prices = tiersFor(detail, cls).map((t) => t.price);
+    return prices.length ? Math.min(...prices) : null;
+  }
+  return null;
+}
+
+/** 예약 가능한 최대 인원(boat 구간 기준). 제한이 없으면 null. */
+export function maxPeopleOf(detail: TourPricing, cls: string = ''): number | null {
+  if (detail.priceMode !== 'boat') return null;
+  const tiers = tiersFor(detail, cls);
+  return tiers.length ? tiers[tiers.length - 1].maxPeople : null;
+}
+
+/** 엔 → 원 참고 금액(천 원 단위 반올림). */
+export function approxKrw(yen: number, jpyKrw: number): number {
+  return Math.round((yen * jpyKrw) / 1000) * 1000;
+}
+
+/** 투어 상세 예약 카드가 넘긴 인원(?people=) — 예약 폼 입력 범위(1~50) 안의 정수만 받는다. */
+export function parsePeopleParam(raw: string | null): number | undefined {
+  if (!raw || !/^\d+$/.test(raw)) return undefined;
+  const n = Number(raw);
+  return n >= 1 && n <= 50 ? n : undefined;
 }

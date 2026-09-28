@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
 import { useRouter } from 'next/navigation';
 import { saveBlogPost } from '@/app/admin/blog-actions';
-import { type BlogPost, type BlogBlock } from '@/lib/blog';
+import { type BlogPost, type BlogBlock, BLOG_TOUR_NONE, inferTourSlug } from '@/lib/blog';
+import { TOUR_CATALOG, getTourCatalogEntry } from '@/lib/tour';
 import MediaInput from './MediaInput';
 import PreviewLink from './PreviewLink';
 import { VIDEO_UPLOAD_HINT } from '@/lib/upload-client';
@@ -77,6 +78,38 @@ export default function BlogEditor({
             disabled={disabled}
             className={inputCls}
           />
+        </div>
+
+        <div>
+          <label htmlFor="blog-tour" className="mb-1 block text-sm font-medium text-ink">
+            어떤 투어였나요?
+          </label>
+          <select
+            id="blog-tour"
+            value={post.tourSlug}
+            onChange={(e) => set({ tourSlug: e.target.value })}
+            disabled={disabled}
+            className={inputCls}
+          >
+            <option value="">
+              자동 (제목으로 찾기
+              {(() => {
+                const guess = inferTourSlug(post.title);
+                return guess ? ` → ${getTourCatalogEntry(guess)?.name}` : ' → 못 찾음';
+              })()}
+              )
+            </option>
+            <option value={BLOG_TOUR_NONE}>연결 안 함</option>
+            {TOUR_CATALOG.map((t) => (
+              <option key={t.slug} value={t.slug}>
+                {t.categoryTitle} · {t.name}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-muted">
+            글 아래에 ‘이 날의 투어’ 카드와 예약 버튼이 붙고, 투어 페이지와 서로 연결돼요. 제목 앞에 날짜(260924)를
+            붙이지 않아도 날짜는 따로 표시돼요.
+          </p>
         </div>
 
         <div>

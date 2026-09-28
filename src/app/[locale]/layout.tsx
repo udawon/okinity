@@ -14,6 +14,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BookButton from '@/components/BookButton';
 import OceanBackground from '@/components/OceanBackground';
+import VisitBeacon from '@/components/VisitBeacon';
 import '../globals.css';
 
 // next/font — self-host + subset + preload. CDN @import(render-blocking) 대체.
@@ -110,6 +111,7 @@ export default async function LocaleLayout({
           <main>{children}</main>
           <Footer />
           <BookButton />
+          <VisitBeacon />
         </NextIntlClientProvider>
       </body>
     </html>

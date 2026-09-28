@@ -32,6 +32,8 @@ export const CONTENT_KEYS = {
   tourPrices: 'tour_prices',
   /** 투어별 가능 시간대(예약 폼 선택지). value: { times: { [slug]: string[] } }. 비면 '개별 문의' 안내. */
   tourTimes: 'tour_times',
+  /** 투어 공통 안내(환불·안전). value: TourNotices(lib/tour-notices). 언어별 키, 한국어 폴백 없음(언어별 기본 문구). */
+  tourNotices: 'tour_notices',
   product: (slug: string) => `product:${slug}`
 } as const;
 

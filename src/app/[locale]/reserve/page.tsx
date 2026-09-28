@@ -53,7 +53,7 @@ export default async function ReservePage({
 
   return (
     <section className="py-12 sm:py-16">
-      <Container className="max-w-container">
+      <Container>
         <h1 className="font-serif text-3xl font-normal text-white sm:text-4xl">{tr('heading')}</h1>
         <p className="mt-2 text-white/70">{tr('intro')}</p>
         <div className="mt-8">

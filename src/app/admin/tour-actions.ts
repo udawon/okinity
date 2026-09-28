@@ -9,6 +9,7 @@ import {
   localizedContentKey,
   isContentLocale
 } from '@/lib/site-content';
+import { TOUR_NOTICE_IDS, TourNoticeSchema, type TourNotices } from '@/lib/tour-notices';
 import {
   TourDetailSchema,
   TourClassesSchema,
@@ -67,6 +68,28 @@ export async function saveFishingClasses(
   try {
     await setSiteContent(localizedContentKey(CONTENT_KEYS.fishingClasses, lang), parsed.data);
     revalidatePath('/', 'layout'); // 모든 낚시 /tours/[slug] 무효화
+    return { ok: true };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : '저장 실패' };
+  }
+}
+
+/**
+ * 투어 공통 안내(환불·안전) 저장 — 언어별 단일 키. 켜 둔 모든 투어 페이지에 한 번에 반영된다.
+ * 빈 제목·본문으로 저장하면 그 언어의 기본 문구로 되돌아간다(lib/tour-notices).
+ */
+export async function saveTourNotices(input: TourNotices, lang: string = 'ko'): Promise<TourActionState> {
+  await requireAdmin();
+  if (!isContentLocale(lang)) return { error: '지원하지 않는 언어입니다.' };
+  const value: Record<string, unknown> = {};
+  for (const id of TOUR_NOTICE_IDS) {
+    const parsed = TourNoticeSchema.safeParse(input?.[id]);
+    if (!parsed.success) return { error: '입력 형식이 올바르지 않습니다.' };
+    value[id] = parsed.data;
+  }
+  try {
+    await setSiteContent(localizedContentKey(CONTENT_KEYS.tourNotices, lang), value);
+    revalidatePath('/', 'layout'); // 모든 /tours/[slug] 무효화
     return { ok: true };
   } catch (e) {
     return { error: e instanceof Error ? e.message : '저장 실패' };
