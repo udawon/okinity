@@ -43,3 +43,6 @@ public/videos/turtle2.mp4
 
 # 디자인 시안(로컬 HTML·사진) — 용량이 커서 저장소에 올리지 않고 로컬에서만 보관
 docs/design-mockups/
+
+# 투어 운영 담당자용 매뉴얼(PDF·HTML·캡처 원본) — 용량이 커서 저장소에 올리지 않고 로컬에서만 보관
+docs/manuals/
