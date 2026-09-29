@@ -27,7 +27,11 @@ function formatDate(date: string, locale: string, opts?: Intl.DateTimeFormatOpti
   if (!date) return '';
   const d = new Date(date);
   if (Number.isNaN(d.getTime())) return date;
-  return new Intl.DateTimeFormat(locale, opts ?? { year: 'numeric', month: 'long', day: 'numeric' }).format(d);
+  // 날짜만 저장('YYYY-MM-DD' = UTC 자정) — UTC 로 읽어야 하루 밀림이 없다.
+  return new Intl.DateTimeFormat(locale, {
+    timeZone: 'UTC',
+    ...(opts ?? { year: 'numeric', month: 'long', day: 'numeric' })
+  }).format(d);
 }
 
 /**
@@ -143,7 +147,7 @@ export default async function BlogPostPage({
               </span>
             )}
           </div>
-          <h1 className="mt-3 text-balance font-serif text-3xl leading-tight text-white sm:text-4xl">{title}</h1>
+          <h1 className="user-text mt-3 text-balance font-serif text-3xl leading-tight text-white sm:text-4xl">{title}</h1>
         </header>
 
         <BlogBody groups={groups} title={title} />

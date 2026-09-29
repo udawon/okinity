@@ -6,7 +6,8 @@ import { localeAlternates } from '@/lib/seo';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { normalizeScheduleItems } from '@/lib/schedule-range';
 import { getGoogleReviews } from '@/lib/google-reviews';
-import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
+import { getSiteContentMap, tourDocsIn, CONTENT_KEYS } from '@/lib/site-content';
+import { reserveOptionsFor } from '@/lib/tour';
 import { parseTourTimes } from '@/lib/tour-times';
 import { parseBlogItems, publishedSorted, BLOG_CAROUSEL_LIMIT } from '@/lib/blog';
 import {
@@ -77,6 +78,8 @@ export default async function HomePage({
 
   // 투어별 가능 시간대(어드민 설정) — 홈 예약 섹션 폼의 시간대 선택지.
   const tourTimes = parseTourTimes(overrides[CONTENT_KEYS.tourTimes]);
+  // 투어별 선택 옵션 — /reserve 와 같은 규칙(홈에서 예약해도 일반/프라이빗 등을 고르게).
+  const tourOptions = reserveOptionsFor(tourDocsIn(overrides, locale));
 
   // 어드민 편집 가능한 미디어(배경영상·투어 카드·갤러리). 비우면 기본값 사용.
   const heroOv = overrides[CONTENT_KEYS.hero] as
@@ -190,6 +193,7 @@ export default async function HomePage({
         content={content}
         googleReviews={googleReviews}
         tourTimes={tourTimes}
+        tourOptions={tourOptions}
       />
     </>
   );

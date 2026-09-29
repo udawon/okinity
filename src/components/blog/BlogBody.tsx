@@ -43,7 +43,7 @@ export default function BlogBody({ groups, title }: { groups: BlogGroup[]; title
       {groups.map((g, i) => {
         if (g.kind === 'text') {
           return (
-            <p key={i} className="whitespace-pre-wrap text-base leading-[1.85] text-white/85">
+            <p key={i} className="user-text whitespace-pre-wrap text-base leading-[1.85] text-white/85">
               {g.value}
             </p>
           );

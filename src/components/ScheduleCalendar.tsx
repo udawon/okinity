@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type { ScheduleItem } from '@/lib/content';
 import { scheduleItemDates } from '@/lib/schedule-range';
+import { okinawaTodayKey } from '@/lib/okinawa-date';
 
 type Status = ScheduleItem['status'];
 
@@ -79,10 +80,13 @@ export default function ScheduleCalendar({
   const prevKey = (key: string) => shiftKey(key, -1);
   const nextKey = (key: string) => shiftKey(key, 1);
 
+  // 오늘 = 영업지(오키나와) 기준 — 서버(UTC)와 방문자 브라우저가 같은 날짜를 계산해야
+  // 한국·일본 새벽(0~9시)에 달력 전체가 다시 그려지는 하이드레이션 불일치가 생기지 않는다.
+  const todayKey = okinawaTodayKey();
   // 초기 월 = 오늘의 월 — 시간이 흐르면 달력도 자연히 따라간다(과거 일정 월로 고정 금지).
   const [{ y, m }, setYM] = useState(() => {
-    const d = new Date();
-    return { y: d.getFullYear(), m: d.getMonth() };
+    const [ty, tm] = todayKey.split('-').map(Number);
+    return { y: ty, m: tm - 1 };
   });
 
   const weekdays = useMemo(() => weekdayLabels(locale), [locale]);
@@ -93,13 +97,6 @@ export default function ScheduleCalendar({
 
   const firstWeekday = new Date(y, m, 1).getDay(); // 0=일
   const daysInMonth = new Date(y, m + 1, 0).getDate();
-  const todayKey = (() => {
-    const t = new Date();
-    return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(
-      t.getDate()
-    ).padStart(2, '0')}`;
-  })();
-
   // 그리드 셀: 앞쪽 빈칸 + 1..말일
   const cells: (number | null)[] = [
     ...Array.from({ length: firstWeekday }, () => null),

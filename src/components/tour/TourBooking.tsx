@@ -15,7 +15,14 @@ import {
   type TourClasses,
   type TourPricing
 } from '@/lib/tour';
-import { findOption, optionMinPeople, pricingWithOption, type TourOption } from '@/lib/tour-options';
+import {
+  clampPeople,
+  findOption,
+  optionPeopleRange,
+  optionPeopleRule,
+  pricingWithOption,
+  type TourOption
+} from '@/lib/tour-options';
 import Icon from './icons';
 
 /**
@@ -39,14 +46,19 @@ const BookingContext = createContext<BookingState | null>(null);
 export function TourBookingProvider({ options = [], children }: { options?: TourOption[]; children: ReactNode }) {
   const [cls, setCls] = useState<FishingClassKey>('middle');
   const [optionKey, setOptionKey] = useState(options[0]?.key ?? '');
-  const [people, setPeople] = useState(() => Math.max(2, optionMinPeople(options[0])));
+  // 처음 인원 = 2명(첫 옵션의 최소~최대 안으로. 예: 1인 단독 옵션이 맨 위면 1명)
+  const [people, setPeople] = useState(() => {
+    const r = optionPeopleRange(options[0]);
+    return clampPeople(2, r.min, r.max);
+  });
   const value = useMemo(() => {
     const option = findOption(options, optionKey);
     const selectOption = (key: string) => {
       const next = findOption(options, key);
       if (!next) return;
       setOptionKey(key);
-      setPeople((p) => Math.max(p, optionMinPeople(next)));
+      const r = optionPeopleRange(next);
+      setPeople((p) => clampPeople(p, r.min, r.max));
     };
     return { cls, setCls, option, selectOption, people, setPeople };
   }, [cls, optionKey, options, people]);
@@ -89,7 +101,9 @@ function usePriceView(info: BookingInfo) {
   // 옵션에 1인 요금이 있으면 그 요금 × 인원(투어 요금 방식 대신)
   const pricing = pricingWithOption(info.pricing, option);
   const optionPriced = option?.pricePerPerson != null;
-  const min = optionMinPeople(option);
+  // 옵션 인원 범위(최대 인원이 없으면 제한 없음)
+  const { min } = optionPeopleRange(option);
+  const optionMax = option?.maxPeople != null ? optionPeopleRange(option).max : null;
 
   const from = startingPrice(pricing, clsKey);
   const total = estimateTotal(pricing, people, clsKey);
@@ -112,7 +126,7 @@ function usePriceView(info: BookingInfo) {
   }
 
   const krw = (yen: number) => (info.rate ? formatKrw(approxKrw(yen, info.rate)) : null);
-  return { label, main, from, total, max, min, calculable, krw, locale, clsLabel, pricing };
+  return { label, main, from, total, max, min, optionMax, calculable, krw, locale, clsLabel, pricing };
 }
 
 function reserveHref(
@@ -133,7 +147,8 @@ export function BookingCard({ info }: { info: BookingInfo }) {
   const { cls, setCls, option, selectOption, people, setPeople } = useBooking();
   const v = usePriceView(info);
   // 구간 요금은 최대 인원 +1 까지 올려 '초과 시 문의' 안내를 보여주고, 제한이 없으면 20명까지.
-  const cap = v.max != null ? v.max + 1 : 20;
+  // 인원 상한 — 옵션 최대 인원이 있으면 그 이상 못 고름. 배 요금 구간은 초과 안내를 위해 +1까지.
+  const cap = v.optionMax ?? (v.max != null ? v.max + 1 : 20);
   const over = v.calculable && v.total == null && v.max != null && people > v.max;
   const longMain = v.main.length > 14;
 
@@ -242,9 +257,7 @@ export function BookingCard({ info }: { info: BookingInfo }) {
               </button>
             </div>
           </div>
-          {option && v.min > 1 && (
-            <p className="mt-2 text-right text-xs text-white/60">{t('optionMinNote', { name: option.name, n: v.min })}</p>
-          )}
+          {option && <OptionPeopleNote option={option} />}
           <div className="mt-4 flex items-end justify-between border-t border-white/10 pt-4">
             <span className="text-sm text-white/75">
               {t('bookTotal')}
@@ -407,7 +420,7 @@ export function TourOptionCards({ options }: { options: TourOption[] }) {
                   {t('optionPerPerson', { price: formatYen(o.pricePerPerson, locale) })}
                 </span>
               )}
-              <span className="text-sm text-white/70">{t('optionFrom', { n: optionMinPeople(o) })}</span>
+              <span className="text-sm text-white/70">{peopleRuleLabel(t, o)}</span>
             </span>
             {lines.length > 0 && (
               <ul className="space-y-1 text-sm leading-relaxed text-white/75">
@@ -424,4 +437,29 @@ export function TourOptionCards({ options }: { options: TourOption[] }) {
       })}
     </div>
   );
+}
+
+type TourDetailT = ReturnType<typeof useTranslations<'tourDetail'>>;
+
+/** 옵션 카드의 인원 규칙 — "N명부터" / "N~M명" / "N명만". */
+function peopleRuleLabel(t: TourDetailT, o: TourOption): string {
+  const r = optionPeopleRule(o);
+  if (r.kind === 'range') return t('optionRange', { min: r.min, max: r.max });
+  if (r.kind === 'only') return t('optionOnly', { n: r.n });
+  return t('optionFrom', { n: r.n });
+}
+
+/** 예약 카드 인원 아래 안내 — 최소 2명 이상이거나 최대 인원이 있을 때만. */
+function OptionPeopleNote({ option }: { option: TourOption }) {
+  const t = useTranslations('tourDetail');
+  const r = optionPeopleRule(option);
+  const text =
+    r.kind === 'range'
+      ? t('optionRangeNote', { name: option.name, min: r.min, max: r.max })
+      : r.kind === 'only'
+        ? t('optionOnlyNote', { name: option.name, n: r.n })
+        : r.n > 1
+          ? t('optionMinNote', { name: option.name, n: r.n })
+          : '';
+  return text ? <p className="mt-2 text-right text-xs text-white/60">{text}</p> : null;
 }

@@ -16,7 +16,8 @@ function formatDate(date: string, locale: string): string {
   if (!date) return '';
   const d = new Date(date);
   if (Number.isNaN(d.getTime())) return date;
-  return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' }).format(
+  // 날짜만 저장('YYYY-MM-DD' = UTC 자정) — UTC 로 읽어야 하루 밀림이 없다.
+  return new Intl.DateTimeFormat(locale, { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' }).format(
     d
   );
 }
@@ -82,12 +83,12 @@ export default async function NoticePostPage({
             )}
             {post.date && <span>{formatDate(post.date, locale)}</span>}
           </div>
-          <h1 className="mt-2 text-balance font-serif text-3xl leading-tight text-white sm:text-4xl">
+          <h1 className="user-text mt-2 text-balance font-serif text-3xl leading-tight text-white sm:text-4xl">
             {post.title || '(제목 없음)'}
           </h1>
         </header>
 
-        <div className="mt-10 whitespace-pre-wrap text-base leading-relaxed text-white/85">
+        <div className="user-text mt-10 whitespace-pre-wrap text-base leading-relaxed text-white/85">
           {post.body}
         </div>
 

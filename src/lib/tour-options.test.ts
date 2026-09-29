@@ -6,6 +6,8 @@ import {
   localizeOptions,
   newOptionKey,
   optionMinPeople,
+  optionPeopleRange,
+  optionPeopleRule,
   parseTourOptions,
   pricingWithOption,
   type TourOption
@@ -17,6 +19,7 @@ const opt = (patch: Partial<TourOption> & { key: string }): TourOption => ({
   description: '',
   pricePerPerson: null,
   minPeople: null,
+  maxPeople: null,
   ...patch
 });
 
@@ -85,6 +88,32 @@ describe('인원 하한', () => {
     expect(clampPeople(1, 2, 20)).toBe(2);
     expect(clampPeople(5, 1, 3)).toBe(3);
     expect(clampPeople(4, 2, 20)).toBe(4);
+  });
+});
+
+describe('옵션 인원 범위 — 최대 인원(예: 1인 단독투어는 1명만)', () => {
+  const solo = opt({ key: 'o3', name: '1인 단독투어', pricePerPerson: 9000, minPeople: 1, maxPeople: 1 });
+  const priv = opt({ key: 'o4', name: '프라이빗', minPeople: 2, maxPeople: 8 });
+
+  it('저장된 최대 인원을 읽고, 없거나 잘못되면 비운다', () => {
+    expect(parseTourOptions([{ key: 'o3', name: '1인', maxPeople: 1 }])[0].maxPeople).toBe(1);
+    expect(parseTourOptions([{ key: 'o3', name: '1인', maxPeople: 0 }])[0].maxPeople).toBeNull();
+    expect(parseTourOptions([{ key: 'o3', name: '1인' }])[0].maxPeople).toBeNull();
+  });
+
+  it('최소~최대 범위 — 최대가 없으면 기본 상한, 최소보다 작게 저장됐으면 최소로', () => {
+    expect(optionPeopleRange(solo)).toEqual({ min: 1, max: 1 });
+    expect(optionPeopleRange(priv)).toEqual({ min: 2, max: 8 });
+    expect(optionPeopleRange(general, 20)).toEqual({ min: 2, max: 20 });
+    expect(optionPeopleRange(opt({ key: 'x', minPeople: 4, maxPeople: 2 }))).toEqual({ min: 4, max: 4 });
+    expect(optionPeopleRange(undefined, 20)).toEqual({ min: 1, max: 20 });
+  });
+
+  it('손님에게 보여줄 인원 규칙 — N명부터 / N~M명 / N명만', () => {
+    expect(optionPeopleRule(general)).toEqual({ kind: 'from', n: 2 });
+    expect(optionPeopleRule(priv)).toEqual({ kind: 'range', min: 2, max: 8 });
+    expect(optionPeopleRule(solo)).toEqual({ kind: 'only', n: 1 });
+    expect(optionPeopleRule(privateOpt)).toEqual({ kind: 'from', n: 1 });
   });
 });
 

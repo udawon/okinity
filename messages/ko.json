@@ -250,7 +250,11 @@
     "optionPlaceholder": "옵션 선택",
     "optionPerPerson": "1인 {price}",
     "optionFrom": "{n}명부터",
-    "optionMinHint": "{name} 옵션은 {n}명부터 예약할 수 있어요."
+    "optionMinHint": "{name} 옵션은 {n}명부터 예약할 수 있어요.",
+    "optionRange": "{min}~{max}명",
+    "optionOnly": "{n}명만",
+    "optionRangeHint": "{name} 옵션은 {min}~{max}명까지 예약할 수 있어요.",
+    "optionOnlyHint": "{name} 옵션은 {n}명만 예약할 수 있어요."
   },
   "tourDetail": {
     "includesTitle": "포함 사항",
@@ -306,7 +310,11 @@
     "optionPerPerson": "1인 {price}",
     "optionFrom": "{n}명부터",
     "optionMinNote": "{name} 옵션은 {n}명부터 예약할 수 있어요.",
-    "bookLabelOption": "1인 요금 · {option}"
+    "bookLabelOption": "1인 요금 · {option}",
+    "optionRange": "{min}~{max}명",
+    "optionOnly": "{n}명만",
+    "optionRangeNote": "{name} 옵션은 {min}~{max}명까지 예약할 수 있어요.",
+    "optionOnlyNote": "{name} 옵션은 {n}명만 예약할 수 있어요."
   },
   "medical": {
     "title": "메디컬 체크",

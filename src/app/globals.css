@@ -32,6 +32,19 @@ html {
   }
 }
 
+/* 줄바꿈 — 한국어는 어절 단위(break-keep)로 끊지만, 공백이 없는 일본어·중국어에 keep-all 을 걸면
+   문장 전체가 한 덩어리가 되어 휴대폰 화면이 가로로 밀린다 → 일본어·중국어는 기본 줄바꿈으로 되돌린다. */
+.break-keep:lang(ja),
+.break-keep:lang(zh) {
+  word-break: normal;
+}
+
+/* 어드민이 입력한 글(블로그·공지·소개 본문과 제목) — 긴 링크·붙여 쓴 해시태그처럼 끊을 곳이 없는
+   글자도 칸 끝에서 줄바꿈해 휴대폰 화면이 가로로 밀리지 않게 한다. */
+.user-text {
+  overflow-wrap: anywhere;
+}
+
 /* 가로 카루셀: 스크롤바 숨김 (스크롤은 유지) */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
