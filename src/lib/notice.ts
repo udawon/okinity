@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { okinawaTodayKey } from './okinawa-date';
 
 /**
  * 공지사항 데이터 모델 — 범용 모듈(server-only 의존 없음).
@@ -30,7 +31,8 @@ export const NoticePostSchema = z.object({
 });
 export type NoticePost = z.infer<typeof NoticePostSchema>;
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+// 새 글 기본 날짜 = 오키나와(영업지) 오늘 — UTC 기준이면 한국·일본 0~9시에 전날로 찍힌다.
+const todayISO = () => okinawaTodayKey();
 
 /** 새 공지 기본값 — 초안(비공개)으로 생성. */
 export function newNoticePost(): NoticePost {

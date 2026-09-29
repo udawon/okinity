@@ -139,32 +139,6 @@ export const ASSURANCES: Assurance[] = [
   }
 ];
 
-export type Testimonial = { quote: string; name: string; city: string; tour: string };
-
-export const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      '처음 다이빙이었는데 강사님이 끝까지 손을 잡아 주셔서 하나도 안 무서웠어요. 푸른동굴 빛이 정말 환상적이었습니다!',
-    name: '김지은',
-    city: '서울',
-    tour: '푸른동굴 체험다이빙'
-  },
-  {
-    quote:
-      '오픈워터 자격증을 한국어로 차근차근 배웠어요. 이론부터 바다 실습까지 안전 케어가 정말 꼼꼼했습니다.',
-    name: '박상현',
-    city: '부산',
-    tour: 'PADI 오픈워터 코스'
-  },
-  {
-    quote:
-      '빅게임 트롤링 갔다가 만새기 네 마리! 선상에서 바로 회로 떠 주셔서 잊지 못할 하루였어요.',
-    name: '이도윤',
-    city: '대구',
-    tour: '8시간 빅게임 트롤링'
-  }
-];
-
 /** 갤러리 마퀴 — 두 줄로 흐름. 실제 사진 6~10장으로 교체 전제. */
 export const GALLERY: string[] = [
   '/images/ph-1.svg',

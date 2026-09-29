@@ -6,6 +6,7 @@ import { ACTIVITIES } from '@/components/ocean-home-data';
 import type { TourTimes } from '@/lib/tour-times';
 
 import { useSaveStatus, SaveStatusBadge } from './save-status';
+import { safeAction } from '@/lib/safe-action';
 
 const inputCls =
   'rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted';
@@ -52,7 +53,7 @@ export default function TourTimesForm({
       if (list.length) times[slug] = list;
     }
     setSaving(true);
-    const res = await saveContent('tour_times', { times });
+    const res = await safeAction(() => saveContent('tour_times', { times }));
     setSaving(false);
     if (res.ok) show(`저장되었습니다 (${Object.keys(times).length}개 투어).`);
     else show(res.error ?? '저장 실패', 'err');

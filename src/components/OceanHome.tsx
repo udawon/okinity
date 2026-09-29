@@ -26,7 +26,6 @@ import type { ReserveOption } from '@/lib/tour-options';
 import {
   ACTIVITIES,
   ASSURANCES,
-  TESTIMONIALS,
   GALLERY,
   HERO_DEFAULTS,
   type Activity
@@ -788,18 +787,13 @@ function GallerySection({ images }: { images?: string[] }) {
    ──────────────────────────────────────────────────────────── */
 function Testimonials({ data, google }: { data?: HomeTestimonials; google?: GoogleReviewsData | null }) {
   const t = useTranslations('ocean');
-  // 우선순위: 구글맵 후기(연동 시) → 어드민 오버라이드 → i18n 샘플 후기.
-  const ovItems = (data?.items ?? []).filter((it) => it.quote?.trim() || it.name?.trim());
-  const list =
-    ovItems.length > 0
-      ? ovItems.map((it) => ({ name: it.name, city: it.city, tour: it.tour, quote: it.quote }))
-      : TESTIMONIALS.map((item, i) => ({
-          name: item.name,
-          city: t(`t${i + 1}City`),
-          tour: t(`t${i + 1}Tour`),
-          quote: t(`t${i + 1}Quote`)
-        }));
+  // 우선순위: 구글맵 후기(연동 시) → 어드민에 입력한 실제 후기(한국어 홈만). 둘 다 없으면 섹션을 숨긴다 —
+  // 코드에 넣어 둔 샘플 후기는 실제 후기처럼 보이면 안 되므로(허위 후기) 쓰지 않는다.
+  const list = (data?.items ?? [])
+    .filter((it) => it.quote?.trim() || it.name?.trim())
+    .map((it) => ({ name: it.name, city: it.city, tour: it.tour, quote: it.quote }));
   const useGoogle = !!google && google.reviews.length > 0;
+  if (!useGoogle && !list.length) return null;
   return (
     <section className="relative py-24 sm:py-28">
       <div className="mx-auto max-w-container px-6">

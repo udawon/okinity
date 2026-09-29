@@ -4,8 +4,13 @@ import { useState } from 'react';
 import { saveContent } from '@/app/admin/content-actions';
 import MediaInput from './MediaInput';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
+import { safeAction } from '@/lib/safe-action';
 
 type Item = { image: string; caption?: string };
+/** 편집 중 항목 — id 는 화면 전용(삭제·이동해도 칸이 섞이지 않게), 저장할 때 뺀다. */
+type Row = Item & { id: string };
+let rowSeq = 0;
+const withId = (it: Item): Row => ({ ...it, id: `g${++rowSeq}` });
 
 const inputCls =
   'w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted';
@@ -18,14 +23,14 @@ export default function GalleryForm({
   defaults: Item[];
   disabled?: boolean;
 }) {
-  const [items, setItems] = useState<Item[]>(defaults.length ? defaults : []);
+  const [items, setItems] = useState<Row[]>(() => defaults.map(withId));
   const { status, show, showSaved } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   const patch = (i: number, p: Partial<Item>) =>
     setItems((arr) => arr.map((it, idx) => (idx === i ? { ...it, ...p } : it)));
   const remove = (i: number) => setItems((arr) => arr.filter((_, idx) => idx !== i));
-  const add = () => setItems((arr) => [...arr, { image: '', caption: '' }]);
+  const add = () => setItems((arr) => [...arr, withId({ image: '', caption: '' })]);
   // 노출 순서 변경(위/아래로 한 칸 이동).
   const move = (i: number, dir: -1 | 1) =>
     setItems((arr) => {
@@ -38,8 +43,8 @@ export default function GalleryForm({
 
   async function save() {
     setSaving(true);
-    const clean = items.filter((it) => it.image.trim());
-    const res = await saveContent('gallery', { items: clean });
+    const clean = items.filter((it) => it.image.trim()).map(({ image, caption }) => ({ image, caption }));
+    const res = await safeAction(() => saveContent('gallery', { items: clean }));
     setSaving(false);
     if (res.ok) showSaved(`저장되었습니다 (${clean.length}장).`, res.sync);
     else show(res.error ?? '저장 실패', 'err');
@@ -49,7 +54,7 @@ export default function GalleryForm({
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         {items.map((it, i) => (
-          <div key={i} className="space-y-2 rounded-card border border-line bg-bg/40 p-3">
+          <div key={it.id} className="space-y-2 rounded-card border border-line bg-bg/40 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-ink">#{i + 1}</span>
               <div className="flex items-center gap-2">
@@ -83,7 +88,7 @@ export default function GalleryForm({
             </div>
             <MediaInput
               prefix="gallery"
-              defaultUrl={it.image}
+              value={it.image}
               accept="image/*"
               disabled={disabled}
               onChange={(url) => patch(i, { image: url })}

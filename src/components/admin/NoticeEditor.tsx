@@ -8,6 +8,7 @@ import { type NoticePost, type NoticeMedia } from '@/lib/notice';
 import { VIDEO_UPLOAD_HINT } from '@/lib/upload-client';
 import MediaInput from './MediaInput';
 import PreviewLink from './PreviewLink';
+import { safeAction } from '@/lib/safe-action';
 
 const labelCls = 'block text-sm font-medium text-ink';
 const inputCls =
@@ -50,7 +51,7 @@ export default function NoticeEditor({
   /** 저장 성공 여부를 반환한다 — 미리보기가 저장 성공했을 때만 새 탭을 열기 위해. */
   async function save(): Promise<boolean> {
     setSaving(true);
-    const res = await saveNotice({ ...post, title, date, published, pinned, body, media });
+    const res = await safeAction(() => saveNotice({ ...post, title, date, published, pinned, body, media }));
     setSaving(false);
     if (res.error) {
       show(res.error, 'err');

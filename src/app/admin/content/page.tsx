@@ -1,6 +1,6 @@
 import { getGallery, type GalleryItem } from '@/lib/content';
 import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
-import { HERO_DEFAULTS, ACTIVITIES, ASSURANCES, TESTIMONIALS } from '@/components/ocean-home-data';
+import { HERO_DEFAULTS, ACTIVITIES, ASSURANCES } from '@/components/ocean-home-data';
 import {
   HOME_CONTENT_KEYS,
   parseHomeTestimonials,
@@ -114,11 +114,9 @@ export default async function AdminContentPage() {
     desc: assuranceOv.items[i]?.desc?.trim() || x.desc
   }));
 
-  // 후기 — 저장값 있으면 그것, 없으면 샘플(코드) 프리필.
+  // 후기 — 저장한 실제 후기만(샘플을 미리 채워 두면 그대로 저장돼 가짜 후기가 노출될 수 있어 비워 둔다).
   const testimonialOv = parseHomeTestimonials(overrides[HOME_CONTENT_KEYS.testimonials]);
-  const testimonialDefaults: TestimonialItem[] = testimonialOv.items.length
-    ? testimonialOv.items
-    : TESTIMONIALS.map((x) => ({ name: x.name, city: x.city, tour: x.tour, quote: x.quote }));
+  const testimonialDefaults: TestimonialItem[] = testimonialOv.items;
 
   return (
     <AdminShell title="사이트 편집">
@@ -187,7 +185,7 @@ export default async function AdminContentPage() {
 
         <EditSection
           title="후기"
-          desc="홈 '다녀온 분들의 이야기' 고객 후기(이름·지역·투어·내용)와 섹션 제목. 추가/수정/삭제하세요."
+          desc="홈 '다녀온 분들의 이야기'. 평소에는 구글맵 후기가 자동으로 보이고, 여기 적은 후기는 구글 후기를 불러오지 못할 때만 한국어 홈에 보입니다. 동의받은 실제 손님 후기만 적으세요(가짜·예시 후기는 광고법 위반 소지). 비워 두면 그때는 후기 섹션을 숨깁니다."
           preview={<SectionPreview highlight="reviews" note="홈 후기 카드 3열 그리드." />}
         >
           <TestimonialsForm

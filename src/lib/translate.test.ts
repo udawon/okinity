@@ -31,3 +31,18 @@ describe('parseTranslateResponse — 번역 결과 읽기', () => {
     expect(parseTranslateResponse('not json', ['summary'])).toBeNull();
   });
 });
+
+describe('retryWaitMs — 사용량 제한·일시 장애 때 기다렸다 재시도', () => {
+  it('429·5xx·529 는 retry-after(초)만큼, 없으면 기본 대기', async () => {
+    const { retryWaitMs } = await import('./translate');
+    expect(retryWaitMs(429, '7', 40_000)).toBe(7_000);
+    expect(retryWaitMs(529, null, 40_000)).toBe(3_000);
+    expect(retryWaitMs(500, null, 40_000)).toBe(3_000);
+  });
+  it('남은 시간 안에 재시도할 수 없으면 null(포기), 그 밖의 오류도 null', async () => {
+    const { retryWaitMs } = await import('./translate');
+    expect(retryWaitMs(429, '30', 20_000)).toBeNull();
+    expect(retryWaitMs(401, null, 40_000)).toBeNull();
+    expect(retryWaitMs(400, null, 40_000)).toBeNull();
+  });
+});

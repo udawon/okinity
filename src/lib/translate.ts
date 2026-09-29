@@ -78,6 +78,17 @@ export function parseTranslateResponse(text: string, ids: string[]): TextMap | n
   return out;
 }
 
+/**
+ * 재시도 대기(ms) — 사용량 제한(429)·일시 장애(5xx, 529 과부하)는 retry-after(초)만큼(없으면 3초) 기다렸다
+ * 한 번 더. 기다린 뒤 번역할 시간(15초)이 남지 않거나 다른 오류(키 오류 등)면 null(포기).
+ */
+export function retryWaitMs(status: number, retryAfter: string | null, remainingMs: number): number | null {
+  if (status !== 429 && status < 500) return null;
+  const sec = Number(retryAfter);
+  const wait = retryAfter && Number.isFinite(sec) && sec > 0 ? sec * 1000 : 3_000;
+  return wait + 15_000 <= remainingMs ? wait : null;
+}
+
 /** 자동 번역이 켜져 있는지(키 설정 여부). */
 export function translationEnabled(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY);
@@ -109,8 +120,10 @@ export async function translateTexts(
         signal: AbortSignal.timeout(Math.min(45_000, remaining))
       });
       if (!res.ok) {
-        if (res.status === 429 || res.status >= 500) continue;
-        return null;
+        const wait = attempt === 0 ? retryWaitMs(res.status, res.headers.get('retry-after'), deadline - Date.now()) : null;
+        if (wait == null) return null;
+        await new Promise((r) => setTimeout(r, wait));
+        continue;
       }
       const data = (await res.json()) as { content?: { type: string; text?: string }[] };
       const text = (data.content ?? []).map((c) => (c.type === 'text' ? c.text ?? '' : '')).join('');

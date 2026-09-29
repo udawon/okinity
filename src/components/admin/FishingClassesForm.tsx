@@ -6,6 +6,7 @@ import { saveFishingClasses } from '@/app/admin/tour-actions';
 import { type TourClasses, type FishingClassKey } from '@/lib/tour';
 import MediaInput from './MediaInput';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
+import { safeAction } from '@/lib/safe-action';
 
 const labelCls = 'block text-sm font-medium text-ink';
 const inputCls =
@@ -37,7 +38,7 @@ export default function FishingClassesForm({
 
   async function save() {
     setSaving(true);
-    const res = await saveFishingClasses(classes, lang);
+    const res = await safeAction(() => saveFishingClasses(classes, lang));
     setSaving(false);
     if (res.error) show(res.error, 'err');
     else {

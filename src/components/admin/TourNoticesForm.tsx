@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { saveTourNotices } from '@/app/admin/tour-actions';
 import { TOUR_NOTICE_IDS, type TourNoticeId, type TourNotices } from '@/lib/tour-notices';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
+import { safeAction } from '@/lib/safe-action';
 
 const inputCls =
   'mt-1 w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted';
@@ -31,7 +32,7 @@ export default function TourNoticesForm({
 
   async function save() {
     setSaving(true);
-    const res = await saveTourNotices(value, lang);
+    const res = await safeAction(() => saveTourNotices(value, lang));
     setSaving(false);
     if (res.error) show(res.error, 'err');
     else {

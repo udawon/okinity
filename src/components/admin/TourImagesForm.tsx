@@ -5,6 +5,7 @@ import { saveContent } from '@/app/admin/content-actions';
 import MediaInput from './MediaInput';
 import { ACTIVITIES } from '../ocean-home-data';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
+import { safeAction } from '@/lib/safe-action';
 
 /**
  * 홈 투어 카테고리 카드 이미지 편집 — 다이빙·PADI·낚시·스노클링 각 1장.
@@ -25,7 +26,7 @@ export default function TourImagesForm({
 
   async function save() {
     setSaving(true);
-    const res = await saveContent('home_tours', { images });
+    const res = await safeAction(() => saveContent('home_tours', { images }));
     setSaving(false);
     if (res.ok) show('저장되었습니다.');
     else show(res.error ?? '저장 실패', 'err');

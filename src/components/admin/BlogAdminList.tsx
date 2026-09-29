@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createBlogPost, deleteBlogPost } from '@/app/admin/blog-actions';
 import { type BlogPost } from '@/lib/blog';
+import { safeAction } from '@/lib/safe-action';
 
 /** 어드민 블로그 글 목록 — 새 글 생성, 편집 링크, 삭제. */
 export default function BlogAdminList({
@@ -21,7 +22,7 @@ export default function BlogAdminList({
   async function create() {
     setBusy(true);
     setMsg('');
-    const res = await createBlogPost();
+    const res = await safeAction(() => createBlogPost());
     setBusy(false);
     if (res.error) setMsg(res.error);
     else if (res.id) router.push(`/admin/blog/${res.id}`);
@@ -31,7 +32,7 @@ export default function BlogAdminList({
     if (!confirm(`"${title || '제목 없음'}" 글을 삭제할까요?`)) return;
     setBusy(true);
     setMsg('');
-    const res = await deleteBlogPost(id);
+    const res = await safeAction(() => deleteBlogPost(id));
     setBusy(false);
     if (res.error) setMsg(res.error);
     else router.refresh();

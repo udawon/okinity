@@ -9,6 +9,7 @@ import { TOUR_CATALOG, getTourCatalogEntry } from '@/lib/tour';
 import MediaInput from './MediaInput';
 import PreviewLink from './PreviewLink';
 import { VIDEO_UPLOAD_HINT } from '@/lib/upload-client';
+import { safeAction } from '@/lib/safe-action';
 
 const inputCls =
   'w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted';
@@ -54,7 +55,7 @@ export default function BlogEditor({
   /** 저장 성공 여부를 반환한다 — 미리보기가 저장 성공했을 때만 새 탭을 열기 위해. */
   async function save(): Promise<boolean> {
     setSaving(true);
-    const res = await saveBlogPost(post);
+    const res = await safeAction(() => saveBlogPost(post));
     setSaving(false);
     if (res.error) {
       show(res.error, 'err');

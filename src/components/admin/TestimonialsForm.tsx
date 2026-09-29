@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { saveContent } from '@/app/admin/content-actions';
 import { HOME_CONTENT_KEYS, type TestimonialItem } from '@/lib/home-content';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
+import { safeAction } from '@/lib/safe-action';
 
 const inputCls =
   'w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted disabled:opacity-50';
@@ -34,10 +35,10 @@ export default function TestimonialsForm({
   async function save() {
     setSaving(true);
     const clean = items.filter((it) => it.quote.trim() || it.name.trim());
-    const res = await saveContent(HOME_CONTENT_KEYS.testimonials, {
+    const res = await safeAction(() => saveContent(HOME_CONTENT_KEYS.testimonials, {
       sectionTitle: title.trim(),
       items: clean
-    });
+    }));
     setSaving(false);
     if (res.ok) show(`저장되었습니다 (후기 ${clean.length}개).`);
     else show(res.error ?? '저장 실패', 'err');

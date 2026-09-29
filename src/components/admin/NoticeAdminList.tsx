@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createNotice, deleteNotice } from '@/app/admin/notice-actions';
 import { type NoticePost } from '@/lib/notice';
+import { safeAction } from '@/lib/safe-action';
 
 /** 어드민 공지 목록 — 새 공지 생성, 편집 링크, 삭제. */
 export default function NoticeAdminList({
@@ -21,7 +22,7 @@ export default function NoticeAdminList({
   async function create() {
     setBusy(true);
     setMsg('');
-    const res = await createNotice();
+    const res = await safeAction(() => createNotice());
     setBusy(false);
     if (res.error) setMsg(res.error);
     else if (res.id) router.push(`/admin/notice/${res.id}`);
@@ -31,7 +32,7 @@ export default function NoticeAdminList({
     if (!confirm(`"${title || '제목 없음'}" 공지를 삭제할까요?`)) return;
     setBusy(true);
     setMsg('');
-    const res = await deleteNotice(id);
+    const res = await safeAction(() => deleteNotice(id));
     setBusy(false);
     if (res.error) setMsg(res.error);
     else router.refresh();
