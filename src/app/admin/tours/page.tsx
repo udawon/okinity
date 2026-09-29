@@ -1,25 +1,29 @@
 import Link from 'next/link';
-import { getSiteContentMap, CONTENT_KEYS, localizedContentKey } from '@/lib/site-content';
+import { getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import { ACTIVITIES } from '@/components/ocean-home-data';
 import { resolveTourDetail, tourImages, TOUR_CATALOG } from '@/lib/tour';
 import AdminShell from '@/components/admin/AdminShell';
+import TranslationSyncPanel from '@/components/admin/TranslationSyncPanel';
+import { staleByLocale, syncItems, syncKeys } from '@/lib/content-sync-server';
+import { translationEnabled } from '@/lib/translate';
 
 export const dynamic = 'force-dynamic';
+// "번역 맞추기"(서버액션)가 이 페이지 함수에서 실행 — 콘텐츠 하나 번역 대기 시간 확보
+export const maxDuration = 60;
 
 export default async function AdminToursPage() {
   const enabled = isSupabaseEnabled();
-  // 모든 투어 상세(한·영·일)를 한 번에 조회
-  const keys = ACTIVITIES.flatMap((a) =>
-    a.tours.flatMap((t) => {
-      const k = CONTENT_KEYS.tour(t.slug);
-      return [k, localizedContentKey(k, 'en'), localizedContentKey(k, 'ja')];
-    })
-  );
-  const map = enabled ? await getSiteContentMap(keys) : {};
+  // 번역 대상 콘텐츠 전체(투어·낚시 클래스·공통 안내·소개·갤러리)의 한·영·일 저장본과 번역 기억을 한 번에 조회
+  const items = syncItems();
+  const map = enabled ? await getSiteContentMap(items.flatMap((i) => syncKeys(i.key))) : {};
+  const status = items.map((i) => ({ key: i.key, label: i.label, ...staleByLocale(map, i) }));
+  const staleOf = Object.fromEntries(status.map((s) => [s.key, s.en + s.ja]));
 
   return (
     <AdminShell title={`투어 상세 · ${TOUR_CATALOG.length}개`}>
+      {enabled && <TranslationSyncPanel items={status} enabled={translationEnabled()} />}
+
       <p className="mb-6 text-sm text-muted">
         투어 목록은 고정되어 있고, 각 투어를 눌러 상세 내용을 등록합니다. 공개된 상세는{' '}
         <code>/tours/&#123;slug&#125;</code> 페이지에 표시됩니다.
@@ -37,7 +41,7 @@ export default async function AdminToursPage() {
                 const detail = resolveTourDetail(t.slug, map[k]);
                 const hasContent = detail.summary || detail.body || detail.heroImage;
                 const photos = tourImages(detail).length;
-                const langs = [map[localizedContentKey(k, 'en')] && 'EN', map[localizedContentKey(k, 'ja')] && 'JA'].filter(Boolean);
+                const stale = staleOf[k] ?? 0;
                 return (
                   <li key={t.slug}>
                     <Link
@@ -47,7 +51,7 @@ export default async function AdminToursPage() {
                       <span className="font-medium text-ink">{t.name}</span>
                       <span className="flex items-center gap-3">
                         <span className="hidden text-xs text-muted sm:inline">
-                          사진 {photos}장 · {langs.length ? langs.join('·') : '번역 없음'}
+                          사진 {photos}장 · {hasContent ? (stale ? `번역 필요 ${stale}칸` : 'EN·JA 최신') : '—'}
                         </span>
                         {detail.published ? (
                           <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">

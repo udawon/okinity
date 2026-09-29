@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getInquiryStore } from '@/lib/inquiries';
-import { getSiteContent, getSiteContentMap, CONTENT_KEYS, localizedContentKey } from '@/lib/site-content';
+import { getSiteContent, getSiteContentMap, CONTENT_KEYS } from '@/lib/site-content';
+import { staleByLocale, syncKeys } from '@/lib/content-sync-server';
 import { parseSettlementMap } from '@/lib/inquiry-settlement';
 import { isSupabaseEnabled } from '@/lib/supabase/server';
 import { TOUR_CATALOG, resolveTourDetail } from '@/lib/tour';
@@ -45,10 +46,7 @@ export default async function AdminTodayPage() {
   const inquiries = await store.list();
   const settlements = enabled ? parseSettlementMap(await getSiteContent(CONTENT_KEYS.inquirySettlement)) : {};
 
-  const tourKeys = TOUR_CATALOG.flatMap((t) => {
-    const k = CONTENT_KEYS.tour(t.slug);
-    return [k, localizedContentKey(k, 'en'), localizedContentKey(k, 'ja')];
-  });
+  const tourKeys = TOUR_CATALOG.flatMap((t) => syncKeys(CONTENT_KEYS.tour(t.slug)));
   const map = enabled ? await getSiteContentMap([...tourKeys, CONTENT_KEYS.tourTimes, CONTENT_KEYS.blog]) : {};
   const times = parseTourTimes(map[CONTENT_KEYS.tourTimes]);
   const lastBlog = publishedSorted(parseBlogItems(map[CONTENT_KEYS.blog]?.items))[0];
@@ -60,12 +58,12 @@ export default async function AdminTodayPage() {
     ? siteChecks({
         tours: TOUR_CATALOG.map((t) => {
           const k = CONTENT_KEYS.tour(t.slug);
+          const stale = staleByLocale(map, { kind: 'tour', key: k, label: t.name });
           return {
             slug: t.slug,
             name: t.name,
             ko: resolveTourDetail(t.slug, map[k] ?? null),
-            hasEn: Boolean(map[localizedContentKey(k, 'en')]),
-            hasJa: Boolean(map[localizedContentKey(k, 'ja')]),
+            translationStale: stale.en + stale.ja,
             times: times[t.slug] ?? []
           };
         }),

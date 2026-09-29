@@ -3,13 +3,10 @@
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { ADMIN_COOKIE, verifySession } from '@/lib/admin-auth';
-import {
-  setSiteContent,
-  CONTENT_KEYS,
-  localizedContentKey,
-  isContentLocale
-} from '@/lib/site-content';
+import { CONTENT_KEYS, isContentLocale } from '@/lib/site-content';
 import { TOUR_NOTICE_IDS, TourNoticeSchema, type TourNotices } from '@/lib/tour-notices';
+import { saveLocalizedContent } from '@/lib/content-sync-server';
+import type { SyncOutcome } from '@/lib/content-sync';
 import {
   TourDetailSchema,
   TourClassesSchema,
@@ -25,7 +22,8 @@ async function requireAdmin(): Promise<void> {
   }
 }
 
-export type TourActionState = { ok?: boolean; error?: string };
+/** sync: 한국어 저장 뒤 EN/JA 자동 번역 결과(EN/JA 저장이면 없음). */
+export type TourActionState = { ok?: boolean; error?: string; sync?: SyncOutcome };
 
 /** 투어 상세 저장(slug·언어별 키 upsert). 목록은 코드 카탈로그 고정이라 생성/삭제 없음. */
 export async function saveTour(
@@ -45,9 +43,9 @@ export async function saveTour(
       ? { ...parsed.data, heroImage: parsed.data.images[0] }
       : parsed.data;
   try {
-    await setSiteContent(localizedContentKey(CONTENT_KEYS.tour(slug), lang), value);
+    const sync = await saveLocalizedContent({ kind: 'tour', key: CONTENT_KEYS.tour(slug) }, lang, value);
     revalidatePath('/', 'layout'); // /tours/[slug]·홈 카드 무효화
-    return { ok: true };
+    return { ok: true, sync };
   } catch (e) {
     return { error: e instanceof Error ? e.message : '저장 실패' };
   }
@@ -66,9 +64,9 @@ export async function saveFishingClasses(
   const parsed = TourClassesSchema.safeParse(input);
   if (!parsed.success) return { error: '입력 형식이 올바르지 않습니다.' };
   try {
-    await setSiteContent(localizedContentKey(CONTENT_KEYS.fishingClasses, lang), parsed.data);
+    const sync = await saveLocalizedContent({ kind: 'fishingClasses', key: CONTENT_KEYS.fishingClasses }, lang, parsed.data);
     revalidatePath('/', 'layout'); // 모든 낚시 /tours/[slug] 무효화
-    return { ok: true };
+    return { ok: true, sync };
   } catch (e) {
     return { error: e instanceof Error ? e.message : '저장 실패' };
   }
@@ -88,9 +86,9 @@ export async function saveTourNotices(input: TourNotices, lang: string = 'ko'): 
     value[id] = parsed.data;
   }
   try {
-    await setSiteContent(localizedContentKey(CONTENT_KEYS.tourNotices, lang), value);
+    const sync = await saveLocalizedContent({ kind: 'tourNotices', key: CONTENT_KEYS.tourNotices }, lang, value);
     revalidatePath('/', 'layout'); // 모든 /tours/[slug] 무효화
-    return { ok: true };
+    return { ok: true, sync };
   } catch (e) {
     return { error: e instanceof Error ? e.message : '저장 실패' };
   }

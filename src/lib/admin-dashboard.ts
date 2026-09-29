@@ -50,8 +50,8 @@ export type SiteCheckTour = {
   name: string;
   /** 한국어 상세(코드 기본값 폴백 적용 후) */
   ko: TourDetail;
-  hasEn: boolean;
-  hasJa: boolean;
+  /** 영어·일본어 번역이 한국어보다 오래된 칸 수(EN+JA, lib/content-sync-server staleByLocale) */
+  translationStale: number;
   /** 투어 시간대 */
   times: string[];
 };
@@ -114,13 +114,13 @@ export function siteChecks(input: { tours: SiteCheckTour[]; lastBlogDate: string
       href: '/admin/tour-times'
     });
 
-  const noTranslation = live.filter((t) => !t.hasEn || !t.hasJa).map((t) => t.name);
+  const noTranslation = live.filter((t) => t.translationStale > 0).map((t) => t.name);
   if (noTranslation.length)
     out.push({
       id: 'translation',
       tone: 'info',
-      title: `English · 日本語 상세가 없는 투어 ${noTranslation.length}개`,
-      detail: '해당 언어 페이지에 한국어가 그대로 보여요.',
+      title: `영어·일본어 번역이 한국어보다 오래된 투어 ${noTranslation.length}개`,
+      detail: '해당 언어 페이지에 예전 내용이 보여요. 투어 상세 목록의 “번역 맞추기”로 한국어 기준으로 다시 번역하세요.',
       items: noTranslation,
       href: '/admin/tours'
     });

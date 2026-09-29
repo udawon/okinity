@@ -112,7 +112,7 @@ export default function TourEditor({
   const [included, setIncluded] = useState(detail.included);
   const [body, setBody] = useState(detail.body);
   const [saving, setSaving] = useState(false);
-  const { status, show } = useSaveStatus();
+  const { status, show, showSaved } = useSaveStatus();
 
   // 본문 자동 정리 결과 — 편집 중 바로 보여줘서 ★제목★ 표기가 어떻게 나뉘는지 확인하게 한다.
   const parsed = useMemo(() => parseTourBody(body), [body]);
@@ -205,7 +205,7 @@ export default function TourEditor({
     setSaving(false);
     if (res.error) show(res.error, 'err');
     else {
-      show('저장되었습니다.');
+      showSaved('저장되었습니다.', res.sync);
       router.refresh();
     }
   }
