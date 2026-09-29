@@ -56,7 +56,7 @@ export default async function AboutPage({
           })}
         </h1>
         {about.intro && (
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/80">{about.intro}</p>
+          <p className="user-text mt-5 max-w-2xl text-lg leading-relaxed text-white/80">{about.intro}</p>
         )}
 
         {about.heroImage && (
@@ -71,7 +71,7 @@ export default async function AboutPage({
         )}
 
         {bodyParas.length > 0 && (
-          <div className="mt-8 space-y-4 text-[15px] leading-relaxed text-white/80">
+          <div className="user-text mt-8 space-y-4 text-[15px] leading-relaxed text-white/80">
             {bodyParas.map((p, i) => (
               <p key={i}>{p}</p>
             ))}
@@ -129,7 +129,7 @@ export default async function AboutPage({
                   </ul>
                 )}
                 {about.instructorBody && (
-                  <p className="mt-5 whitespace-pre-wrap text-[15px] leading-relaxed text-white/80">
+                  <p className="user-text mt-5 whitespace-pre-wrap text-[15px] leading-relaxed text-white/80">
                     {about.instructorBody}
                   </p>
                 )}

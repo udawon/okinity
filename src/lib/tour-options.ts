@@ -12,7 +12,8 @@ export const TourOptionSchema = z.object({
   name: z.string().default(''),
   description: z.string().default(''), // 줄마다 한 항목
   pricePerPerson: z.number().nonnegative().nullable().default(null).catch(null), // 1인 요금(엔)
-  minPeople: z.number().int().min(1).max(50).nullable().default(null).catch(null) // 최소 인원(없으면 1명)
+  minPeople: z.number().int().min(1).max(50).nullable().default(null).catch(null), // 최소 인원(없으면 1명)
+  maxPeople: z.number().int().min(1).max(50).nullable().default(null).catch(null) // 최대 인원(없으면 제한 없음. 예: 1인 단독 = 1)
 });
 export type TourOption = z.infer<typeof TourOptionSchema>;
 
@@ -53,6 +54,29 @@ export function optionMinPeople(option: Pick<TourOption, 'minPeople'> | null | u
   return option?.minPeople ?? 1;
 }
 
+/**
+ * 옵션의 인원 범위 — 최소(없으면 1명) ~ 최대(없으면 fallbackMax).
+ * 최대가 최소보다 작게 저장돼 있으면(어드민 검증 이전 값) 최소 인원만 받는다.
+ */
+export function optionPeopleRange(
+  option: Pick<TourOption, 'minPeople' | 'maxPeople'> | null | undefined,
+  fallbackMax = 50
+): { min: number; max: number } {
+  const min = optionMinPeople(option);
+  const max = option?.maxPeople ?? fallbackMax;
+  return { min, max: Math.max(min, max) };
+}
+
+/** 손님에게 보여줄 인원 규칙 — "N명부터" / "N~M명" / "N명만". */
+export type PeopleRule = { kind: 'from'; n: number } | { kind: 'range'; min: number; max: number } | { kind: 'only'; n: number };
+
+export function optionPeopleRule(option: Pick<TourOption, 'minPeople' | 'maxPeople'>): PeopleRule {
+  const min = optionMinPeople(option);
+  if (option.maxPeople == null) return { kind: 'from', n: min };
+  const { max } = optionPeopleRange(option);
+  return max === min ? { kind: 'only', n: min } : { kind: 'range', min, max };
+}
+
 export function clampPeople(people: number, min: number, max: number): number {
   return Math.min(Math.max(people, min), max);
 }
@@ -76,6 +100,7 @@ export type ReserveOption = {
   productLabel: string;
   pricePerPerson: number | null;
   minPeople: number | null;
+  maxPeople: number | null;
 };
 
 /** 새 옵션 key — 지운 옵션의 key 를 다시 쓰지 않도록 시각 기반(번역본에 남은 옛 key 와 겹치지 않게). */

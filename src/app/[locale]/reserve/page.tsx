@@ -2,10 +2,9 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { normalizeScheduleItems } from '@/lib/schedule-range';
-import { getSiteContent, getSiteContentMap, localizedContentKey, CONTENT_KEYS } from '@/lib/site-content';
+import { getSiteContent, getSiteContentMap, localizedContentKey, tourDocsIn, CONTENT_KEYS } from '@/lib/site-content';
 import { parseTourTimes } from '@/lib/tour-times';
-import { TOUR_CATALOG, bookableOptions, resolveTourDetail } from '@/lib/tour';
-import type { ReserveOption } from '@/lib/tour-options';
+import { TOUR_CATALOG, reserveOptionsFor } from '@/lib/tour';
 import { localeAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
 import ReservePlanner from '@/components/ReservePlanner';
@@ -52,22 +51,7 @@ export default async function ReservePage({
     const k = CONTENT_KEYS.tour(t.slug);
     return [k, localizedContentKey(k, locale)];
   });
-  const tourMap = await getSiteContentMap(Array.from(new Set(tourKeys)));
-  const tourOptions: Record<string, ReserveOption[]> = {};
-  for (const t of TOUR_CATALOG) {
-    const k = CONTENT_KEYS.tour(t.slug);
-    const base = resolveTourDetail(t.slug, tourMap[k] ?? null);
-    const local = resolveTourDetail(t.slug, tourMap[localizedContentKey(k, locale)] ?? tourMap[k] ?? null);
-    const opts = bookableOptions(t.slug, base, local);
-    if (!opts.length) continue;
-    tourOptions[t.slug] = opts.map((o) => ({
-      key: o.key,
-      label: o.name,
-      productLabel: base.options.find((b) => b.key === o.key)?.name.trim() || o.name,
-      pricePerPerson: o.pricePerPerson,
-      minPeople: o.minPeople
-    }));
-  }
+  const tourOptions = reserveOptionsFor(tourDocsIn(await getSiteContentMap(Array.from(new Set(tourKeys))), locale));
 
   const statusLabel: Record<ScheduleItem['status'], string> = {
     tour: t('kindTour'),

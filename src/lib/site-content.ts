@@ -61,6 +61,20 @@ export async function getLocalizedSiteContent(key: string, locale: string): Prom
   return (map[localized] ?? map[key] ?? null) as Json | null;
 }
 
+/**
+ * 투어 상세 저장본 조회기 — 한 번에 읽어 둔 map 에서 투어별 한국어 저장본(base)과
+ * 이 언어 저장본(local, 없으면 한국어)을 꺼낸다. lib/tour 의 reserveOptionsFor 에 넘긴다.
+ */
+export function tourDocsIn(
+  map: Record<string, unknown>,
+  locale: string
+): (slug: string) => { base: unknown; local: unknown } {
+  return (slug) => {
+    const key = CONTENT_KEYS.tour(slug);
+    return { base: map[key], local: map[localizedContentKey(key, locale)] ?? map[key] };
+  };
+}
+
 /** 여러 키를 한 번에 조회(메인 페이지용). 키 생략 시 전체. */
 export async function getSiteContentMap(keys?: string[]): Promise<Record<string, Json>> {
   const sb = getSupabaseAdmin();

@@ -22,6 +22,7 @@ import { type ScheduleItem } from '@/lib/content';
 import type { GoogleReviewsData } from '@/lib/google-reviews';
 import BlogCard from '@/components/BlogCard';
 import ReservePlanner from '@/components/ReservePlanner';
+import type { ReserveOption } from '@/lib/tour-options';
 import {
   ACTIVITIES,
   ASSURANCES,
@@ -929,11 +930,13 @@ function Testimonials({ data, google }: { data?: HomeTestimonials; google?: Goog
 function ReserveSection({
   schedule,
   locale,
-  tourTimes
+  tourTimes,
+  tourOptions
 }: {
   schedule: ScheduleData;
   locale: string;
   tourTimes?: Record<string, string[]>;
+  tourOptions?: Record<string, ReserveOption[]>;
 }) {
   const t = useTranslations('ocean');
   return (
@@ -969,6 +972,7 @@ function ReserveSection({
             locale={locale}
             statusLabel={schedule.statusLabel}
             tourTimes={tourTimes}
+            tourOptions={tourOptions}
           />
         </R>
       </div>
@@ -1007,7 +1011,8 @@ export default function OceanHome({
   media,
   content,
   googleReviews,
-  tourTimes
+  tourTimes,
+  tourOptions
 }: {
   posts: BlogPost[];
   locale: string;
@@ -1018,6 +1023,8 @@ export default function OceanHome({
   googleReviews?: GoogleReviewsData | null;
   /** 투어별 가능 시간대(어드민 tour_times 설정) — 예약 섹션 폼의 시간대 선택지. */
   tourTimes?: Record<string, string[]>;
+  /** 투어별 선택 옵션(예: 스노클링 일반/프라이빗) — 예약 섹션 폼의 옵션 칸. */
+  tourOptions?: Record<string, ReserveOption[]>;
 }) {
   return (
     <div className="relative text-white">
@@ -1033,7 +1040,7 @@ export default function OceanHome({
       <GallerySection images={media?.gallery} />
       <Testimonials data={content?.testimonials} google={googleReviews} />
       <WaveDivider flip />
-      <ReserveSection schedule={schedule} locale={locale} tourTimes={tourTimes} />
+      <ReserveSection schedule={schedule} locale={locale} tourTimes={tourTimes} tourOptions={tourOptions} />
     </div>
   );
 }

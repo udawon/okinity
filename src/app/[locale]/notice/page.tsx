@@ -13,7 +13,8 @@ function formatDate(date: string, locale: string): string {
   if (!date) return '';
   const d = new Date(date);
   if (Number.isNaN(d.getTime())) return date;
-  return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' }).format(
+  // 날짜만 저장('YYYY-MM-DD' = UTC 자정) — UTC 로 읽어야 하루 밀림이 없다.
+  return new Intl.DateTimeFormat(locale, { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' }).format(
     d
   );
 }

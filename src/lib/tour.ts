@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ACTIVITIES, type Activity } from '@/components/ocean-home-data';
-import { activeOptions, localizeOptions, parseTourOptions, type TourOption } from './tour-options';
+import { activeOptions, localizeOptions, parseTourOptions, type ReserveOption, type TourOption } from './tour-options';
 
 /**
  * 투어 상세 — 목록(어떤 투어가 있는지)은 코드 카탈로그(ACTIVITIES.tours)로 고정,
@@ -232,20 +232,78 @@ export function resolveTourDetail(slug: string, raw: unknown): TourDetail {
 }
 
 /**
+ * 상세 공개 여부 — 언어 공통 값이라 한국어 저장본(base)만 본다.
+ * 번역본마다 따로 보면 한국어에서 비공개로 바꿔도 EN/JA 는 계속 공개·예약되는 일이 생긴다.
+ */
+export function isTourPublished(base: TourDetail): boolean {
+  return base.published;
+}
+
+/**
  * 손님이 고를 수 있는 옵션 — 요금·순서는 한국어 저장본(base), 이름·설명은 그 언어 저장본(local).
  * 상세가 공개된 투어만, 낚시는 제외(미들/럭셔리 클래스로 고른다). 투어 페이지·예약 폼 공용.
  */
 export function bookableOptions(slug: string, base: TourDetail, local: TourDetail): TourOption[] {
-  if (tourHasClasses(slug) || !local.published) return [];
+  if (tourHasClasses(slug) || !isTourPublished(base)) return [];
   return activeOptions(localizeOptions(base.options, local.options));
 }
 
-/** 줄바꿈/쉼표로 구분된 문자열을 리스트로(포함 사항 등). */
+/**
+ * 예약 폼 옵션(투어별) — 홈 예약 섹션·예약 페이지 공용. docs(slug) 는 그 투어의 한국어 저장본(base)과
+ * 이 언어 저장본(local, 없으면 한국어)을 돌려준다. 예약 기록(productLabel)은 운영자가 읽는 한국어 이름.
+ * 옵션 없는 투어는 키를 만들지 않는다.
+ */
+export function reserveOptionsFor(
+  docs: (slug: string) => { base: unknown; local: unknown }
+): Record<string, ReserveOption[]> {
+  const out: Record<string, ReserveOption[]> = {};
+  for (const t of TOUR_CATALOG) {
+    const { base: rawBase, local: rawLocal } = docs(t.slug);
+    const base = resolveTourDetail(t.slug, rawBase ?? null);
+    const local = resolveTourDetail(t.slug, rawLocal ?? rawBase ?? null);
+    const opts = bookableOptions(t.slug, base, local);
+    if (!opts.length) continue;
+    out[t.slug] = opts.map((o) => ({
+      key: o.key,
+      label: o.name,
+      productLabel: base.options.find((b) => b.key === o.key)?.name.trim() || o.name,
+      pricePerPerson: o.pricePerPerson,
+      minPeople: o.minPeople,
+      maxPeople: o.maxPeople
+    }));
+  }
+  return out;
+}
+
+/**
+ * 목록 글 → 항목들(포함 사항 등). 여러 줄로 썼으면 줄마다 한 항목(문장 안의 쉼표는 그대로 둔다 —
+ * "숙소 픽업, 드랍"이 두 칸으로 쪼개지지 않게). 한 줄로 썼으면 쉼표로 나누되, 숫자 사이(10,000)와
+ * 괄호 안의 쉼표는 나누지 않는다.
+ */
 export function splitLines(value: string): string[] {
-  return value
-    .split(/\r?\n|,/)
+  const lines = value
+    .split(/\r?\n/)
     .map((s) => s.trim())
     .filter(Boolean);
+  return lines.length === 1 ? splitCommaList(lines[0]) : lines;
+}
+
+function splitCommaList(line: string): string[] {
+  const out: string[] = [];
+  let depth = 0;
+  let cur = '';
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '(' || ch === '（') depth++;
+    else if ((ch === ')' || ch === '）') && depth > 0) depth--;
+    const betweenDigits = /\d/.test(line[i - 1] ?? '') && /\d/.test(line[i + 1] ?? '');
+    if (ch === ',' && depth === 0 && !betweenDigits) {
+      out.push(cur);
+      cur = '';
+    } else cur += ch;
+  }
+  out.push(cur);
+  return out.map((s) => s.trim()).filter(Boolean);
 }
 
 // ── 요약 타일 · 예약 카드용 도메인 계산 ──────────────────────────────

@@ -4,7 +4,8 @@ import { useRef, useState, type FormEvent } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ACTIVITIES } from './ocean-home-data';
 import { TOUR_NAME_NAV_KEY, FISHING_CLASS_KEYS, type FishingClassKey } from '@/lib/tour';
-import { findOption, optionMinPeople, type ReserveOption } from '@/lib/tour-options';
+import { clampPeople, findOption, optionPeopleRange, optionPeopleRule, type ReserveOption } from '@/lib/tour-options';
+import { okinawaTodayKey } from '@/lib/okinawa-date';
 import { buildProduct } from '@/lib/inquiry-product';
 import { formatYen } from '@/lib/money';
 import { MEDICAL_MARKER } from '@/lib/inquiries/types';
@@ -87,16 +88,26 @@ export default function ReservationForm({
   // 선택 옵션(예: 일반/프라이빗) — 고른 옵션의 최소 인원이 인원 칸의 하한이 된다.
   const options = (slug && tourOptions?.[slug]) || [];
   const option = findOption(options, optionKey);
-  const minPeople = optionMinPeople(option);
+  const { min: minPeople, max: maxPeople } = optionPeopleRange(option);
+  // 옵션의 인원 규칙 문구 — "N명부터"(1명부터는 생략) / "N~M명" / "N명만"
+  const peopleRuleText = (o: ReserveOption) => {
+    const r = optionPeopleRule(o);
+    if (r.kind === 'range') return t('optionRange', { min: r.min, max: r.max });
+    if (r.kind === 'only') return t('optionOnly', { n: r.n });
+    return r.n > 1 ? t('optionFrom', { n: r.n }) : '';
+  };
+  const peopleHint = (() => {
+    if (!option) return '';
+    const r = optionPeopleRule(option);
+    if (r.kind === 'range') return t('optionRangeHint', { name: option.label, min: r.min, max: r.max });
+    if (r.kind === 'only') return t('optionOnlyHint', { name: option.label, n: r.n });
+    return r.n > 1 ? t('optionMinHint', { name: option.label, n: r.n }) : '';
+  })();
   // 낚시·요트 크루징은 메디컬 체크 불필요(다이빙·스노클링·PADI만 필수).
   const needsMedical = !!cat && cat.id !== 'fishing' && cat.id !== 'yacht';
 
-  const todayKey = (() => {
-    const t = new Date();
-    return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(
-      t.getDate()
-    ).padStart(2, '0')}`;
-  })();
+  // 오늘(오키나와 기준) — 서버·브라우저가 같은 값을 계산한다(하이드레이션 불일치 방지).
+  const todayKey = okinawaTodayKey();
 
   function reset() {
     setState('idle');
@@ -317,10 +328,12 @@ export default function ReservationForm({
             value={optionKey}
             onChange={(e) => {
               setOptionKey(e.target.value);
-              // 투어 상세 예약 카드와 같게 — 최소 인원보다 적으면 최소 인원으로 올린다.
-              const min = optionMinPeople(findOption(options, e.target.value));
+              // 투어 상세 예약 카드와 같게 — 인원을 그 옵션의 최소~최대 안으로 맞춘다.
+              const range = optionPeopleRange(findOption(options, e.target.value));
               const input = formRef.current?.elements.namedItem('people');
-              if (input instanceof HTMLInputElement && Number(input.value) < min) input.value = String(min);
+              if (input instanceof HTMLInputElement) {
+                input.value = String(clampPeople(Number(input.value) || range.min, range.min, range.max));
+              }
             }}
             className={`mt-1.5 ${inputCls} app-select app-select-dark [&>option]:text-ink`}
           >
@@ -332,7 +345,7 @@ export default function ReservationForm({
                 {[
                   o.label,
                   o.pricePerPerson != null && t('optionPerPerson', { price: formatYen(o.pricePerPerson, locale) }),
-                  optionMinPeople(o) > 1 && t('optionFrom', { n: optionMinPeople(o) })
+                  peopleRuleText(o)
                 ]
                   .filter(Boolean)
                   .join(' · ')}
@@ -384,21 +397,22 @@ export default function ReservationForm({
       {/* 인원 */}
       <div className="mt-4">
         <label htmlFor="rf-people" className={labelCls}>
-          {t('people')}
+          {t('people')} *
         </label>
         <input
           id="rf-people"
           name="people"
           type="number"
+          required
           min={minPeople}
-          max={50}
-          defaultValue={Math.max(initialPeople ?? 2, minPeople)}
-          aria-describedby={option && minPeople > 1 ? 'rf-people-hint' : undefined}
+          max={maxPeople}
+          defaultValue={clampPeople(initialPeople ?? 2, minPeople, maxPeople)}
+          aria-describedby={peopleHint ? 'rf-people-hint' : undefined}
           className={`mt-1.5 ${inputCls}`}
         />
-        {option && minPeople > 1 && (
+        {peopleHint && (
           <p id="rf-people-hint" className="mt-1.5 text-xs text-white/60">
-            {t('optionMinHint', { name: option.label, n: minPeople })}
+            {peopleHint}
           </p>
         )}
       </div>

@@ -250,7 +250,11 @@
     "optionPlaceholder": "Select an option",
     "optionPerPerson": "{price} per person",
     "optionFrom": "{n, plural, one {from # guest} other {from # guests}}",
-    "optionMinHint": "The {name} option needs at least {n} guests."
+    "optionMinHint": "The {name} option needs at least {n} guests.",
+    "optionRange": "{min}–{max} guests",
+    "optionOnly": "{n, plural, one {# guest only} other {# guests only}}",
+    "optionRangeHint": "The {name} option is for {min}–{max} guests.",
+    "optionOnlyHint": "{n, plural, one {The {name} option is for # guest only.} other {The {name} option is for # guests only.}}"
   },
   "tourDetail": {
     "includesTitle": "What's included",
@@ -306,7 +310,11 @@
     "optionPerPerson": "{price} per person",
     "optionFrom": "{n, plural, one {From # guest} other {From # guests}}",
     "optionMinNote": "The {name} option needs at least {n} guests.",
-    "bookLabelOption": "Per person · {option}"
+    "bookLabelOption": "Per person · {option}",
+    "optionRange": "{min}–{max} guests",
+    "optionOnly": "{n, plural, one {# guest only} other {# guests only}}",
+    "optionRangeNote": "The {name} option is for {min}–{max} guests.",
+    "optionOnlyNote": "{n, plural, one {The {name} option is for # guest only.} other {The {name} option is for # guests only.}}"
   },
   "medical": {
     "title": "Medical Check",

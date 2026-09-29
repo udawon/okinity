@@ -46,7 +46,7 @@ function toNumber(v: string): number | null {
 }
 
 /** 옵션 편집 행 — 숫자 칸은 입력 중 문자열로 들고 있다가 저장할 때 숫자로 바꾼다. */
-type OptionRow = { key: string; name: string; description: string; price: string; min: string };
+type OptionRow = { key: string; name: string; description: string; price: string; min: string; max: string };
 
 /**
  * 투어 상세 편집 폼. (목록은 코드 고정)
@@ -101,7 +101,8 @@ export default function TourEditor({
         name: local?.name ?? '',
         description: local?.description ?? '',
         price: o.pricePerPerson?.toString() ?? '',
-        min: o.minPeople?.toString() ?? ''
+        min: o.minPeople?.toString() ?? '',
+        max: o.maxPeople?.toString() ?? ''
       };
     })
   );
@@ -145,15 +146,18 @@ export default function TourEditor({
       show('요금 구간의 최대 인원과 요금을 숫자로 모두 입력해 주세요.', 'err');
       return;
     }
-    // 옵션: 이름은 필수, 1인 요금·최소 인원은 비우거나 숫자로
+    // 옵션: 이름은 필수, 1인 요금·최소/최대 인원은 비우거나 숫자로(최대 ≥ 최소)
+    const isPeople = (v: string) => /^([1-9]|[1-4]\d|50)$/.test(v.trim());
     const optionError = isKo
       ? options.some((o) => !o.name.trim())
         ? '옵션 이름을 모두 입력해 주세요. 쓰지 않는 옵션은 삭제해 주세요.'
         : options.some((o) => o.price.trim() && toNumber(o.price) == null)
           ? '옵션의 1인 요금은 숫자로 입력해 주세요.'
-          : options.some((o) => o.min.trim() && !/^([1-9]|[1-4]\d|50)$/.test(o.min.trim()))
-            ? '옵션의 최소 인원은 1~50 사이 숫자로 입력해 주세요.'
-            : null
+          : options.some((o) => (o.min.trim() && !isPeople(o.min)) || (o.max.trim() && !isPeople(o.max)))
+            ? '옵션의 최소·최대 인원은 1~50 사이 숫자로 입력해 주세요.'
+            : options.some((o) => o.max.trim() && Number(o.max) < (Number(o.min) || 1))
+              ? '옵션의 최대 인원은 최소 인원보다 작을 수 없어요.'
+              : null
       : null;
     if (optionError) {
       show(optionError, 'err');
@@ -163,16 +167,18 @@ export default function TourEditor({
       key: o.key,
       name: o.name.trim(),
       description: o.description.trim(),
-      // 요금·최소 인원은 언어 공통(한국어 저장본만 사용) — 번역 탭에는 비워 둔다.
+      // 요금·최소/최대 인원은 언어 공통(한국어 저장본만 사용) — 번역 탭에는 비워 둔다.
       pricePerPerson: isKo ? toNumber(o.price) : null,
-      minPeople: isKo && o.min.trim() ? Number(o.min.trim()) : null
+      minPeople: isKo && o.min.trim() ? Number(o.min.trim()) : null,
+      maxPeople: isKo && o.max.trim() ? Number(o.max.trim()) : null
     }));
     setSaving(true);
     const cleanImages = images.map((u) => u.trim()).filter(Boolean);
     const res = await saveTour(
       slug,
       {
-        published,
+        // 공개 여부는 언어 공통(한국어 탭에서만 정함) — 번역 탭 저장은 기존 값을 통과시킨다.
+        published: isKo ? published : detail.published,
         summary,
         // 사진·요금 숫자·공통 안내는 ko 탭에서만 편집(언어 공통) — en/ja 저장은 기존 값을 통과시킨다.
         heroImage: isKo ? (cleanImages[0] ?? '') : detail.heroImage,
@@ -209,16 +215,22 @@ export default function TourEditor({
       {/* ── 기본 정보 ── */}
       <section className={cardCls}>
         <h3 className="text-base font-bold text-ink">기본 정보</h3>
-        <label className="mt-3 flex items-center gap-2 text-sm font-medium text-ink">
-          <input
-            type="checkbox"
-            checked={published}
-            onChange={(e) => setPublished(e.target.checked)}
-            disabled={disabled}
-            className="h-4 w-4"
-          />
-          상세 내용 공개 (체크 해제 시 상세 페이지는 기본 정보 + 예약 문의만 노출)
-        </label>
+        {isKo ? (
+          <label className="mt-3 flex items-center gap-2 text-sm font-medium text-ink">
+            <input
+              type="checkbox"
+              checked={published}
+              onChange={(e) => setPublished(e.target.checked)}
+              disabled={disabled}
+              className="h-4 w-4"
+            />
+            상세 내용 공개 (체크 해제 시 상세 페이지는 기본 정보 + 예약 문의만 노출 · 모든 언어에 적용)
+          </label>
+        ) : (
+          <p className="mt-3 rounded-card border border-line bg-bg/40 p-3 text-xs text-muted">
+            공개 여부는 한국어 탭에서 정합니다. 모든 언어에 똑같이 적용돼요.
+          </p>
+        )}
 
         <div className="mt-4">
           <label className={labelCls} htmlFor="tour-summary">
@@ -496,11 +508,12 @@ export default function TourEditor({
             <p className={hintCls}>
               한 투어를 방식별로 나눠 손님이 고르게 해요(예: 일반 / 프라이빗). <b>2개 이상</b> 넣으면 투어 페이지에 옵션
               카드가, 예약 폼에 옵션 칸이 생겨요. 옵션에 1인 요금을 넣으면 예약 카드는 위 요금 방식 대신
-              “옵션 1인 요금 × 인원”으로 계산하고, 최소 인원보다 적게는 고를 수 없어요. 맨 위 옵션이 처음에 선택돼 있어요.
+              “옵션 1인 요금 × 인원”으로 계산하고, 최소~최대 인원 밖으로는 고를 수 없어요(1인 단독 옵션은 최소·최대 모두 1).
+              맨 위 옵션이 처음에 선택돼 있어요.
             </p>
             {!isKo && (
               <p className={hintCls}>
-                이 탭에서는 옵션 이름·설명만 번역해요. 옵션 추가·삭제·순서·요금·최소 인원은 한국어 탭에서 합니다.
+                이 탭에서는 옵션 이름·설명만 번역해요. 옵션 추가·삭제·순서·요금·최소/최대 인원은 한국어 탭에서 합니다.
               </p>
             )}
             <div className="mt-3 space-y-3">
@@ -527,7 +540,7 @@ export default function TourEditor({
                       </div>
                     )}
                   </div>
-                  <div className={`mt-2 grid gap-3 ${isKo ? 'sm:grid-cols-[minmax(0,1fr)_8rem_6rem]' : ''}`}>
+                  <div className={`mt-2 grid gap-3 ${isKo ? 'sm:grid-cols-[minmax(0,1fr)_8rem_5.5rem_5.5rem]' : ''}`}>
                     <div>
                       <label className="block text-xs font-medium text-muted" htmlFor={`opt-name-${o.key}`}>
                         이름
@@ -537,6 +550,7 @@ export default function TourEditor({
                         value={o.name}
                         onChange={(e) => patchOption(i, { name: e.target.value })}
                         placeholder={isKo ? '예) 일반' : baseOptions?.[i]?.name}
+                        maxLength={30}
                         disabled={disabled}
                         className={inputCls}
                       />
@@ -571,6 +585,20 @@ export default function TourEditor({
                             className={inputCls}
                           />
                         </div>
+                        <div>
+                          <label className="block text-xs font-medium text-muted" htmlFor={`opt-max-${o.key}`}>
+                            최대 인원
+                          </label>
+                          <input
+                            id={`opt-max-${o.key}`}
+                            inputMode="numeric"
+                            value={o.max}
+                            onChange={(e) => patchOption(i, { max: e.target.value })}
+                            placeholder="제한 없음"
+                            disabled={disabled}
+                            className={inputCls}
+                          />
+                        </div>
                       </>
                     )}
                   </div>
@@ -594,7 +622,7 @@ export default function TourEditor({
                 <button
                   type="button"
                   onClick={() =>
-                    setOptions((a) => [...a, { key: newOptionKey(a.map((o) => o.key)), name: '', description: '', price: '', min: '' }])
+                    setOptions((a) => [...a, { key: newOptionKey(a.map((o) => o.key)), name: '', description: '', price: '', min: '', max: '' }])
                   }
                   disabled={disabled}
                   className="rounded-button border border-line bg-surface px-4 py-2 text-sm text-ink hover:border-brand disabled:opacity-50"
@@ -613,7 +641,7 @@ export default function TourEditor({
       {/* ── 포함 사항 · 진행 순서 ── */}
       <section className={cardCls}>
         <label className={labelCls} htmlFor="tour-included">
-          포함 사항 <span className="font-normal text-muted">(줄바꿈 또는 쉼표로 구분)</span>
+          포함 사항 <span className="font-normal text-muted">(줄마다 한 항목 · 한 줄로 쓰면 쉼표로 구분)</span>
         </label>
         <textarea
           id="tour-included"

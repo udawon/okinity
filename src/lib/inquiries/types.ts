@@ -19,20 +19,25 @@ export function splitMedical(message?: string): { medicalChecked: boolean; reque
   return { medicalChecked: false, request: m };
 }
 
+/** 폼이 비워 보낸 값('' · null)은 입력하지 않은 것으로 — 선택 칸을 비워도 접수가 실패하지 않게. */
+const blankToUndefined = (v: unknown) => (v === '' || v === null ? undefined : v);
+const optionalText = (max: number) => z.preprocess(blankToUndefined, z.string().max(max).optional());
+
 /** 폼에서 받는 입력 (검증용). API 라우트와 store가 공유. */
 export const NewInquirySchema = z.object({
-  product: z.string().max(100).optional(),
-  date: z.string().max(40).optional(),
+  product: optionalText(100),
+  date: optionalText(40),
   /** 희망 시간대(오전·오후·종일 등). 방문자 입력. */
-  time: z.string().max(40).optional(),
-  people: z.coerce.number().int().min(1).max(50).optional(),
+  time: optionalText(40),
+  /** 인원 — 칸을 비우면 인원 미정(운영자가 연락해 확인). */
+  people: z.preprocess(blankToUndefined, z.coerce.number().int().min(1).max(50).optional()),
   name: z.string().min(1).max(100),
   /** 이메일 — 확정/변경/취소 안내 수신용. 고객 예약 폼에서는 필수(required)로 강제.
    *  스키마는 레거시(이메일 없는 기존 문의)의 어드민 수정·이동을 깨지 않도록 빈 값/미입력 허용. */
   email: z.string().email().max(200).optional().or(z.literal('')),
   /** 전화·카카오톡·라인 등 즉시 연락 수단. */
   contact: z.string().min(1).max(200),
-  message: z.string().max(2000).optional()
+  message: optionalText(2000)
 });
 export type NewInquiry = z.infer<typeof NewInquirySchema>;
 

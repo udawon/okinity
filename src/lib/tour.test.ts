@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   approxKrw,
   bookableOptions,
+  isTourPublished,
   parsePeopleParam,
+  reserveOptionsFor,
+  splitLines,
   emptyTourDetail,
   estimateTotal,
   extractAgeRange,
@@ -177,8 +180,8 @@ describe('parsePeopleParam', () => {
 
 describe('bookableOptions — 손님이 고를 수 있는 옵션', () => {
   const options = [
-    { key: 'o1', name: '일반', description: '', pricePerPerson: 6000, minPeople: 2 },
-    { key: 'o2', name: '프라이빗', description: '', pricePerPerson: 9000, minPeople: null }
+    { key: 'o1', name: '일반', description: '', pricePerPerson: 6000, minPeople: 2, maxPeople: null },
+    { key: 'o2', name: '프라이빗', description: '', pricePerPerson: 9000, minPeople: null, maxPeople: null }
   ];
   const ko = detail({ published: true, options });
   const en = detail({ published: true, options: [{ ...options[1], name: 'Private', pricePerPerson: null }] });
@@ -190,8 +193,64 @@ describe('bookableOptions — 손님이 고를 수 있는 옵션', () => {
     ]);
   });
 
-  it('비공개 투어·낚시(클래스로 고름)는 옵션 없음', () => {
-    expect(bookableOptions('blue-cave-snorkeling', ko, { ...en, published: false })).toEqual([]);
+  it('공개 여부는 한국어 저장본 기준(번역본의 공개 체크는 보지 않는다)', () => {
+    expect(bookableOptions('blue-cave-snorkeling', { ...ko, published: false }, en)).toEqual([]);
+    expect(bookableOptions('blue-cave-snorkeling', ko, { ...en, published: false })).toHaveLength(2);
+  });
+
+  it('낚시(클래스로 고름)는 옵션 없음', () => {
     expect(bookableOptions('trial-fishing-4h', ko, ko)).toEqual([]);
+  });
+});
+
+describe('isTourPublished — 상세 공개 여부는 언어 공통', () => {
+  it('한국어 저장본만 본다', () => {
+    expect(isTourPublished(detail({ published: true }))).toBe(true);
+    expect(isTourPublished(detail({ published: false }))).toBe(false);
+  });
+});
+
+describe('reserveOptionsFor — 예약 폼 옵션(홈·예약 페이지 공용)', () => {
+  const ko = {
+    published: true,
+    options: [
+      { key: 'o1', name: '일반 투어', pricePerPerson: 6000, minPeople: 2 },
+      { key: 'o2', name: '1인 단독투어', pricePerPerson: 9000, minPeople: 1, maxPeople: 1 }
+    ]
+  };
+  const en = { published: false, options: [{ key: 'o2', name: 'Solo tour' }] };
+
+  it('손님 언어 이름 + 예약 기록용 한국어 이름 + 인원 범위', () => {
+    const map = reserveOptionsFor((slug) => (slug === 'blue-cave-snorkeling' ? { base: ko, local: en } : { base: null, local: null }));
+    expect(Object.keys(map)).toEqual(['blue-cave-snorkeling']);
+    expect(map['blue-cave-snorkeling']).toEqual([
+      { key: 'o1', label: '일반 투어', productLabel: '일반 투어', pricePerPerson: 6000, minPeople: 2, maxPeople: null },
+      { key: 'o2', label: 'Solo tour', productLabel: '1인 단독투어', pricePerPerson: 9000, minPeople: 1, maxPeople: 1 }
+    ]);
+  });
+
+  it('한국어가 비공개면 어느 언어에서도 옵션 없음', () => {
+    const map = reserveOptionsFor(() => ({ base: { ...ko, published: false }, local: { ...en, published: true } }));
+    expect(map).toEqual({});
+  });
+});
+
+describe('splitLines — 포함 사항 목록', () => {
+  it('여러 줄이면 줄바꿈으로만 나눈다(문장 안의 쉼표는 그대로)', () => {
+    expect(splitLines('전세 요트 단독 이용\n주요 숙소 무료 픽업, 드랍\n')).toEqual(['전세 요트 단독 이용', '주요 숙소 무료 픽업, 드랍']);
+    expect(splitLines('Boat fee\nFree pickup (some areas cannot be served, depending on location)')).toEqual([
+      'Boat fee',
+      'Free pickup (some areas cannot be served, depending on location)'
+    ]);
+  });
+
+  it('한 줄이면 쉼표로 나누되 숫자·괄호 안 쉼표는 나누지 않는다', () => {
+    expect(splitLines('기본 낚시 도구, 기본 미끼 일체')).toEqual(['기본 낚시 도구', '기본 미끼 일체']);
+    expect(splitLines('수중 사진(10장, 원본), 사진 10,000엔 상당')).toEqual(['수중 사진(10장, 원본)', '사진 10,000엔 상당']);
+  });
+
+  it('비어 있으면 빈 목록', () => {
+    expect(splitLines('')).toEqual([]);
+    expect(splitLines(' \n ')).toEqual([]);
   });
 });

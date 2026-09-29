@@ -8,6 +8,7 @@ import ReservationForm from './ReservationForm';
 import { FISHING_CLASS_KEYS, parsePeopleParam } from '@/lib/tour';
 import type { ScheduleItem } from '@/lib/content';
 import type { ReserveOption } from '@/lib/tour-options';
+import { formatDateKeyLong } from '@/lib/okinawa-date';
 
 type Status = ScheduleItem['status'];
 
@@ -46,14 +47,8 @@ export default function ReservePlanner({
   // 상세에서 고른 옵션(?option=) — 폼이 그 투어의 옵션 목록에 있는 값만 받는다.
   const initialOption = searchParams.get('option') ?? undefined;
 
-  const dateLong = selectedKey
-    ? new Intl.DateTimeFormat(locale, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        weekday: 'long'
-      }).format(new Date(selectedKey))
-    : '';
+  // 고른 날짜 그대로 표시 — new Date('YYYY-MM-DD')(UTC 자정)는 미국 등에서 하루 전으로 보인다.
+  const dateLong = selectedKey ? formatDateKeyLong(selectedKey, locale) : '';
 
   // 선택한 날짜에 이미 잡혀 있는 일정(예약 불가 제외 — 그런 날짜는 선택 자체가 안 됨)을
   // 폼에 정보로 전달. 한국어(ko)는 입력 원문 그대로, EN/JA는 한글 포함 텍스트를 상태별

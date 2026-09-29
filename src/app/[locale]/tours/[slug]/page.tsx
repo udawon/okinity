@@ -16,6 +16,7 @@ import {
   getTourCatalogEntry,
   resolveTourDetail,
   parseFishingClasses,
+  isTourPublished,
   splitLines,
   tourHasClasses,
   tourImages,
@@ -116,7 +117,7 @@ export default async function TourDetailPage({
   const detail = resolveTourDetail(slug, contentMap[localizedKey] ?? contentMap[tourKey] ?? null);
   const base = resolveTourDetail(slug, contentMap[tourKey] ?? null);
   const images = tourImages(base).map(cdnMedia);
-  const showDetail = detail.published;
+  const showDetail = isTourPublished(base); // 공개 여부는 언어 공통(한국어 저장본)
   const included = splitLines(detail.included);
   const times = parseTourTimes(contentMap[CONTENT_KEYS.tourTimes])[slug] ?? [];
 
