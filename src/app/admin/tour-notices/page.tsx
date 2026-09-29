@@ -11,8 +11,11 @@ import { TOUR_NOTICE_IDS, parseTourNotices, type TourNoticeId } from '@/lib/tour
 import AdminShell from '@/components/admin/AdminShell';
 import LangTabs from '@/components/admin/LangTabs';
 import TourNoticesForm from '@/components/admin/TourNoticesForm';
+import AutoTranslateNote from '@/components/admin/AutoTranslateNote';
 
 export const dynamic = 'force-dynamic';
+// 한국어 저장 시 EN/JA 자동 번역 — 번역 대기 시간 확보
+export const maxDuration = 60;
 
 export default async function AdminTourNoticesPage({
   searchParams
@@ -49,6 +52,7 @@ export default async function AdminTourNoticesPage({
           {lang !== 'ko' && ' 이 언어는 저장하지 않으면 아래 기본 번역문이 보여요 — 기존 영어·일본어 본문에는 환불 규정이 없어서 새로 번역한 문구이니, 켜기 전에 꼭 확인해 주세요.'}
         </p>
       </div>
+      <AutoTranslateNote lang={lang} className="mt-3" />
       <div className="mt-5">
         <TourNoticesForm key={lang} initial={notices} usage={usage} lang={lang} disabled={!enabled} />
       </div>

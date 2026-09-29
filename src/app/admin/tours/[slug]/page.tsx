@@ -11,8 +11,11 @@ import AdminShell from '@/components/admin/AdminShell';
 import TourEditor from '@/components/admin/TourEditor';
 import FishingClassesForm from '@/components/admin/FishingClassesForm';
 import LangTabs from '@/components/admin/LangTabs';
+import AutoTranslateNote from '@/components/admin/AutoTranslateNote';
 
 export const dynamic = 'force-dynamic';
+// 한국어 저장 시 EN/JA 자동 번역(서버액션이 이 페이지 함수에서 실행) — 번역 대기 시간 확보
+export const maxDuration = 60;
 
 export default async function AdminTourEditPage({
   params,
@@ -70,13 +73,7 @@ export default async function AdminTourEditPage({
         </div>
         <LangTabs basePath={`/admin/tours/${slug}`} current={lang} />
       </div>
-      {lang !== 'ko' && (
-        <p className="mt-3 rounded-card border border-line bg-bg/40 p-3 text-xs text-muted">
-          {lang === 'en' ? 'English' : '日本語'} 버전을 편집 중입니다. 저장 전 내용은 한국어 원문이
-          초안으로 표시될 수 있으며, 이 언어로 저장하지 않으면 방문자에게 한국어가 폴백으로
-          보입니다.
-        </p>
-      )}
+      <AutoTranslateNote lang={lang} className="mt-3" />
 
       <div className="mt-5 space-y-5">
         <TourEditor key={lang} slug={slug} detail={detail} lang={lang} baseOptions={baseOptions} disabled={!enabled} />

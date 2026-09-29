@@ -9,8 +9,11 @@ import { parseAbout, resolveAbout } from '@/lib/about';
 import AdminShell from '@/components/admin/AdminShell';
 import AboutEditor from '@/components/admin/AboutEditor';
 import LangTabs from '@/components/admin/LangTabs';
+import AutoTranslateNote from '@/components/admin/AutoTranslateNote';
 
 export const dynamic = 'force-dynamic';
+// 한국어 저장 시 EN/JA 자동 번역 — 번역 대기 시간 확보
+export const maxDuration = 60;
 
 export default async function AdminAboutPage({
   searchParams
@@ -36,12 +39,7 @@ export default async function AdminAboutPage({
         </p>
         <LangTabs basePath="/admin/about" current={lang} />
       </div>
-      {lang !== 'ko' && (
-        <p className="mb-4 rounded-card border border-line bg-bg/40 p-3 text-xs text-muted">
-          {lang === 'en' ? 'English' : '日本語'} 버전을 편집 중입니다. 이 언어로 저장하지 않으면
-          방문자에게 한국어가 폴백으로 보입니다.
-        </p>
-      )}
+      <AutoTranslateNote lang={lang} className="mb-4" />
 
       <AboutEditor key={lang} defaults={about} lang={lang} disabled={!enabled} />
     </AdminShell>

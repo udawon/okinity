@@ -37,7 +37,7 @@ export default function AboutEditor({
   const [instructorCerts, setInstructorCerts] = useState(defaults.instructorCerts);
   const [instructorBody, setInstructorBody] = useState(defaults.instructorBody);
   const [saving, setSaving] = useState(false);
-  const { status, show } = useSaveStatus();
+  const { status, show, showSaved } = useSaveStatus();
 
   const setStrength = (i: number, key: keyof Strength, v: string) =>
     setStrengths((arr) => arr.map((s, j) => (j === i ? { ...s, [key]: v } : s)));
@@ -65,7 +65,7 @@ export default function AboutEditor({
     setSaving(false);
     if (res.error) show(res.error, 'err');
     else {
-      show('저장되었습니다.');
+      showSaved('저장되었습니다.', res.sync);
       router.refresh();
     }
   }

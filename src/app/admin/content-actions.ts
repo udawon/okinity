@@ -3,7 +3,9 @@
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { ADMIN_COOKIE, verifySession } from '@/lib/admin-auth';
-import { setSiteContent, createSignedUpload, type Json } from '@/lib/site-content';
+import { setSiteContent, createSignedUpload, CONTENT_KEYS, type Json } from '@/lib/site-content';
+import { syncTranslations } from '@/lib/content-sync-server';
+import type { SyncOutcome } from '@/lib/content-sync';
 
 /** 서버액션 2차 방어 — 미들웨어 외에 세션 재검증. */
 async function requireAdmin(): Promise<void> {
@@ -13,15 +15,16 @@ async function requireAdmin(): Promise<void> {
   }
 }
 
-export type SaveState = { ok?: boolean; error?: string };
+export type SaveState = { ok?: boolean; error?: string; sync?: SyncOutcome };
 
-/** 영역 콘텐츠 저장 후 메인 전체 무효화. */
+/** 영역 콘텐츠 저장 후 메인 전체 무효화. 갤러리는 사진 설명을 EN/JA 로 자동 번역(한국어 기준). */
 export async function saveContent(key: string, value: Json): Promise<SaveState> {
   await requireAdmin();
   try {
     await setSiteContent(key, value);
+    const sync = key === CONTENT_KEYS.gallery ? await syncTranslations({ kind: 'gallery', key }) : undefined;
     revalidatePath('/', 'layout');
-    return { ok: true };
+    return { ok: true, sync };
   } catch (e) {
     return { error: e instanceof Error ? e.message : '저장 실패' };
   }

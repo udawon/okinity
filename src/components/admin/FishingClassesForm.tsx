@@ -30,7 +30,7 @@ export default function FishingClassesForm({
   const router = useRouter();
   const [classes, setClasses] = useState<TourClasses>(initial);
   const [saving, setSaving] = useState(false);
-  const { status, show } = useSaveStatus();
+  const { status, show, showSaved } = useSaveStatus();
 
   const patchClass = (key: FishingClassKey, p: Partial<TourClasses[FishingClassKey]>) =>
     setClasses((c) => ({ ...c, [key]: { ...c[key], ...p } }));
@@ -41,7 +41,7 @@ export default function FishingClassesForm({
     setSaving(false);
     if (res.error) show(res.error, 'err');
     else {
-      show('저장되었습니다. (모든 낚시 투어에 반영)');
+      showSaved('저장되었습니다. (모든 낚시 투어에 반영)', res.sync);
       router.refresh();
     }
   }

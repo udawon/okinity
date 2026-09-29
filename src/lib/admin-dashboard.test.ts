@@ -66,10 +66,10 @@ describe('siteChecks', () => {
   it('비어 있는 투어·환불 규정 없는 투어·출발 시간 없는 투어를 알려준다', () => {
     const checks = siteChecks({
       tours: [
-        { slug: 'a', name: 'A 투어', ko: tour({ body: '★환불 규정★\n*7일 전 100%' }), hasEn: true, hasJa: true, times: ['09:00'] },
-        { slug: 'b', name: 'B 투어', ko: tour({ body: '소개만' }), hasEn: true, hasJa: true, times: [] },
-        { slug: 'c', name: 'C 투어', ko: tour({ published: false, body: '' }), hasEn: false, hasJa: false, times: [] },
-        { slug: 'd', name: 'D 투어', ko: tour({ body: '소개', notices: ['refund'], startNote: '자유 출발' }), hasEn: false, hasJa: true, times: [] }
+        { slug: 'a', name: 'A 투어', ko: tour({ body: '★환불 규정★\n*7일 전 100%' }), translationStale: 0, times: ['09:00'] },
+        { slug: 'b', name: 'B 투어', ko: tour({ body: '소개만' }), translationStale: 0, times: [] },
+        { slug: 'c', name: 'C 투어', ko: tour({ published: false, body: '' }), translationStale: 12, times: [] },
+        { slug: 'd', name: 'D 투어', ko: tour({ body: '소개', notices: ['refund'], startNote: '자유 출발' }), translationStale: 3, times: [] }
       ],
       lastBlogDate: '2026-09-24',
       today: '2026-09-28'
@@ -85,7 +85,7 @@ describe('siteChecks', () => {
   it('문제가 없으면 해당 항목을 만들지 않는다', () => {
     const checks = siteChecks({
       tours: [
-        { slug: 'a', name: 'A', ko: tour({ notices: ['refund'], images: ['1', '2', '3'] }), hasEn: true, hasJa: true, times: ['09:00'] }
+        { slug: 'a', name: 'A', ko: tour({ notices: ['refund'], images: ['1', '2', '3'] }), translationStale: 0, times: ['09:00'] }
       ],
       lastBlogDate: null,
       today: '2026-09-28'

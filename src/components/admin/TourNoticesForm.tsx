@@ -25,7 +25,7 @@ export default function TourNoticesForm({
   const router = useRouter();
   const [value, setValue] = useState<TourNotices>(initial);
   const [saving, setSaving] = useState(false);
-  const { status, show } = useSaveStatus();
+  const { status, show, showSaved } = useSaveStatus();
   const patch = (id: TourNoticeId, p: Partial<TourNotices[TourNoticeId]>) =>
     setValue((v) => ({ ...v, [id]: { ...v[id], ...p } }));
 
@@ -35,7 +35,7 @@ export default function TourNoticesForm({
     setSaving(false);
     if (res.error) show(res.error, 'err');
     else {
-      show('저장되었습니다.');
+      showSaved('저장되었습니다.', res.sync);
       router.refresh();
     }
   }

@@ -19,7 +19,7 @@ export default function GalleryForm({
   disabled?: boolean;
 }) {
   const [items, setItems] = useState<Item[]>(defaults.length ? defaults : []);
-  const { status, show } = useSaveStatus();
+  const { status, show, showSaved } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   const patch = (i: number, p: Partial<Item>) =>
@@ -41,7 +41,7 @@ export default function GalleryForm({
     const clean = items.filter((it) => it.image.trim());
     const res = await saveContent('gallery', { items: clean });
     setSaving(false);
-    if (res.ok) show(`저장되었습니다 (${clean.length}장).`);
+    if (res.ok) showSaved(`저장되었습니다 (${clean.length}장).`, res.sync);
     else show(res.error ?? '저장 실패', 'err');
   }
 

@@ -1,8 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { syncMessage, type SyncOutcome } from '@/lib/content-sync';
 
-type SaveStatus = { text: string; tone: 'ok' | 'err'; at: number } | null;
+type Tone = 'ok' | 'warn' | 'err';
+type SaveStatus = { text: string; tone: Tone; at: number } | null;
 
 /**
  * 어드민 저장 피드백 공용 훅.
@@ -26,10 +28,10 @@ export function useSaveStatus(autoHideMs = 4000) {
   };
 
   const show = useCallback(
-    (text: string, tone: 'ok' | 'err' = 'ok') => {
+    (text: string, tone: Tone = 'ok') => {
       clearTimer();
       setStatus({ text, tone, at: Date.now() });
-      // 성공만 자동 소멸. 실패는 사용자가 원인을 읽도록 유지.
+      // 성공만 자동 소멸. 경고·실패는 사용자가 원인을 읽도록 유지.
       if (tone === 'ok') {
         timer.current = setTimeout(() => setStatus(null), autoHideMs);
       }
@@ -40,7 +42,16 @@ export function useSaveStatus(autoHideMs = 4000) {
   // 언마운트 시 타이머 정리(unmounted setState 방지).
   useEffect(() => clearTimer, []);
 
-  return { status, show };
+  /** 저장 성공 + 한국어 기준 자동 번역 결과(lib/content-sync). 번역 실패·꺼짐은 경고로 남긴다. */
+  const showSaved = useCallback(
+    (text: string, sync?: SyncOutcome) => {
+      const note = syncMessage(sync);
+      show(note.text ? `${text} ${note.text}` : text, note.warn ? 'warn' : 'ok');
+    },
+    [show]
+  );
+
+  return { status, show, showSaved };
 }
 
 /** 저장 결과 배지 — 성공(초록·시각 표기·자동 소멸) / 실패(빨강·유지). aria-live로 SR 통지. */
@@ -52,15 +63,16 @@ export function SaveStatusBadge({ status }: { status: SaveStatus }) {
     second: '2-digit'
   });
   const ok = status.tone === 'ok';
+  const color = { ok: 'text-emerald-600', warn: 'text-amber-700', err: 'text-red-600' }[status.tone];
   return (
     <span
       role="status"
       aria-live="polite"
-      className={`inline-flex items-center gap-1.5 text-sm ${ok ? 'text-emerald-600' : 'text-red-600'}`}
+      className={`inline-flex items-center gap-1.5 text-sm ${color}`}
     >
       <span aria-hidden>{ok ? '✓' : '⚠'}</span>
       {status.text}
-      {ok && <span className="text-muted">· {time}</span>}
+      {status.tone !== 'err' && <span className="text-muted">· {time}</span>}
     </span>
   );
 }

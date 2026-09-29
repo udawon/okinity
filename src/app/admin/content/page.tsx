@@ -22,6 +22,8 @@ import SectionPreview from '@/components/admin/SectionPreview';
 import { type ReactNode } from 'react';
 
 export const dynamic = 'force-dynamic';
+// 갤러리 저장 시 사진 설명 EN/JA 자동 번역 — 번역 대기 시간 확보
+export const maxDuration = 60;
 
 const sectionCls = 'rounded-card border border-line bg-surface p-5 sm:p-6';
 const sectionTitleCls = 'text-lg font-bold text-ink';
@@ -177,7 +179,7 @@ export default async function AdminContentPage() {
 
         <EditSection
           title="갤러리"
-          desc="홈 갤러리(반응형 그리드)와 /갤러리 페이지에 올린 순서대로 노출됩니다. 이미지를 추가/삭제하세요."
+          desc="홈 갤러리(반응형 그리드)와 /갤러리 페이지에 올린 순서대로 노출됩니다. 이미지를 추가/삭제하세요. 사진 설명은 저장할 때 English·日本語로 자동 번역됩니다."
           preview={<SectionPreview highlight="gallery" note="홈 갤러리 그리드 + /gallery 페이지." />}
         >
           <GalleryForm defaults={galleryDefaults} disabled={!enabled} />
