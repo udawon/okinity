@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
 import { saveContent } from '@/app/admin/content-actions';
 import MediaInput from './MediaInput';
+import { mediaKind } from '@/lib/media';
+import { safeAction } from '@/lib/safe-action';
 
 type HeroDefaults = {
   eyebrow?: string;
@@ -61,12 +63,13 @@ export default function HeroForm({
 
   async function action(formData: FormData) {
     setSaving(true);
-    const res = await saveContent('hero', {
+    const res = await safeAction(() => saveContent('hero', {
       eyebrow: String(formData.get('eyebrow') ?? ''),
       title: String(formData.get('title') ?? ''),
       subtitle: String(formData.get('subtitle') ?? ''),
       mediaUrl: String(formData.get('mediaUrl') ?? ''),
-      mediaType: String(formData.get('mediaType') ?? 'image'),
+      // 배경 종류는 파일 확장자로 판별(선택 드롭다운이 파일과 어긋나 첫 화면이 깨지던 문제 방지)
+      mediaType: mediaKind(String(formData.get('mediaUrl') ?? ''), defaults.mediaType),
       badge1: String(formData.get('badge1') ?? ''),
       badge2: String(formData.get('badge2') ?? ''),
       badge3: String(formData.get('badge3') ?? ''),
@@ -76,7 +79,7 @@ export default function HeroForm({
       hideEyebrow: formData.get('showEyebrow') !== 'on',
       hideSubtitle: formData.get('showSubtitle') !== 'on',
       hideBadges: formData.get('showBadges') !== 'on'
-    });
+    }));
     setSaving(false);
     if (res.ok) show('저장되었습니다.');
     else show(res.error ?? '저장 실패', 'err');
@@ -87,25 +90,9 @@ export default function HeroForm({
       <div>
         <label className={labelCls}>배경 이미지 / 동영상</label>
         <p className="mb-2 mt-0.5 text-xs text-muted">
-          비워두면 기본 이미지가 사용됩니다. 동영상은 자동재생(무음 루프)됩니다.
+          비워두면 기본 이미지가 사용됩니다. 동영상은 자동재생(무음 루프)됩니다. 이미지인지 동영상인지는 올린 파일로 자동 판별합니다.
         </p>
         <MediaInput name="mediaUrl" prefix="hero" defaultUrl={defaults.mediaUrl} disabled={disabled} />
-      </div>
-
-      <div>
-        <label className={labelCls} htmlFor="hero-mediaType">
-          배경 종류
-        </label>
-        <select
-          id="hero-mediaType"
-          name="mediaType"
-          defaultValue={defaults.mediaType ?? 'image'}
-          disabled={disabled}
-          className={`${inputCls} app-select app-select-light`}
-        >
-          <option value="image">이미지</option>
-          <option value="video">동영상</option>
-        </select>
       </div>
 
       <div>

@@ -12,6 +12,18 @@ export function isVideoUrl(url: string | undefined | null): boolean {
   return VIDEO_EXT.test(url ?? '');
 }
 
+const IMAGE_EXT = /\.(jpe?g|png|webp|gif|avif|svg)(\?|#|$)/i;
+
+/**
+ * 배경 미디어 종류 — 파일 확장자가 우선(업로드 시 원본 확장자 보존). 어드민 "배경 종류" 선택이
+ * 파일과 어긋나도(mp4 인데 '이미지') 첫 화면이 깨지지 않게. 확장자로 모를 때만 저장된 선택값.
+ */
+export function mediaKind(url: string | undefined | null, fallback?: string): 'video' | 'image' {
+  if (isVideoUrl(url)) return 'video';
+  if (IMAGE_EXT.test(url ?? '')) return 'image';
+  return fallback === 'video' ? 'video' : 'image';
+}
+
 export function cdnMedia(url: string | undefined | null): string {
   if (!url) return url ?? '';
   // 영상은 프록시를 태우지 않는다. /cdn 라우트는 Range 헤더를 업스트림에 전달하지 않아

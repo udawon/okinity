@@ -18,6 +18,8 @@ import { TOUR_NOTICE_IDS, type TourNoticeId } from '@/lib/tour-notices';
 import { newOptionKey, type TourOption } from '@/lib/tour-options';
 import MediaInput from './MediaInput';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
+import { safeAction } from '@/lib/safe-action';
+import { parseYenInput } from '@/lib/number-input';
 
 const labelCls = 'block text-sm font-medium text-ink';
 const hintCls = 'mt-1 text-xs text-muted';
@@ -39,10 +41,9 @@ const NOTICE_LABEL: Record<TourNoticeId, string> = {
   safety: '안전관리 안내'
 };
 
-/** 숫자 입력칸 문자열 → 숫자(빈 값·잘못된 값은 null). */
+/** 숫자 입력칸 문자열 → 숫자("13,000엔"도 허용, 빈 값·잘못된 값은 null — 잘못된 값은 저장 전에 막는다). */
 function toNumber(v: string): number | null {
-  const n = Number(v.replace(/[,\s]/g, ''));
-  return v.trim() && Number.isFinite(n) && n >= 0 ? n : null;
+  return parseYenInput(v).value;
 }
 
 /** 옵션 편집 행 — 숫자 칸은 입력 중 문자열로 들고 있다가 저장할 때 숫자로 바꾼다. */
@@ -138,6 +139,11 @@ export default function TourEditor({
   }
 
   async function save() {
+    // 1인당 요금 숫자 칸 — 읽을 수 없는 글("만삼천" 등)이 조용히 빈 값으로 저장되지 않게
+    if (isKo && priceMode === 'perPerson' && (!parseYenInput(pricePerPerson).ok || !parseYenInput(priceSolo).ok)) {
+      show('1인 요금·1인 단독 요금은 숫자로 입력해 주세요. 예) 13000', 'err');
+      return;
+    }
     // 구간 요금: 인원·요금이 모두 숫자인 행만 저장
     const cleanTiers: PriceTier[] = tiers
       .map((t) => ({ cls: t.cls, maxPeople: Math.round(toNumber(t.maxPeople) ?? 0), price: toNumber(t.price) ?? -1 }))
@@ -174,7 +180,7 @@ export default function TourEditor({
     }));
     setSaving(true);
     const cleanImages = images.map((u) => u.trim()).filter(Boolean);
-    const res = await saveTour(
+    const res = await safeAction(() => saveTour(
       slug,
       {
         // 공개 여부는 언어 공통(한국어 탭에서만 정함) — 번역 탭 저장은 기존 값을 통과시킨다.
@@ -201,7 +207,7 @@ export default function TourEditor({
         body
       },
       lang
-    );
+    ));
     setSaving(false);
     if (res.error) show(res.error, 'err');
     else {

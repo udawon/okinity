@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { getTourCatalogEntry } from './tour';
+import { okinawaTodayKey } from './okinawa-date';
 
 /**
  * 블로그("오늘의 오키니티") 데이터 모델 — 범용(universal) 모듈.
@@ -41,7 +42,8 @@ export type BlogPost = z.infer<typeof BlogPostSchema>;
 /** 메인 캐러셀에 노출하는 최대 글 수. */
 export const BLOG_CAROUSEL_LIMIT = 8;
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+// 새 글 기본 날짜 = 오키나와(영업지) 오늘 — UTC 기준이면 한국·일본 0~9시에 전날로 찍힌다.
+const todayISO = () => okinawaTodayKey();
 
 /** 새 글 기본값 — 초안(비공개)으로 생성. */
 export function newBlogPost(): BlogPost {

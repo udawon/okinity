@@ -18,7 +18,7 @@ import {
   nonEmpty
 } from '@/lib/home-content';
 import OceanHome, { type HomeContent } from '@/components/OceanHome';
-import { cdnMedia } from '@/lib/media';
+import { cdnMedia, mediaKind } from '@/lib/media';
 
 // 어드민 편집(블로그·일정)을 즉시 반영하기 위해 동적 렌더링.
 // (Supabase 미설정 시에도 오버라이드 조회는 빈 객체라 비용 거의 없음)
@@ -117,7 +117,7 @@ export default async function HomePage({
   const isDefaultLocale = locale === routing.defaultLocale;
   const media = {
     hero: heroOv?.mediaUrl?.trim()
-      ? { url: cdnMedia(heroOv.mediaUrl), type: heroOv.mediaType }
+      ? { url: cdnMedia(heroOv.mediaUrl), type: mediaKind(heroOv.mediaUrl, heroOv.mediaType) } // 종류는 파일 확장자 우선
       : undefined,
     heroText: isDefaultLocale
       ? { eyebrow: heroOv?.eyebrow, title: heroOv?.title, subtitle: heroOv?.subtitle }

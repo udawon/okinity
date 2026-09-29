@@ -78,6 +78,8 @@ export default function ReservationForm({
   );
   const [state, setState] = useState<SubmitState>('idle');
   const [done, setDone] = useState<{ product: string; dateLabel: string } | null>(null);
+  // 서버가 옵션 인원 조건으로 거절한 경우의 허용 범위(그 밖의 실패는 null)
+  const [rangeError, setRangeError] = useState<{ min: number; max: number } | null>(null);
   const [medOpen, setMedOpen] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -130,6 +132,7 @@ export default function ReservationForm({
     const form = formRef.current;
     if (!form) return;
     setState('submitting');
+    setRangeError(null);
     const fd = new FormData(form);
     const tourName = cat?.tours.find((t) => t.slug === slug)?.name ?? '';
     const classLabel = isFishing && fishingClass ? FISHING_CLASS_PRODUCT[fishingClass] : '';
@@ -155,7 +158,11 @@ export default function ReservationForm({
           company: fd.get('company') // 허니팟
         })
       });
-      if (!res.ok) throw new Error('failed');
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string; min?: number; max?: number };
+        setRangeError(body.error === 'people_range' && body.min != null && body.max != null ? { min: body.min, max: body.max } : null);
+        throw new Error('failed');
+      }
       setMedOpen(false);
       setDone({ product, dateLabel: lockedDateLabel ?? (date ?? t('dateTbd')) });
       setState('success');
@@ -490,7 +497,11 @@ export default function ReservationForm({
 
       {state === 'error' && (
         <p role="alert" className="mt-3 rounded-button bg-red-500/15 px-4 py-2.5 text-sm text-red-200">
-          {t('errorMsg')}
+          {rangeError
+            ? rangeError.min === rangeError.max
+              ? t('errorPeopleOnly', { n: rangeError.min })
+              : t('errorPeopleRange', { min: rangeError.min, max: rangeError.max })
+            : t('errorMsg')}
         </p>
       )}
 

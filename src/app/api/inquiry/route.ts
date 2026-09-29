@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { site } from '@/config/site.config';
 import { getInquiryStore, NewInquirySchema, type NewInquiry } from '@/lib/inquiries';
+import { parseProduct } from '@/lib/inquiry-product';
+import { optionPeopleViolation } from '@/lib/inquiry-rules';
+import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 
 /**
  * 예약 문의 처리.
@@ -141,6 +144,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'validation' }, { status: 400 });
   }
   const data = parsed.data;
+
+  // 옵션 인원 조건(최소~최대) — 화면을 거치지 않은 요청·조건이 바뀐 뒤의 옛 화면도 막는다(lib/inquiry-rules)
+  const { slug } = parseProduct(data.product);
+  if (slug) {
+    const range = optionPeopleViolation(data.product, data.people, await getSiteContent(CONTENT_KEYS.tour(slug)));
+    if (range) return NextResponse.json({ error: 'people_range', ...range }, { status: 400 });
+  }
 
   // 1) 저장 (실패 시에만 접수 실패)
   try {

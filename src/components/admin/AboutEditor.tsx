@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { saveAbout } from '@/app/admin/about-actions';
 import { type AboutContent, type Strength } from '@/lib/about';
 import MediaInput from './MediaInput';
+import { safeAction } from '@/lib/safe-action';
 
 const labelCls = 'block text-sm font-medium text-ink';
 const inputCls =
@@ -46,7 +47,7 @@ export default function AboutEditor({
 
   async function save() {
     setSaving(true);
-    const res = await saveAbout(
+    const res = await safeAction(() => saveAbout(
       {
         eyebrow,
         title,
@@ -61,7 +62,7 @@ export default function AboutEditor({
         instructorBody
       },
       lang
-    );
+    ));
     setSaving(false);
     if (res.error) show(res.error, 'err');
     else {

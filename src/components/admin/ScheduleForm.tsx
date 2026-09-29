@@ -6,6 +6,7 @@ import type { ScheduleItem, ScheduleStatus } from '@/lib/content';
 
 import { useSaveStatus, SaveStatusBadge } from './save-status';
 import ScheduleCalendarEditor, { KIND_OPTS, inputCls } from './ScheduleCalendarEditor';
+import { safeAction } from '@/lib/safe-action';
 
 type Item = { date: string; endDate?: string; program: string; status: ScheduleStatus };
 
@@ -51,7 +52,7 @@ export default function ScheduleForm({
         status: it.status
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
-    const res = await saveContent('schedule', { items: clean });
+    const res = await safeAction(() => saveContent('schedule', { items: clean }));
     setSaving(false);
     if (res.ok) {
       setDirty(false);

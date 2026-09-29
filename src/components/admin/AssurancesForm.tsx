@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { saveContent } from '@/app/admin/content-actions';
 import { HOME_CONTENT_KEYS, type AssuranceItem } from '@/lib/home-content';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
+import { safeAction } from '@/lib/safe-action';
 
 const inputCls =
   'w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted disabled:opacity-50';
@@ -30,10 +31,10 @@ export default function AssurancesForm({
 
   async function save() {
     setSaving(true);
-    const res = await saveContent(HOME_CONTENT_KEYS.assurances, {
+    const res = await safeAction(() => saveContent(HOME_CONTENT_KEYS.assurances, {
       sectionTitle: title.trim(),
       items: items.map((it) => ({ title: it.title.trim(), desc: it.desc.trim() }))
-    });
+    }));
     setSaving(false);
     if (res.ok) show('저장되었습니다.');
     else show(res.error ?? '저장 실패', 'err');
