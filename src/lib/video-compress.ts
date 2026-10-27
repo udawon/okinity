@@ -58,8 +58,10 @@ export async function compressVideo(file: File, onProgress?: (ratio: number) => 
         // 숫자만 넘기면 0~1 품질 등급으로 해석된다 — 비트레이트는 반드시 객체로
         quality: new mb.Quality({ bitrate: VIDEO_TARGET.bitrate, bitrateMode: 'variable' }),
         forceTranscode: true
-      }
+      },
       // 오디오는 기본값 — MP4 에 그대로 담을 수 있으면 복사, 아니면 변환(불가하면 소리 없이)
+      // 촬영 정보는 비운다 — 기본값은 원본 태그 복사라 아이폰 영상의 촬영 위치(GPS)가 공개될 수 있다
+      tags: {}
     });
     // 이 브라우저가 원본 코덱(예: HEVC)을 풀지 못하면 영상 트랙을 버리고 '소리만 남은' 파일로
     // 성공 처리된다(2026-10-27 실측, Chromium). 영상이 빠지면 반드시 원본으로.
