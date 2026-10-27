@@ -204,6 +204,26 @@ html {
   }
 }
 
+/* 블로그 사진 슬라이드 설명 — 사진이 바뀔 때 살짝 떠오르며 나타남(BlogPhotoSlider, key 교체로 재생) */
+@keyframes slide-caption {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.slide-caption {
+  animation: slide-caption 0.45s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide-caption {
+    animation: none;
+  }
+}
+
 /* Hero 스크롤 인디케이터 — 아래 화살표가 위아래로 둥둥 (trickyknot 톤) */
 @keyframes float-down {
   0%,

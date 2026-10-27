@@ -131,15 +131,15 @@ export function postTourSlug(post: BlogPost): string | null {
   return inferTourSlug(post.title);
 }
 
-export type BlogPhoto = { url: string; index: number };
+export type BlogPhoto = { url: string; index: number; caption: string };
 export type BlogGroup =
   | { kind: 'text'; value: string }
   | { kind: 'photos'; photos: BlogPhoto[] }
-  | { kind: 'figure'; url: string; caption: string; index: number }
   | { kind: 'video'; url: string; poster: string; caption: string };
 
 /**
- * 본문 블록을 화면 묶음으로 — 설명 없는 연속 사진은 한 그리드로 묶는다.
+ * 본문 블록을 화면 묶음으로 — 연속 사진은 설명 유무와 관계없이 한 슬라이드로 묶고,
+ * 설명은 사진마다 들고 간다(슬라이드 아래 표시).
  * 사진 index 는 글 전체의 사진 순번(라이트박스에서 이어서 넘기기용). 빈 URL 은 건너뛴다.
  */
 export function groupBlocks(blocks: BlogBlock[]): BlogGroup[] {
@@ -151,14 +151,10 @@ export function groupBlocks(blocks: BlogBlock[]): BlogGroup[] {
     } else if (b.type === 'video') {
       if (b.url) out.push({ kind: 'video', url: b.url, poster: b.poster ?? '', caption: b.caption ?? '' });
     } else if (b.url) {
-      const index = photoIndex++;
-      if (b.caption?.trim()) {
-        out.push({ kind: 'figure', url: b.url, caption: b.caption, index });
-        continue;
-      }
+      const photo = { url: b.url, index: photoIndex++, caption: b.caption?.trim() ?? '' };
       const last = out[out.length - 1];
-      if (last?.kind === 'photos') last.photos.push({ url: b.url, index });
-      else out.push({ kind: 'photos', photos: [{ url: b.url, index }] });
+      if (last?.kind === 'photos') last.photos.push(photo);
+      else out.push({ kind: 'photos', photos: [photo] });
     }
   }
   return out;

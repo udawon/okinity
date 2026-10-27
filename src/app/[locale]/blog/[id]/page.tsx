@@ -102,7 +102,7 @@ export default async function BlogPostPage({
 
   const title = displayTitle(post.title) || '(제목 없음)';
   const groups = groupBlocks(post.blocks);
-  const photoCount = groups.reduce((n, g) => n + (g.kind === 'photos' ? g.photos.length : g.kind === 'figure' ? 1 : 0), 0);
+  const photoCount = groups.reduce((n, g) => n + (g.kind === 'photos' ? g.photos.length : 0), 0);
   const videoCount = groups.filter((g) => g.kind === 'video').length;
 
   // 이 날의 투어 — 어드민 지정 또는 제목 추론. 투어 사진·요약은 한국어 투어 상세에서.

@@ -62,9 +62,9 @@ describe('postTourSlug', () => {
   });
 });
 
-describe('groupBlocks — 연속 사진은 한 묶음(그리드)으로', () => {
+describe('groupBlocks — 연속 사진은 한 묶음(슬라이드)으로', () => {
   const post = (blocks: BlogPost['blocks']) => blocks;
-  it('설명 없는 연속 사진을 묶고, 글·영상·설명 달린 사진은 그대로', () => {
+  it('연속 사진은 설명 유무와 관계없이 한 묶음, 글·영상이 끼면 끊는다', () => {
     const groups = groupBlocks(
       post([
         { type: 'text', value: '소개' },
@@ -76,9 +76,26 @@ describe('groupBlocks — 연속 사진은 한 묶음(그리드)으로', () => {
         { type: 'image', url: '', caption: '' }
       ])
     );
-    expect(groups.map((g) => g.kind)).toEqual(['text', 'photos', 'video', 'figure', 'photos']);
-    expect(groups[1]).toMatchObject({ kind: 'photos', photos: [{ url: 'a', index: 0 }, { url: 'b', index: 1 }] });
-    // 사진 순번은 글 전체 기준(라이트박스 이동용), 빈 URL 사진은 제외
-    expect(groups[4]).toMatchObject({ kind: 'photos', photos: [{ url: 'd', index: 3 }] });
+    expect(groups.map((g) => g.kind)).toEqual(['text', 'photos', 'video', 'photos']);
+    expect(groups[1]).toMatchObject({
+      kind: 'photos',
+      photos: [
+        { url: 'a', index: 0, caption: '' },
+        { url: 'b', index: 1, caption: '' }
+      ]
+    });
+    // 설명은 사진마다 따로 들고 간다. 사진 순번은 글 전체 기준(라이트박스 이동용), 빈 URL 사진은 제외
+    expect(groups[3]).toMatchObject({
+      kind: 'photos',
+      photos: [
+        { url: 'c', index: 2, caption: '설명' },
+        { url: 'd', index: 3, caption: '' }
+      ]
+    });
+  });
+
+  it('설명 앞뒤 공백은 정리', () => {
+    const [g] = groupBlocks(post([{ type: 'image', url: 'a', caption: '  거북이  ' }]));
+    expect(g).toMatchObject({ kind: 'photos', photos: [{ url: 'a', caption: '거북이' }] });
   });
 });
