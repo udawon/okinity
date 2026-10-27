@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { uploadMediaFile } from '@/lib/upload-client';
+import { uploadMediaFile, type UploadStage } from '@/lib/upload-client';
 import { isVideoUrl } from '@/lib/media';
 
 /**
@@ -47,7 +47,9 @@ export default function MediaInput({
   const [innerPoster, setInnerPoster] = useState(defaultPoster);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [stage, setStage] = useState<UploadStage>('upload');
   const [err, setErr] = useState('');
+  const [note, setNote] = useState('');
 
   const url = controlled ? value : innerUrl;
   const poster = controlled ? posterValue ?? '' : innerPoster;
@@ -66,10 +68,16 @@ export default function MediaInput({
     if (!raw) return;
     setBusy(true);
     setProgress(0);
+    setStage(raw.type.startsWith('video/') ? 'compress' : 'upload');
     setErr('');
+    setNote('');
     try {
-      const res = await uploadMediaFile(raw, prefix, setProgress);
+      const res = await uploadMediaFile(raw, prefix, (r, s) => {
+        setStage(s);
+        setProgress(r);
+      });
       apply(res.url, res.poster ?? '');
+      setNote(res.note ?? '');
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : '업로드에 실패했습니다.');
     } finally {
@@ -113,7 +121,7 @@ export default function MediaInput({
             disabled || busy ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
           }`}
         >
-          {busy ? `업로드 중… ${pct}%` : '파일 선택'}
+          {busy ? `${stage === 'compress' ? '영상 줄이는 중' : '업로드 중'}… ${pct}%` : '파일 선택'}
           <input
             type="file"
             accept={accept}
@@ -154,6 +162,10 @@ export default function MediaInput({
         className="w-full rounded-button border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted"
       />
 
+      {busy && stage === 'compress' && (
+        <p className="text-xs text-muted">4K 영상을 1080p로 줄이고 있어요. 창을 닫지 말고 잠시 기다려 주세요.</p>
+      )}
+      {note && !busy && <p className="text-xs text-amber-700">{note}</p>}
       {err && <p className="text-sm text-red-600">{err}</p>}
     </div>
   );
