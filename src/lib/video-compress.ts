@@ -58,7 +58,7 @@ export async function compressVideo(file: File, onProgress?: (ratio: number) => 
         // 숫자만 넘기면 0~1 품질 등급으로 해석된다 — 비트레이트는 반드시 객체로
         quality: new mb.Quality({ bitrate: VIDEO_TARGET.bitrate, bitrateMode: 'variable' }),
         forceTranscode: true
-      }
+      },
       // 오디오는 기본값 — MP4 에 그대로 담을 수 있으면 복사, 아니면 변환(불가하면 소리 없이)
       // 촬영 정보는 비운다 — 기본값은 원본 태그 복사라 아이폰 영상의 촬영 위치(GPS)가 공개될 수 있다
       tags: {}
