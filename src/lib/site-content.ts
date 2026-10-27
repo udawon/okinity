@@ -1,5 +1,7 @@
 import 'server-only';
+import { revalidateTag, unstable_cache } from 'next/cache';
 import { getSupabaseAdmin, MEDIA_BUCKET } from './supabase/server';
+import { normalizeContentKeys, orEmpty, rowsToContentMap } from './content-read';
 
 /**
  * 콘텐츠 오버라이드 레이어 — content/*.md(기본값) 위에 어드민 편집분을 덮어쓴다.
@@ -75,28 +77,37 @@ export function tourDocsIn(
   };
 }
 
+// ── 저장소 장애 대비: 마지막 정상값 유지 ─────────────────────────────────
+// 2026-10 Supabase 용량 정지 때 읽기가 모두 실패 → 빈 값 → 사이트가 초기 문구("(대표 강사 이름)")로
+// 돌아간 것처럼 보였다. 읽기 결과를 Next 데이터 캐시에 두고(unstable_cache):
+// - 60초가 지나면 다음 요청이 옛 값을 보여주며 뒤에서 새로 읽는다. 그 읽기가 실패하면 옛 값을 계속 쓴다.
+// - 저장(setSiteContent)은 태그를 무효화해 어드민 수정이 즉시 반영된다(같은 요청 안의 재조회 포함).
+// - 캐시가 비어 있을 때 장애가 나면 예전처럼 빈 값(orEmpty) → 기본값으로 뜬다.
+
+/** site_content 읽기 캐시 태그 — 모든 저장이 무효화한다. */
+const SITE_CONTENT_TAG = 'site-content';
+
+/** 캐시되는 실제 조회. 실패는 throw(rowsToContentMap) — 빈 값이 정상값으로 캐시되지 않게. */
+const readContentMap = unstable_cache(
+  async (keys: string[] | null): Promise<Record<string, Json>> => {
+    let query = getSupabaseAdmin()!.from('site_content').select('key, value');
+    if (keys) query = query.in('key', keys);
+    return rowsToContentMap(await query);
+  },
+  ['site-content-map'],
+  { tags: [SITE_CONTENT_TAG], revalidate: 60 }
+);
+
 /** 여러 키를 한 번에 조회(메인 페이지용). 키 생략 시 전체. */
 export async function getSiteContentMap(keys?: string[]): Promise<Record<string, Json>> {
-  const sb = getSupabaseAdmin();
-  if (!sb) return {};
-  let query = sb.from('site_content').select('key, value');
-  if (keys && keys.length) query = query.in('key', keys);
-  const { data, error } = await query;
-  if (error || !data) return {};
-  return Object.fromEntries(data.map((r) => [r.key as string, (r.value as Json) ?? {}]));
+  if (!getSupabaseAdmin()) return {};
+  return orEmpty(() => readContentMap(normalizeContentKeys(keys)), {}, 'site_content');
 }
 
 /** 단일 키 조회. 없으면 null. */
 export async function getSiteContent(key: string): Promise<Json | null> {
-  const sb = getSupabaseAdmin();
-  if (!sb) return null;
-  const { data, error } = await sb
-    .from('site_content')
-    .select('value')
-    .eq('key', key)
-    .maybeSingle();
-  if (error || !data) return null;
-  return (data.value as Json) ?? null;
+  const map = await getSiteContentMap([key]);
+  return map[key] ?? null;
 }
 
 /** 단일 키 저장(upsert). 어드민 서버액션 전용. Supabase 미설정 시 에러. */
@@ -105,6 +116,7 @@ export async function setSiteContent(key: string, value: Json): Promise<void> {
   if (!sb) throw new Error('Supabase가 설정되지 않았습니다. (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)');
   const { error } = await sb.from('site_content').upsert({ key, value });
   if (error) throw new Error(`콘텐츠 저장 실패: ${error.message}`);
+  revalidateTag(SITE_CONTENT_TAG);
 }
 
 /**

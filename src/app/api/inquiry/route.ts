@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { site } from '@/config/site.config';
-import { getInquiryStore, NewInquirySchema, type NewInquiry } from '@/lib/inquiries';
+import { getInquiryStore, NewInquirySchema } from '@/lib/inquiries';
+import { buildInquiryEmail, inquiryResult, type EmailResult, type Notif } from '@/lib/inquiry-delivery';
 import { parseProduct } from '@/lib/inquiry-product';
 import { optionPeopleViolation } from '@/lib/inquiry-rules';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
@@ -8,9 +9,10 @@ import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 /**
  * 예약 문의 처리.
  *
- * 1) 저장소에 영속(source of truth — 어드민에서 조회). 저장 실패 시에만 에러.
- * 2) 강사 이메일 알림(best-effort). 이메일 실패해도 문의는 이미 저장됨 → ok 반환.
- *    (설계 검토에서 지적된 부분-실패 정책: 저장 성공이 곧 접수 성공.)
+ * 1) 저장소에 영속(source of truth — 어드민에서 조회).
+ * 2) 강사 이메일 알림. 저장이 실패해도 메일은 보낸다(제목에 '저장 실패' 경고).
+ *    부분 실패 정책: 저장·메일 중 하나라도 운영자에게 닿으면 접수 성공(lib/inquiry-delivery).
+ *    (2026-10 Supabase 용량 정지 때 저장 실패로 메일까지 끊겨 문의가 유실될 수 있었다.)
  *
  * 저장소(우선순위): Supabase(기본) → Postgres → JSON 파일(로컬 전용·휘발). src/lib/inquiries 참조.
  * 보안: 허니팟(company 필드) + IP 기준 단순 rate-limit.
@@ -33,71 +35,15 @@ function rateLimited(ip: string): boolean {
   return entry.count > RATE_LIMIT_MAX;
 }
 
-/** HTML 이스케이프 — 사용자 입력을 이메일 본문에 안전하게 넣는다. */
-function esc(v: string): string {
-  return v
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-type Notif = { subject: string; text: string; html: string; replyTo?: string };
-
-/** 문의 데이터로 알림 이메일(제목·텍스트·HTML)을 구성한다. */
-function buildEmail(data: NewInquiry): Notif {
-  const adminUrl = `${site.url}/admin`;
-  const rows: [string, string][] = [
-    ['상품', data.product ?? '-'],
-    ['희망일', data.date ?? '-'],
-    ['희망 시간대', data.time ?? '-'],
-    ['인원', data.people != null ? `${data.people}명` : '-'],
-    ['성함', data.name],
-    ['이메일', data.email || '-'],
-    ['연락처', data.contact],
-    ['메시지', data.message ?? '-']
-  ];
-
-  const subject =
-    `[OKINITY] 새 예약 문의 — ${data.name}` + (data.product ? ` · ${data.product}` : '');
-
-  const text =
-    rows.map(([k, v]) => `${k}: ${v}`).join('\n') + `\n\n예약 관리: ${adminUrl}`;
-
-  const trs = rows
-    .map(
-      ([k, v]) =>
-        `<tr><td style="padding:8px 12px;color:#64748b;white-space:nowrap;vertical-align:top">${k}</td>` +
-        `<td style="padding:8px 12px;color:#0f172a;font-weight:600">${esc(v).replace(/\n/g, '<br>')}</td></tr>`
-    )
-    .join('');
-
-  const html = `
-  <div style="background:#f1f5f9;padding:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
-    <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e2e8f0">
-      <div style="background:#02101e;padding:18px 24px">
-        <p style="margin:0;color:#7dd3fc;font-size:12px;letter-spacing:2px">OKINITY · 새 예약 문의</p>
-      </div>
-      <table style="width:100%;border-collapse:collapse;font-size:14px">${trs}</table>
-      <div style="padding:20px 24px;border-top:1px solid #e2e8f0">
-        <a href="${adminUrl}" style="display:inline-block;background:#0ea5e9;color:#fff;text-decoration:none;font-weight:600;font-size:14px;padding:11px 20px;border-radius:10px">예약 관리에서 처리하기 →</a>
-      </div>
-    </div>
-  </div>`;
-
-  // 회신은 고객 이메일로(없으면 연락처가 이메일 형식일 때만).
-  const replyTo = data.email || (data.contact.includes('@') ? data.contact : undefined);
-  return { subject, text, html, replyTo };
-}
-
-async function sendEmail(n: Notif) {
+/** 'sent' = Resend 가 접수, 'skipped' = 메일 키 미설정(콘솔 기록만). 실패는 throw. */
+async function sendEmail(n: Notif): Promise<Exclude<EmailResult, 'failed'>> {
   const apiKey = process.env.RESEND_API_KEY;
   const toEmail = process.env.INQUIRY_TO_EMAIL ?? site.contact.email;
   const fromEmail = process.env.INQUIRY_FROM_EMAIL ?? 'onboarding@resend.dev';
 
   if (!apiKey) {
     console.info('[inquiry] (이메일 미설정 — 콘솔 로그)\n' + n.text);
-    return;
+    return 'skipped';
   }
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -117,6 +63,7 @@ async function sendEmail(n: Notif) {
   if (!res.ok) {
     throw new Error(`resend failed: ${await res.text()}`);
   }
+  return 'sent';
 }
 
 export async function POST(req: Request) {
@@ -152,23 +99,25 @@ export async function POST(req: Request) {
     if (range) return NextResponse.json({ error: 'people_range', ...range }, { status: 400 });
   }
 
-  // 1) 저장 (실패 시에만 접수 실패)
+  // 1) 저장
+  let stored = true;
   try {
     const store = await getInquiryStore();
     await store.create(data);
   } catch (err) {
-    console.error('[inquiry] store failed', err);
-    return NextResponse.json({ error: 'store_failed' }, { status: 500 });
+    console.error('[inquiry] store failed — 메일로만 전달 시도', err);
+    stored = false;
   }
 
-  // 2) 이메일 알림 (best-effort)
+  // 2) 이메일 알림 — 저장 실패여도 보낸다(운영자가 메일로 처리)
+  let email: EmailResult;
   try {
-    await sendEmail(buildEmail(data));
+    email = await sendEmail(buildInquiryEmail(data, { stored }));
   } catch (err) {
-    console.error('[inquiry] email failed (저장은 완료됨)', err);
-    // 저장은 됐으므로 접수는 성공으로 처리
-    return NextResponse.json({ ok: true, delivery: 'stored_email_failed' });
+    console.error(`[inquiry] email failed (저장 ${stored ? '완료' : '실패'})`, err);
+    email = 'failed';
   }
 
-  return NextResponse.json({ ok: true });
+  const { status, body: resBody } = inquiryResult(stored, email);
+  return NextResponse.json(resBody, { status });
 }
