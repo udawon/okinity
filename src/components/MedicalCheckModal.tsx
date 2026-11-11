@@ -6,14 +6,16 @@ import { useTranslations } from 'next-intl';
 
 type Group = { title: string; items: string[] };
 
+/**
+ * 메디컬 체크 팝업 — 다이빙·스노클링·PADI 예약 문의의 첫 확인 단계.
+ * 모든 영역을 확인하면 [다음]으로 가예약 확인 팝업(BookingConfirmModal)으로 넘어간다(여기서 직접 보내지 않음).
+ */
 export default function MedicalCheckModal({
   onCancel,
-  onConfirm,
-  submitting
+  onNext
 }: {
   onCancel: () => void;
-  onConfirm: () => void;
-  submitting: boolean;
+  onNext: () => void;
 }) {
   const t = useTranslations('medical');
   // 안전 체크리스트 — 6개 그룹(번역 카탈로그). 펼쳐 읽고 그룹 단위로 '해당 없음' 확인.
@@ -188,11 +190,11 @@ export default function MedicalCheckModal({
             </button>
             <button
               type="button"
-              onClick={onConfirm}
-              disabled={!allConfirmed || submitting}
+              onClick={onNext}
+              disabled={!allConfirmed}
               className="flex-1 rounded-full bg-amber-400 px-6 py-3 text-sm font-bold text-[#06202f] shadow-[0_8px_30px_rgba(246,166,35,0.35)] transition-colors hover:bg-amber-300 disabled:opacity-40 disabled:shadow-none"
             >
-              {submitting ? t('submitting') : t('submit')}
+              {t('next')}
             </button>
           </div>
         </div>

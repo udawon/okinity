@@ -228,7 +228,7 @@
     "errorPeopleRange": "選択したオプションは{min}〜{max}名様のみご予約いただけます。人数をご確認ください（ページを再読み込みすると最新の条件が表示されます）。",
     "errorPeopleOnly": "選択したオプションは{n}名様のみご予約いただけます。人数をご確認ください（ページを再読み込みすると最新の条件が表示されます）。",
     "freeConsult": "予約前のご相談は無料 · お問い合わせのみではご予約は確定しません",
-    "successTitle": "お問い合わせを受け付けました",
+    "successTitle": "仮予約を受け付けました",
     "successBody": "カカオトークチャンネルを友だち追加すると、予約確認とお見積もりをカカオトークでお送りします。",
     "successKakao": "カカオトークチャンネルを友だち追加",
     "successAnotherDate": "別の日付を見る",
@@ -247,7 +247,20 @@
     "optionRange": "{min}〜{max}名様",
     "optionOnly": "{n}名様のみ",
     "optionRangeHint": "{name}は{min}〜{max}名様でご予約いただけます。",
-    "optionOnlyHint": "{name}は{n}名様のみご予約いただけます。"
+    "optionOnlyHint": "{name}は{n}名様のみご予約いただけます。",
+    "confirmTitle": "送信前にご確認ください",
+    "confirmNotice": "現在のご予約は仮予約です。カカオトークまたはメールでのご相談後、ご予約が確定します。",
+    "confirmSummary": "ご入力内容",
+    "confirmDate": "日付",
+    "confirmTour": "ツアー",
+    "confirmTime": "ご希望の時間帯",
+    "confirmPeople": "人数",
+    "confirmPeopleValue": "{n}名",
+    "confirmEmail": "メール",
+    "confirmContact": "連絡先",
+    "confirmEdit": "修正する",
+    "confirmSend": "確認して送信",
+    "confirmClose": "閉じる"
   },
   "tourDetail": {
     "includesTitle": "含まれるもの",
@@ -321,8 +334,7 @@
     "progress": "確認 {done} / {total} 項目",
     "progressHint": "すべての項目を開いて確認してください",
     "cancel": "キャンセル",
-    "submit": "予約を問い合わせる",
-    "submitting": "送信中…",
+    "next": "次へ",
     "groups": [
       {
         "title": "ダイビング後の飛行機",

@@ -228,7 +228,7 @@
     "errorPeopleRange": "선택한 옵션은 {min}~{max}명만 예약할 수 있어요. 인원을 확인해 주세요(페이지를 새로고침하면 최신 조건이 보여요).",
     "errorPeopleOnly": "선택한 옵션은 {n}명만 예약할 수 있어요. 인원을 확인해 주세요(페이지를 새로고침하면 최신 조건이 보여요).",
     "freeConsult": "예약 전 상담은 무료 · 문의 접수만으로는 예약이 확정되지 않습니다",
-    "successTitle": "문의가 접수되었어요",
+    "successTitle": "가예약이 접수되었어요",
     "successBody": "카카오톡 채널을 친구추가하시면 예약 확인과 맞춤 견적을 카카오톡으로 안내해 드려요.",
     "successKakao": "카카오톡 채널 친구추가",
     "successAnotherDate": "다른 날짜 보기",
@@ -247,7 +247,20 @@
     "optionRange": "{min}~{max}명",
     "optionOnly": "{n}명만",
     "optionRangeHint": "{name} 옵션은 {min}~{max}명까지 예약할 수 있어요.",
-    "optionOnlyHint": "{name} 옵션은 {n}명만 예약할 수 있어요."
+    "optionOnlyHint": "{name} 옵션은 {n}명만 예약할 수 있어요.",
+    "confirmTitle": "보내기 전에 확인해 주세요",
+    "confirmNotice": "현재 예약은 가예약이며, 카카오톡이나 메일로 상담 후 예약이 확정됩니다.",
+    "confirmSummary": "입력하신 내용",
+    "confirmDate": "날짜",
+    "confirmTour": "투어",
+    "confirmTime": "희망 시간대",
+    "confirmPeople": "인원",
+    "confirmPeopleValue": "{n}명",
+    "confirmEmail": "이메일",
+    "confirmContact": "연락처",
+    "confirmEdit": "수정하기",
+    "confirmSend": "확인하고 보내기",
+    "confirmClose": "닫기"
   },
   "tourDetail": {
     "includesTitle": "포함 사항",
@@ -321,8 +334,7 @@
     "progress": "확인 {done} / {total} 영역",
     "progressHint": "모든 영역을 펼쳐 확인해 주세요",
     "cancel": "취소",
-    "submit": "예약 문의 보내기",
-    "submitting": "보내는 중…",
+    "next": "다음",
     "groups": [
       {
         "title": "다이빙 후 비행",
