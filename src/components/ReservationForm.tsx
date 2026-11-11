@@ -1,15 +1,17 @@
 'use client';
 
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ACTIVITIES } from './ocean-home-data';
 import { TOUR_NAME_NAV_KEY, FISHING_CLASS_KEYS, type FishingClassKey } from '@/lib/tour';
 import { clampPeople, findOption, optionPeopleRange, optionPeopleRule, type ReserveOption } from '@/lib/tour-options';
-import { okinawaTodayKey } from '@/lib/okinawa-date';
+import { formatDateKeyLong, okinawaTodayKey } from '@/lib/okinawa-date';
 import { buildProduct } from '@/lib/inquiry-product';
 import { formatYen } from '@/lib/money';
 import { MEDICAL_MARKER } from '@/lib/inquiries/types';
+import { bookingSummaryRows, joinTourLabel, nextSubmitStep, sendsMedicalMarker, type SummaryField } from '@/lib/booking-confirm';
 import MedicalCheckModal from './MedicalCheckModal';
+import BookingConfirmModal from './BookingConfirmModal';
 import { site } from '@/config/site.config';
 
 // 문의 내역(product)에 실리는 클래스 표기 — 운영자가 읽는 한국어 고정값(표시 라벨만 i18n).
@@ -23,6 +25,16 @@ const inputCls =
 const labelCls = 'block text-xs font-medium uppercase tracking-wider text-white/55';
 
 type SubmitState = 'idle' | 'submitting' | 'success' | 'error';
+
+// 가예약 확인 팝업 요약 줄의 라벨(번역 키)
+const SUMMARY_LABEL_KEY: Record<SummaryField, string> = {
+  date: 'confirmDate',
+  tour: 'confirmTour',
+  time: 'confirmTime',
+  people: 'confirmPeople',
+  email: 'confirmEmail',
+  contact: 'confirmContact'
+};
 
 /**
  * 공통 예약 문의 폼 — /reserve의 예약 플래너(ReservePlanner)가 사용.
@@ -77,11 +89,25 @@ export default function ReservationForm({
     presetCat && findOption(tourOptions?.[initialSlug as string] ?? [], initialOption) ? (initialOption as string) : ''
   );
   const [state, setState] = useState<SubmitState>('idle');
-  const [done, setDone] = useState<{ product: string; dateLabel: string } | null>(null);
+  // 완료 화면 표시값 — 모두 손님 언어(운영자용 한국어 product 를 보이지 않는다)
+  const [done, setDone] = useState<{ tourLabel: string; dateLabel: string } | null>(null);
   // 서버가 옵션 인원 조건으로 거절한 경우의 허용 범위(그 밖의 실패는 null)
   const [rangeError, setRangeError] = useState<{ min: number; max: number } | null>(null);
   const [medOpen, setMedOpen] = useState(false);
+  // 메디컬 체크를 한 번 마치면 폼 초기화 전까지 기억 — 가예약 팝업에서 수정하러 돌아갔다 다시 보내도 재체크 없음
+  const [medicalDone, setMedicalDone] = useState(false);
+  // 가예약 확인 팝업(열렸을 때만 요약 줄 보관)
+  const [confirmRows, setConfirmRows] = useState<{ label: string; value: string }[] | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const successRef = useRef<HTMLDivElement>(null);
+
+  // 접수 완료 화면을 화면 가운데로 — 휴대폰에서 긴 폼이 짧은 완료 화면으로 바뀌면 스크롤 위치가 그대로라
+  // "가예약이 접수되었어요" 제목이 화면 위로 밀려 보이지 않는다.
+  useEffect(() => {
+    if (state !== 'success') return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    successRef.current?.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+  }, [state]);
 
   const cat = ACTIVITIES.find((a) => a.id === catId);
   // 선택한 투어의 시간대 옵션 — '개별 문의'는 항상 마지막에 붙는 고정 옵션과 값이 겹치므로 목록에서 제외.
@@ -118,14 +144,58 @@ export default function ReservationForm({
     setSlug('');
     setFishingClass('');
     setOptionKey('');
+    setMedicalDone(false);
   }
 
-  // 제출 버튼 클릭 — 필수값 검증 후, 낚시 외 투어는 메디컬 체크 모달로, 그 외는 바로 전송.
+  // 제출 버튼 클릭 — 필수값 검증 후, 다이빙·스노클링·PADI는 메디컬 체크(처음 한 번)를 거쳐 가예약 확인 팝업으로.
+  // 실제 전송은 가예약 확인 팝업의 [확인하고 보내기]에서만 일어난다.
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!formRef.current?.reportValidity()) return;
-    if (needsMedical) setMedOpen(true);
-    else doSubmit(false);
+    if (nextSubmitStep(needsMedical, medicalDone) === 'medical') setMedOpen(true);
+    else openConfirm();
+  }
+
+  function handleMedicalNext() {
+    setMedicalDone(true);
+    setMedOpen(false);
+    openConfirm();
+  }
+
+  // 손님 언어 날짜 — 캘린더에서 고른 날짜(이미 손님 언어) 또는 직접 입력한 날짜.
+  function dateDisplay(dateValue: string) {
+    return lockedDateLabel ?? (dateValue ? formatDateKeyLong(dateValue, locale) || dateValue : t('dateTbd'));
+  }
+
+  // 손님 언어 투어 이름 조각 — 종류 · 세부 프로그램 · 클래스/옵션(운영자용 한국어 기록값 product 와 별개).
+  function tourDisplayParts() {
+    const tour = cat?.tours.find((tr) => tr.slug === slug);
+    return [
+      cat ? tNav(cat.id) : '',
+      tour ? (TOUR_NAME_NAV_KEY[tour.slug] ? tNav(TOUR_NAME_NAV_KEY[tour.slug]) : tour.name) : '',
+      isFishing && fishingClass ? (fishingClass === 'middle' ? t('classMiddle') : t('classLuxury')) : '',
+      option?.label
+    ];
+  }
+
+  // 지금 폼에 입력된 값으로 요약을 만들어 가예약 확인 팝업을 연다(이전 전송 실패 안내는 지운다).
+  function openConfirm() {
+    const form = formRef.current;
+    if (!form) return;
+    const fd = new FormData(form);
+    const peopleN = Number(fd.get('people'));
+    const rows = bookingSummaryRows({
+      dateLabel: dateDisplay(String(fd.get('date') || '')),
+      tour: tourDisplayParts(),
+      time: String(fd.get('time') ?? ''),
+      people: Number.isFinite(peopleN) && peopleN > 0 ? t('confirmPeopleValue', { n: peopleN }) : '',
+      email: String(fd.get('email') ?? ''),
+      contact: String(fd.get('contact') ?? ''),
+      timeAskLabel: t('timeAsk')
+    });
+    setState('idle');
+    setRangeError(null);
+    setConfirmRows(rows.map((r) => ({ label: t(SUMMARY_LABEL_KEY[r.field]), value: r.value })));
   }
 
   async function doSubmit(medical: boolean) {
@@ -163,24 +233,34 @@ export default function ReservationForm({
         setRangeError(body.error === 'people_range' && body.min != null && body.max != null ? { min: body.min, max: body.max } : null);
         throw new Error('failed');
       }
-      setMedOpen(false);
-      setDone({ product, dateLabel: lockedDateLabel ?? (date ?? t('dateTbd')) });
+      setConfirmRows(null);
+      setDone({ tourLabel: joinTourLabel(tourDisplayParts()), dateLabel: dateDisplay(date ?? '') });
       setState('success');
     } catch {
       setState('error');
     }
   }
 
+  // 전송 실패 안내 — 인원 조건으로 거절됐으면 허용 범위를, 그 밖에는 일반 안내를 보인다.
+  const errorText =
+    state !== 'error'
+      ? null
+      : rangeError
+        ? rangeError.min === rangeError.max
+          ? t('errorPeopleOnly', { n: rangeError.min })
+          : t('errorPeopleRange', { min: rangeError.min, max: rangeError.max })
+        : t('errorMsg');
+
   if (state === 'success' && done) {
     return (
-      <div className="flex flex-col items-center px-6 py-14 text-center">
+      <div ref={successRef} className="flex flex-col items-center px-6 py-14 text-center">
         <div className="grid h-14 w-14 place-items-center rounded-full border border-[#5fc6ef]/40 bg-[#5fc6ef]/15 text-2xl">
           ✓
         </div>
         <p className="mt-5 font-serif text-xl text-white">{t('successTitle')}</p>
         <p className="mt-2 max-w-[17rem] text-sm leading-relaxed text-white/65">
           {done.dateLabel}
-          {done.product ? ` · ${done.product}` : ''}
+          {done.tourLabel ? ` · ${done.tourLabel}` : ''}
           <br />
           {t('successBody')}
         </p>
@@ -495,23 +575,24 @@ export default function ReservationForm({
         </p>
       )}
 
-      {state === 'error' && (
+      {/* 팝업이 열려 있으면 오류는 팝업 안에 보인다(같은 안내가 뒤에 겹쳐 읽히지 않게) */}
+      {errorText && !confirmRows && (
         <p role="alert" className="mt-3 rounded-button bg-red-500/15 px-4 py-2.5 text-sm text-red-200">
-          {rangeError
-            ? rangeError.min === rangeError.max
-              ? t('errorPeopleOnly', { n: rangeError.min })
-              : t('errorPeopleRange', { min: rangeError.min, max: rangeError.max })
-            : t('errorMsg')}
+          {errorText}
         </p>
       )}
 
       <p className="mt-3 text-center text-xs text-white/45">{t('freeConsult')}</p>
 
-      {medOpen && (
-        <MedicalCheckModal
+      {medOpen && <MedicalCheckModal onCancel={() => setMedOpen(false)} onNext={handleMedicalNext} />}
+
+      {confirmRows && (
+        <BookingConfirmModal
+          rows={confirmRows}
           submitting={state === 'submitting'}
-          onCancel={() => setMedOpen(false)}
-          onConfirm={() => doSubmit(true)}
+          error={errorText}
+          onEdit={() => setConfirmRows(null)}
+          onConfirm={() => doSubmit(sendsMedicalMarker(needsMedical, medicalDone))}
         />
       )}
     </form>

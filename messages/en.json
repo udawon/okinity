@@ -228,7 +228,7 @@
     "errorPeopleRange": "The selected option is for {min}–{max} people. Please check the number of guests (refresh the page to see the latest conditions).",
     "errorPeopleOnly": "The selected option is for {n} {n, plural, one {person} other {people}} only. Please check the number of guests (refresh the page to see the latest conditions).",
     "freeConsult": "Pre-booking consultation is free · An inquiry alone does not confirm your reservation",
-    "successTitle": "Your inquiry has been received",
+    "successTitle": "Your tentative booking has been received",
     "successBody": "Add our KakaoTalk channel to receive your booking confirmation and quote via KakaoTalk.",
     "successKakao": "Add KakaoTalk Channel",
     "successAnotherDate": "View another date",
@@ -247,7 +247,20 @@
     "optionRange": "{min}–{max} guests",
     "optionOnly": "{n, plural, one {# guest only} other {# guests only}}",
     "optionRangeHint": "The {name} option is for {min}–{max} guests.",
-    "optionOnlyHint": "{n, plural, one {The {name} option is for # guest only.} other {The {name} option is for # guests only.}}"
+    "optionOnlyHint": "{n, plural, one {The {name} option is for # guest only.} other {The {name} option is for # guests only.}}",
+    "confirmTitle": "Please check before sending",
+    "confirmNotice": "This is a tentative booking. Your reservation will be confirmed after we consult with you via KakaoTalk or email.",
+    "confirmSummary": "Your details",
+    "confirmDate": "Date",
+    "confirmTour": "Tour",
+    "confirmTime": "Preferred time",
+    "confirmPeople": "People",
+    "confirmPeopleValue": "{n, plural, one {# person} other {# people}}",
+    "confirmEmail": "Email",
+    "confirmContact": "Contact",
+    "confirmEdit": "Edit",
+    "confirmSend": "Confirm & send",
+    "confirmClose": "Close"
   },
   "tourDetail": {
     "includesTitle": "What's included",
@@ -321,8 +334,7 @@
     "progress": "Confirmed {done} / {total} sections",
     "progressHint": "Please expand and confirm every section",
     "cancel": "Cancel",
-    "submit": "Send booking inquiry",
-    "submitting": "Sending…",
+    "next": "Next",
     "groups": [
       {
         "title": "Flying after diving",
