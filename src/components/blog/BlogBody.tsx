@@ -5,10 +5,10 @@ import { cdnMedia } from '@/lib/media';
 import type { BlogGroup, BlogPhoto } from '@/lib/blog';
 import MediaFigure from '@/components/MediaFigure';
 import PhotoLightbox from '@/components/PhotoLightbox';
-import BlogPhotoSlider from './BlogPhotoSlider';
+import BlogPhotoList from './BlogPhotoList';
 
 /**
- * 블로그 본문 — 연속 사진은 큰 사진 슬라이드로 묶고(BlogPhotoSlider), 누르면 글 전체 사진을 크게 넘겨본다.
+ * 블로그 본문 — 연속 사진은 한 장씩 세로로 나열하고(BlogPhotoList), 누르면 글 전체 사진을 크게 넘겨본다.
  * 글·영상은 원래 순서대로. (블로그는 한국어 전용 — 문구는 한국어 고정)
  */
 export default function BlogBody({ groups, title }: { groups: BlogGroup[]; title: string }) {
@@ -31,7 +31,7 @@ export default function BlogBody({ groups, title }: { groups: BlogGroup[]; title
         if (g.kind === 'video') {
           return <MediaFigure key={i} type="video" url={g.url} poster={g.poster} caption={g.caption} />;
         }
-        return <BlogPhotoSlider key={i} photos={g.photos} onOpen={openPhoto} eager={i === 0} />;
+        return <BlogPhotoList key={i} photos={g.photos} title={title} eagerIndex={all[0]?.index} onOpen={openPhoto} />;
       })}
 
       <PhotoLightbox
