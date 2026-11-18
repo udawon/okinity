@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
 import { useRouter } from 'next/navigation';
 import { saveBlogPost } from '@/app/admin/blog-actions';
-import { type BlogPost, type BlogBlock, BLOG_TOUR_NONE, inferTourSlug } from '@/lib/blog';
+import { type BlogPost, type BlogBlock, BLOG_TOUR_NONE, BLOG_WRITING_GUIDE, inferTourSlug } from '@/lib/blog';
 import { TOUR_CATALOG, getTourCatalogEntry } from '@/lib/tour';
 import MediaInput from './MediaInput';
 import PreviewLink from './PreviewLink';
@@ -188,8 +188,8 @@ export default function BlogEditor({
               <textarea
                 value={b.value}
                 onChange={(e) => patchBlock(i, { value: e.target.value })}
-                placeholder="본문 텍스트 (줄바꿈 가능)"
-                rows={5}
+                placeholder={BLOG_WRITING_GUIDE}
+                rows={7}
                 disabled={disabled}
                 className={`${inputCls} resize-y !rounded-card`}
               />

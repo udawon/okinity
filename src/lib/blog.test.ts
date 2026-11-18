@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { displayTitle, groupBlocks, inferTourSlug, parseBlogItems, postTourSlug, type BlogPost } from './blog';
+import {
+  blogDescription,
+  blogSeoTitle,
+  displayTitle,
+  groupBlocks,
+  inferTourSlug,
+  koDateLabel,
+  parseBlogItems,
+  postTourSlug,
+  type BlogPost
+} from './blog';
 
 describe('displayTitle', () => {
   it('제목 앞의 6자리 날짜를 떼어낸다(날짜는 따로 표시)', () => {
@@ -97,5 +107,57 @@ describe('groupBlocks — 연속 사진은 한 묶음(슬라이드)으로', () =
   it('설명 앞뒤 공백은 정리', () => {
     const [g] = groupBlocks(post([{ type: 'image', url: 'a', caption: '  거북이  ' }]));
     expect(g).toMatchObject({ kind: 'photos', photos: [{ url: 'a', caption: '거북이' }] });
+  });
+});
+
+describe('koDateLabel — 한국어 날짜 표기(시간대 영향 없음)', () => {
+  it('YYYY-MM-DD → 2026년 11월 5일', () => {
+    expect(koDateLabel('2026-11-05')).toBe('2026년 11월 5일');
+    expect(koDateLabel('2026-01-31')).toBe('2026년 1월 31일');
+  });
+  it('형식이 아니면 그대로', () => {
+    expect(koDateLabel('')).toBe('');
+    expect(koDateLabel('어제')).toBe('어제');
+  });
+});
+
+const sample = (over: Partial<BlogPost> = {}): BlogPost => ({
+  id: 'b1',
+  title: '261105 푸른동굴 투어',
+  thumbnail: '',
+  date: '2026-11-05',
+  published: true,
+  blocks: [],
+  tourSlug: '',
+  ...over
+});
+
+describe('blogSeoTitle — 검색 제목에만 날짜(같은 제목 글 구분)', () => {
+  it('표시 제목 + (날짜)', () => {
+    expect(blogSeoTitle(sample())).toBe('푸른동굴 투어 (2026년 11월 5일)');
+  });
+  it('제목이 비면 블로그', () => {
+    expect(blogSeoTitle(sample({ title: '' }))).toBe('블로그 (2026년 11월 5일)');
+  });
+});
+
+describe('blogDescription — 검색 요약문', () => {
+  it('본문이 있으면 본문 요약', () => {
+    const post = sample({ blocks: [{ type: 'text', value: '파도가 높아 마에다 플랫에서 진행했어요.' }] });
+    expect(blogDescription(post, '푸른동굴 스노클링')).toBe('파도가 높아 마에다 플랫에서 진행했어요.');
+  });
+  it('본문이 없으면 날짜·투어·사진/영상 수로 — 내용은 지어내지 않는다', () => {
+    const post = sample({
+      blocks: [
+        { type: 'image', url: 'a.jpg', caption: '' },
+        { type: 'image', url: 'b.jpg', caption: '' },
+        { type: 'video', url: 'v.mp4', poster: '', caption: '' },
+        { type: 'text', value: '   ' }
+      ]
+    });
+    expect(blogDescription(post, '푸른동굴 보트 체험다이빙')).toBe(
+      '2026년 11월 5일 오키니티 푸른동굴 보트 체험다이빙 현장 기록. 사진 2장 · 영상 1개.'
+    );
+    expect(blogDescription(sample(), null)).toBe('2026년 11월 5일 오키니티 현장 기록.');
   });
 });
