@@ -18,7 +18,7 @@ import {
 import { getTourCatalogEntry, resolveTourDetail, tourImages } from '@/lib/tour';
 import { cdnMedia } from '@/lib/media';
 import { koOnlyAlternates } from '@/lib/seo';
-import { blogPostingJsonLd } from '@/lib/structured-data';
+import { blogPostingJsonLd, jsonLdHtml } from '@/lib/structured-data';
 import { site } from '@/config/site.config';
 import { isAdminPreview } from '@/lib/admin-preview';
 import Container from '@/components/Container';
@@ -143,7 +143,7 @@ export default async function BlogPostPage({
   return (
     <article className="break-keep py-12 sm:py-16">
       {post.published && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
       )}
       <Container size="text">
         {!post.published && <DraftNotice editHref={`/admin/blog/${post.id}`} />}

@@ -3,12 +3,12 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { site } from '@/config/site.config';
 import { localeAlternates } from '@/lib/seo';
-import { BUSINESS_ID, representativePerson } from '@/lib/structured-data';
+import { businessJsonLd, jsonLdHtml, representativePerson } from '@/lib/structured-data';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { normalizeScheduleItems } from '@/lib/schedule-range';
 import { getGoogleReviews } from '@/lib/google-reviews';
 import { getSiteContentMap, tourDocsIn, CONTENT_KEYS } from '@/lib/site-content';
-import { reserveOptionsFor } from '@/lib/tour';
+import { isTourPublished, resolveTourDetail, reserveOptionsFor, TOUR_CATALOG, TOUR_NAME_NAV_KEY } from '@/lib/tour';
 import { parseTourTimes } from '@/lib/tour-times';
 import { parseBlogItems, publishedSorted, BLOG_CAROUSEL_LIMIT } from '@/lib/blog';
 import {
@@ -151,32 +151,14 @@ export default async function HomePage({
     testimonials: isDefaultLocale ? parseHomeTestimonials(overrides[HOME_CONTENT_KEYS.testimonials]) : undefined
   };
 
-  // 구조화 데이터(JSON-LD) — 구글이 "OKINITY = 오키나와 다이빙샵(주소·연락처)"를
-  // 명확히 인식하도록. 브랜드/지역 검색 노출에 유리.
-  const business = {
-    '@type': 'LocalBusiness',
-    '@id': BUSINESS_ID,
-    name: site.name,
-    // 한글·일문 표기 병기 — "오키니티" 검색어와 브랜드를 연결하는 신호
-    alternateName: ['오키니티', 'オキニティ', 'Okinity'],
-    url: site.url,
-    image: `${site.url}/og-image.png`,
-    logo: `${site.url}/icon.png`,
-    description:
-      '오키나와 현지 다이빙&투어샵 오키니티(OKINITY). 스노클링·체험다이빙·펀다이빙·라이센스 강습·낚시 투어.',
-    telephone: site.phone,
-    email: site.contact.email,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: site.address.line,
-      addressLocality: 'Naha',
-      addressRegion: 'Okinawa',
-      postalCode: site.address.postal.replace(/[^0-9-]/g, ''),
-      addressCountry: 'JP'
-    },
-    areaServed: 'Okinawa, Japan',
-    sameAs: [site.contact.kakaoChannel, site.contact.line].filter(Boolean)
-  };
+  // 구조화 데이터(JSON-LD) — 업체(구글 지도와 같은 분류·연결, 언어별 설명) + 공개 투어 목록 + 대표.
+  // 투어 목록의 @id 는 투어 상세 구조화 데이터와 같아 AI 가 "이 업체의 상품"으로 묶는다(lib/structured-data).
+  const tMeta = await getTranslations('meta');
+  const tNav = await getTranslations('nav');
+  const publishedTours = TOUR_CATALOG.filter((e) =>
+    isTourPublished(resolveTourDetail(e.slug, overrides[CONTENT_KEYS.tour(e.slug)] ?? null))
+  ).map((e) => ({ slug: e.slug, name: TOUR_NAME_NAV_KEY[e.slug] ? tNav(TOUR_NAME_NAV_KEY[e.slug]) : e.name }));
+  const business = businessJsonLd({ locale, description: tMeta('description'), tours: publishedTours });
   // 대표 — 한국·일본 이름이 같은 사람임을 연결(블로그 작성자와 같은 @id).
   const representative = representativePerson(locale, tFooter('representative'));
   const jsonLd = { '@context': 'https://schema.org', '@graph': [business, representative] };
@@ -188,7 +170,7 @@ export default async function HomePage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }}
       />
       <OceanHome
         posts={posts}

@@ -5,6 +5,7 @@ import { getLocalizedSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseAbout, resolveAbout, splitList } from '@/lib/about';
 import { cdnMedia } from '@/lib/media';
 import { localeAlternates } from '@/lib/seo';
+import { aboutPageJsonLd, jsonLdHtml } from '@/lib/structured-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,9 +38,18 @@ export default async function AboutPage({
   const titleLines = about.title.split('\n');
   const bodyParas = about.body.split('\n').filter((p) => p.trim());
   const certs = splitList(about.instructorCerts);
+  // 구조화 데이터 — 대표(홈·블로그와 같은 @id)에 화면의 자격 목록·사진을 붙여 업체와 잇는다.
+  const tFooter = await getTranslations('footer');
+  const jsonLd = aboutPageJsonLd({
+    locale,
+    jobTitle: tFooter('representative'),
+    image: about.instructorPhoto ? cdnMedia(about.instructorPhoto) : '',
+    credentials: certs
+  });
 
   return (
     <section className="py-14 sm:py-20">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
       <Container size="text" className="[text-shadow:0_2px_14px_rgba(0,0,0,0.45)]">
         {/* 상단 소개 */}
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200/80">

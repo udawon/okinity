@@ -16,9 +16,14 @@ export const site = {
     // 카카오톡 채널 URL (예: http://pf.kakao.com/_xxxxxx). 비우면 푸터에서 숨김.
     kakaoChannel: 'https://pf.kakao.com/_GLkxlX',
     // LINE URL (예: https://lin.ee/xxxxxx 또는 https://line.me/ti/p/@xxxx). 비우면 푸터에서 숨김.
-    line: 'https://lin.ee/vdxgimQ'
+    line: 'https://lin.ee/vdxgimQ',
+    // 인스타그램 공식 계정(2026-11-18 원님 확인). 하단 문의 줄 + 구조화 데이터 sameAs. 비우면 둘 다 숨김.
+    instagram: 'https://www.instagram.com/okinity_official/'
   },
-  // 푸터 주소·연락처 (일본 본사)
+  // 구글 지도 등록 정보(샵 — 宜野湾市 真志喜). 사이트 하단 주소(사업자 등록지)는 그대로 두고, 구조화 데이터에서
+  // 이 링크로 "사이트의 OKINITY = 구글 지도의 OKINITY"를 잇는다(2026-11-18 원님 결정 — 두 주소 모두 유지).
+  googleMapsUrl: 'https://maps.google.com/?cid=4404185334192370822',
+  // 푸터 주소·연락처 — 사업자 등록지(나하). 샵은 기노완(구글 지도 googleMapsUrl).
   address: {
     postal: '〒902-0075',
     line: '192-3, Kokuba, Naha-Si, Okinawa-Ken, JAPAN'

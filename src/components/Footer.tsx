@@ -52,6 +52,18 @@ function LineTile() {
   );
 }
 
+function InstagramTile() {
+  return (
+    <AppTile bg="bg-gradient-to-br from-[#feda75] via-[#d62976] to-[#4f5bd5]">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" className="h-[14px] w-[14px]" aria-hidden>
+        <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.3" cy="6.7" r="0.6" fill="#ffffff" stroke="none" />
+      </svg>
+    </AppTile>
+  );
+}
+
 /**
  * 푸터 문의 행 — 컨테이너 없이 [라벨][앱 아이콘] 순서. 우측 정렬 컬럼에서 아이콘이 오른쪽 세로 라인으로
  * 정렬돼 통일감을 만든다(라벨 길이와 무관하게 아이콘 열이 가지런함). 카카오톡·라인은 실제 앱 아이콘으로 식별.
@@ -135,6 +147,11 @@ export default async function Footer() {
               {site.contact.line && (
                 <ContactRow href={site.contact.line} label={t('line')} external>
                   <LineTile />
+                </ContactRow>
+              )}
+              {site.contact.instagram && (
+                <ContactRow href={site.contact.instagram} label={t('instagram')} external>
+                  <InstagramTile />
                 </ContactRow>
               )}
             </div>
