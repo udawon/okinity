@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { GEO_PLATFORMS, GEO_QUESTIONS, NewGeoCheckSchema, monthMatrix, summarizeByMonth, type GeoCheck } from './geo-checks';
+import {
+  GEO_PLATFORM_GUIDE,
+  GEO_PLATFORMS,
+  GEO_QUESTIONS,
+  NewGeoCheckSchema,
+  monthMatrix,
+  summarizeByMonth,
+  type GeoCheck
+} from './geo-checks';
 
 describe('질문·플랫폼 — 달마다 비교하려고 고정(2026-11-18 원님 확정)', () => {
   it('질문 10개, 플랫폼 4개', () => {
@@ -78,5 +86,14 @@ describe('summarizeByMonth — 월별 언급·출처·추천 수', () => {
     expect(m.q1.ChatGPT.mentioned).toBe(true);
     expect(m.q1.Claude).toBeUndefined();
     expect(m.q2.Claude.cited).toBe(true);
+  });
+});
+
+describe('GEO_PLATFORM_GUIDE — 플랫폼별 묻는 방법(어드민 매뉴얼)', () => {
+  it('모든 플랫폼에 어디서·어떻게가 있다', () => {
+    for (const p of GEO_PLATFORMS) {
+      expect(GEO_PLATFORM_GUIDE[p].where.length).toBeGreaterThan(0);
+      expect(GEO_PLATFORM_GUIDE[p].steps.length).toBeGreaterThanOrEqual(3);
+    }
   });
 });

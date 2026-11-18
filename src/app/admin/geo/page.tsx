@@ -9,6 +9,7 @@ import { GEO_PLATFORMS, GEO_QUESTIONS, monthMatrix, summarizeByMonth, type GeoTa
 import { isAiSource, sourceLabel, sourceSummary, summarizeInquirySources } from '@/lib/traffic-source';
 import AdminShell from '@/components/admin/AdminShell';
 import GeoCheckForm from '@/components/admin/GeoCheckForm';
+import GeoManual from '@/components/admin/GeoManual';
 
 export const dynamic = 'force-dynamic';
 
@@ -206,11 +207,10 @@ export default async function AdminGeoPage() {
       <section className={`${card} mt-4 p-5`}>
         <h2 className="text-base font-bold text-ink">AI 답변 기록 · 월 1회</h2>
         <p className="mt-1 text-sm leading-relaxed text-muted">
-          매달 같은 질문 10개를 플랫폼마다 물어보고 결과를 체크합니다. 로그인한 상태로 <b>새 대화</b>를 열고(ChatGPT는 웹 검색
-          켜기) 질문을 그대로 붙여넣으세요. 구글·네이버는 검색창에 질문을 넣고 맨 위 AI 요약을 봅니다.
-          <br />
-          <b>언급</b>=오키니티 이름이 나옴 · <b>출처(링크)</b>=okinity.com 이 출처 링크로 나옴 · <b>추천</b>=추천 목록에 들어감
+          매달 1번, 같은 질문 10개를 AI 4곳에 물어보고 오키니티가 나왔는지 체크합니다. <b>언급</b>=이름이 나옴 ·{' '}
+          <b>출처(링크)</b>=okinity.com 이 출처로 나옴 · <b>추천</b>=추천 목록에 들어감
         </p>
+        <GeoManual open={geo.checks.length === 0} />
 
         {months.length > 0 && (
           <div className="mt-4 overflow-x-auto">
