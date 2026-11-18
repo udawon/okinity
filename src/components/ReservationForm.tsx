@@ -13,6 +13,7 @@ import { bookingSummaryRows, joinTourLabel, nextSubmitStep, sendsMedicalMarker, 
 import MedicalCheckModal from './MedicalCheckModal';
 import BookingConfirmModal from './BookingConfirmModal';
 import { site } from '@/config/site.config';
+import { readSourceMemory } from '@/lib/source-memory';
 
 // 문의 내역(product)에 실리는 클래스 표기 — 운영자가 읽는 한국어 고정값(표시 라벨만 i18n).
 const FISHING_CLASS_PRODUCT: Record<FishingClassKey, string> = {
@@ -225,6 +226,7 @@ export default function ReservationForm({
           email: fd.get('email'),
           contact: fd.get('contact'),
           message,
+          ...readSourceMemory(), // 유입처(처음·마지막) — 어드민 예약 목록·알림 메일에 표시
           company: fd.get('company') // 허니팟
         })
       });

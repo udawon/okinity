@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import type { Inquiry, InquiryStatus, InquiryStore, NewInquiry } from './types';
+import type { Inquiry, InquiryStatus, InquiryStore, NewInquiry, InquirySource } from './types';
 
 /**
  * JSON 파일 기반 저장소 — 로컬 개발 / 단일 서버 전용.
@@ -26,10 +26,11 @@ async function writeAll(rows: Inquiry[]): Promise<void> {
 }
 
 export const jsonStore: InquiryStore = {
-  async create(input: NewInquiry): Promise<Inquiry> {
+  async create(input: NewInquiry, source?: InquirySource): Promise<Inquiry> {
     const rows = await readAll();
     const inquiry: Inquiry = {
       ...input,
+      ...source,
       id: randomUUID(),
       createdAt: new Date().toISOString(),
       status: 'tentative'

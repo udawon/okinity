@@ -41,7 +41,10 @@ export const NewInquirySchema = z.object({
 });
 export type NewInquiry = z.infer<typeof NewInquirySchema>;
 
-export interface Inquiry extends NewInquiry {
+/** 유입처(lib/traffic-source id) — 처음 들어온 경로(30일 기억)·문의 직전 경로. 예약 폼이 보내고 수정 화면은 건드리지 않는다. */
+export type InquirySource = { sourceFirst?: string; sourceLast?: string };
+
+export interface Inquiry extends NewInquiry, InquirySource {
   id: string;
   createdAt: string; // ISO
   status: InquiryStatus;
@@ -53,7 +56,7 @@ export interface Inquiry extends NewInquiry {
 
 /** 저장소 어댑터 인터페이스. JSON/Postgres가 동일 계약을 구현한다. */
 export interface InquiryStore {
-  create(input: NewInquiry): Promise<Inquiry>;
+  create(input: NewInquiry, source?: InquirySource): Promise<Inquiry>;
   list(): Promise<Inquiry[]>;
   updateStatus(id: string, status: InquiryStatus): Promise<boolean>;
   updateNote(id: string, note: string): Promise<boolean>;

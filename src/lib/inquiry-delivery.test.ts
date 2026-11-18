@@ -61,3 +61,14 @@ describe('buildInquiryEmail — 알림 메일', () => {
     expect(buildInquiryEmail({ ...data, email: '' }, { stored: true }).replyTo).toBeUndefined();
   });
 });
+
+describe('buildInquiryEmail — 유입 표시', () => {
+  const data = { name: '김손님', contact: '010', product: '스노클링 · 푸른동굴 스노클링' };
+  it('유입처가 있으면 메일에 한 줄', () => {
+    const n = buildInquiryEmail(data, { stored: true, source: { sourceFirst: 'chatgpt', sourceLast: 'naver' } });
+    expect(n.text).toContain('유입: 처음 ChatGPT · 마지막 네이버');
+  });
+  it('없으면 줄 자체를 넣지 않는다', () => {
+    expect(buildInquiryEmail(data, { stored: true }).text).not.toContain('유입');
+  });
+});

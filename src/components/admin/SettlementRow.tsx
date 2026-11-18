@@ -9,6 +9,7 @@ import EditInquiryButton from './EditInquiryButton';
 import DeleteInquiryButton from './DeleteInquiryButton';
 import { splitMedical, type Inquiry, type InquiryStatus } from '@/lib/inquiries/types';
 import type { InquirySettlement } from '@/lib/inquiry-settlement';
+import { sourceSummary } from '@/lib/traffic-source';
 
 const STATUS_LABEL: Record<InquiryStatus, string> = {
   tentative: '가예약',
@@ -269,6 +270,9 @@ export default function SettlementRow({
               ) : (
                 <span className="text-muted">해당 없음</span>
               )}
+            </DetailField>
+            <DetailField label="유입">
+              {sourceSummary(inquiry) || <span className="text-muted">기록 없음</span>}
             </DetailField>
           </dl>
 

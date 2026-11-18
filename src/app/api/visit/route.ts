@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { ADMIN_COOKIE, verifySession } from '@/lib/admin-auth';
 import { clientIp, isBot, jstDateKey, visitorHash } from '@/lib/visit-key';
 import { recordVisit } from '@/lib/visits';
+import { normalizeSourceId } from '@/lib/traffic-source';
 
 /**
  * 방문 기록(공개 페이지 비콘) — 항상 204(결과를 알려주지 않음).
@@ -22,9 +23,13 @@ export async function POST(req: NextRequest) {
 
   if (await verifySession(req.cookies.get(ADMIN_COOKIE)?.value)) return skip;
 
+  // 유입처(사이트 이름만) — 모르는 값은 버린다
+  const body = (await req.json().catch(() => null)) as { source?: unknown } | null;
+  const source = normalizeSourceId(body?.source) ?? undefined;
+
   try {
     const day = jstDateKey();
-    await recordVisit(day, await visitorHash(secret, day, clientIp(req.headers), ua));
+    await recordVisit(day, await visitorHash(secret, day, clientIp(req.headers), ua), source);
   } catch {
     // 집계 실패는 방문자 경험과 무관 — 조용히 무시
   }

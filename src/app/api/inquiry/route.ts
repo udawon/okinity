@@ -3,6 +3,7 @@ import { site } from '@/config/site.config';
 import { getInquiryStore, NewInquirySchema } from '@/lib/inquiries';
 import { buildInquiryEmail, inquiryResult, type EmailResult, type Notif } from '@/lib/inquiry-delivery';
 import { parseProduct } from '@/lib/inquiry-product';
+import { normalizeSourceId } from '@/lib/traffic-source';
 import { optionPeopleViolation } from '@/lib/inquiry-rules';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 
@@ -99,11 +100,17 @@ export async function POST(req: Request) {
     if (range) return NextResponse.json({ error: 'people_range', ...range }, { status: 400 });
   }
 
+  // 유입처(처음·마지막, 사이트 이름만) — 모르는 값은 버린다(lib/traffic-source)
+  const source = {
+    sourceFirst: normalizeSourceId(body.sourceFirst) ?? undefined,
+    sourceLast: normalizeSourceId(body.sourceLast) ?? undefined
+  };
+
   // 1) 저장
   let stored = true;
   try {
     const store = await getInquiryStore();
-    await store.create(data);
+    await store.create(data, source);
   } catch (err) {
     console.error('[inquiry] store failed — 메일로만 전달 시도', err);
     stored = false;
@@ -112,7 +119,7 @@ export async function POST(req: Request) {
   // 2) 이메일 알림 — 저장 실패여도 보낸다(운영자가 메일로 처리)
   let email: EmailResult;
   try {
-    email = await sendEmail(buildInquiryEmail(data, { stored }));
+    email = await sendEmail(buildInquiryEmail(data, { stored, source }));
   } catch (err) {
     console.error(`[inquiry] email failed (저장 ${stored ? '완료' : '실패'})`, err);
     email = 'failed';
