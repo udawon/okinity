@@ -1,7 +1,7 @@
 import 'server-only';
 import { revalidateTag, unstable_cache } from 'next/cache';
 import { getSupabaseAdmin, MEDIA_BUCKET } from './supabase/server';
-import { normalizeContentKeys, orEmpty, rowsToContentMap } from './content-read';
+import { localizedContentKey, normalizeContentKeys, orEmpty, rowsToContentMap } from './content-read';
 
 /**
  * 콘텐츠 오버라이드 레이어 — content/*.md(기본값) 위에 어드민 편집분을 덮어쓴다.
@@ -50,10 +50,8 @@ export function isContentLocale(v: unknown): v is ContentLocale {
   return typeof v === 'string' && (CONTENT_LOCALES as readonly string[]).includes(v);
 }
 
-/** 로케일별 저장 키. ko는 기존 키 그대로(하위 호환). */
-export function localizedContentKey(key: string, locale: string): string {
-  return locale === 'ko' ? key : `${key}:${locale}`;
-}
+/** 로케일별 저장 키. ko는 기존 키 그대로(하위 호환). 순수 모듈(content-read)에 두고 여기서 다시 내보낸다. */
+export { localizedContentKey };
 
 /** 로케일 우선 조회 — `${key}:${locale}` 값이 있으면 그것을, 없으면 기본(ko) 키 값으로 폴백. */
 export async function getLocalizedSiteContent(key: string, locale: string): Promise<Json | null> {

@@ -42,7 +42,7 @@ export const ABOUT_DEFAULTS: AboutContent = {
     },
     {
       title: '한국어 안전 가이드',
-      desc: '예약·브리핑·수중 사인까지 한국어로. 전 게스트 다이빙 상해보험으로 안전을 보장합니다.'
+      desc: '예약·브리핑·수중 사인까지 한국어로 안내합니다.'
     },
     {
       title: '소수정예 프라이빗',

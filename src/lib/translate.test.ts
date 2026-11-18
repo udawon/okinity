@@ -14,6 +14,11 @@ describe('buildTranslateRequest — 번역 요청', () => {
   it('영어는 ¥ 표기 규칙', () => {
     expect(buildTranslateRequest({ a: '가' }, 'en', 'm').system).toMatch(/¥/);
   });
+
+  it('대표 이름(한국·일본 이름 병기)은 사이트 하단과 같은 표기로', () => {
+    expect(buildTranslateRequest({ a: '가' }, 'en', 'm').system).toContain('Beomyoung Heo (Higa Kaito)');
+    expect(buildTranslateRequest({ a: '가' }, 'ja', 'm').system).toContain('比嘉海斗（ホ・ボミョン）');
+  });
 });
 
 describe('parseTranslateResponse — 번역 결과 읽기', () => {

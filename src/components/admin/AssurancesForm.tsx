@@ -23,7 +23,7 @@ export default function AssurancesForm({
 }) {
   const [title, setTitle] = useState(defaultTitle ?? '');
   const [items, setItems] = useState<AssuranceItem[]>(defaults);
-  const { status, show } = useSaveStatus();
+  const { status, show, showSaved } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   const patch = (i: number, p: Partial<AssuranceItem>) =>
@@ -36,7 +36,7 @@ export default function AssurancesForm({
       items: items.map((it) => ({ title: it.title.trim(), desc: it.desc.trim() }))
     }));
     setSaving(false);
-    if (res.ok) show('저장되었습니다.');
+    if (res.ok) showSaved('저장되었습니다.', res.sync);
     else show(res.error ?? '저장 실패', 'err');
   }
 

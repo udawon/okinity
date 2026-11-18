@@ -20,6 +20,7 @@ import {
 } from './content-sync';
 import { translateTexts, translationEnabled, type TranslateTarget } from './translate';
 import { TOUR_CATALOG } from './tour';
+import { HOME_CONTENT_KEYS } from './home-content';
 import { TOUR_NOTICE_DEFAULTS, TOUR_NOTICE_IDS } from './tour-notices';
 
 /**
@@ -43,7 +44,10 @@ export function syncItems(): SyncItem[] {
     { kind: 'fishingClasses', key: CONTENT_KEYS.fishingClasses, label: '낚시 클래스(미들·럭셔리)' },
     { kind: 'tourNotices', key: CONTENT_KEYS.tourNotices, label: '투어 공통 안내(환불·안전)' },
     { kind: 'about', key: CONTENT_KEYS.about, label: '소개' },
-    { kind: 'gallery', key: CONTENT_KEYS.gallery, label: '갤러리 사진 설명' }
+    { kind: 'gallery', key: CONTENT_KEYS.gallery, label: '갤러리 사진 설명' },
+    { kind: 'homeHero', key: CONTENT_KEYS.hero, label: '홈 첫 화면 문구' },
+    { kind: 'homeTourCopy', key: HOME_CONTENT_KEYS.tourCopy, label: '홈 투어 카드 텍스트' },
+    { kind: 'homeAssurances', key: HOME_CONTENT_KEYS.assurances, label: '홈 신뢰 영역' }
   ];
 }
 

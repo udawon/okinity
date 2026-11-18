@@ -22,7 +22,7 @@ import SectionPreview from '@/components/admin/SectionPreview';
 import { type ReactNode } from 'react';
 
 export const dynamic = 'force-dynamic';
-// 갤러리 저장 시 사진 설명 EN/JA 자동 번역 — 번역 대기 시간 확보
+// 갤러리·홈 문구 저장 시 EN/JA 자동 번역 — 번역 대기 시간 확보
 export const maxDuration = 60;
 
 const sectionCls = 'rounded-card border border-line bg-surface p-5 sm:p-6';
@@ -126,7 +126,8 @@ export default async function AdminContentPage() {
           desc={
             <>
               홈 첫 화면의 <strong>배경 영상/이미지</strong>와 <strong>제목·부제 문구</strong>를
-              교체합니다. 비우면 기본값이 사용됩니다. 동영상은 자동재생(무음 루프)됩니다.
+              교체합니다. 비우면 기본값이 사용됩니다. 동영상은 자동재생(무음 루프)됩니다. 문구는 저장할 때
+              English·日本語로 자동 번역됩니다.
             </>
           }
           preview={
@@ -151,7 +152,7 @@ export default async function AdminContentPage() {
 
         <EditSection
           title="투어 카드 텍스트 (홈 캐러셀)"
-          desc="홈 투어 카드의 카테고리명·태그라인·설명과 섹션 제목/소개. 비운 칸은 기본 문구를 사용합니다."
+          desc="홈 투어 카드의 카테고리명·태그라인·설명과 섹션 제목/소개. 비운 칸은 기본 문구를 사용합니다. 저장할 때 English·日本語로 자동 번역됩니다."
           preview={<SectionPreview highlight="tours" note="홈 투어 캐러셀 카드의 텍스트." />}
         >
           <TourCopyForm
@@ -165,7 +166,7 @@ export default async function AdminContentPage() {
 
         <EditSection
           title="신뢰 영역 (왜 우리인가)"
-          desc="홈 '안심하고 맡기세요' 4개 카드의 제목·설명. 아이콘은 고정입니다."
+          desc="홈 '안심하고 맡기세요' 4개 카드의 제목·설명. 아이콘은 고정입니다. 저장할 때 English·日本語로 자동 번역됩니다."
           preview={<SectionPreview highlight="assurance" note="홈 신뢰 배지 4종 카드." />}
         >
           <AssurancesForm

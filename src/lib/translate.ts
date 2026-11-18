@@ -17,14 +17,14 @@ const STYLE: Record<TranslateTarget, string> = {
   en: [
     '- Tone: natural, friendly American English for travelers (marketing copy, not literal).',
     "- Yen amounts: write the yen sign before the number, e.g. '1인 6,000엔' → '¥6,000 per person'. Korean won → 'KRW'.",
-    "- Instructor: '허 범영' → 'Beomyoung Heo'; '포뇨(강사)' → 'Instructor Ponyo'.",
+    "- Instructor: '허범영'/'허 범영' → 'Beomyoung Heo'; '포뇨(강사)' → 'Instructor Ponyo'. 比嘉海斗 is his Japanese name: '허범영 (比嘉海斗)' → 'Beomyoung Heo (Higa Kaito)'.",
     '- Places: 푸른동굴 → Blue Cave, 케라마 → Kerama, 오키나와 → Okinawa, 나하 → Naha, 온나손 → Onna, 기노완 → Ginowan.',
     '- PADI course names in official English (Open Water Diver, Advanced Open Water Diver).'
   ].join('\n'),
   ja: [
     '- Tone: polite です・ます style used by Japanese tour operators (natural, not literal).',
     "- Yen amounts: number followed by 円, e.g. '1인 6,000엔' → 'お一人様 6,000円'. Korean won → 'ウォン'.",
-    "- Instructor: '허 범영' → 'ホ・ボミョン'; '포뇨(강사)' → 'ポニョインストラクター'.",
+    "- Instructor: '허범영'/'허 범영' → 'ホ・ボミョン'; '포뇨(강사)' → 'ポニョインストラクター'. 比嘉海斗 is his Japanese name: '허범영 (比嘉海斗)' → '比嘉海斗（ホ・ボミョン）' (Japanese name first).",
     '- Places: 푸른동굴 → 青の洞窟, 케라마 → 慶良間, 오키나와 → 沖縄, 나하 → 那覇, 온나손 → 恩納村, 기노완 → 宜野湾.',
     '- Use official Japanese terms for licenses and courses (e.g. 一級小型船舶操縦免許, オープン・ウォーター).'
   ].join('\n')

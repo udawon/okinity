@@ -6,6 +6,11 @@
 type Json = Record<string, unknown>;
 type ContentRow = { key: string; value: unknown };
 
+/** 로케일별 저장 키 — ko(기본)는 무접미사 키 그대로(하위 호환), en/ja는 `${key}:${locale}`. */
+export function localizedContentKey(key: string, locale: string): string {
+  return locale === 'ko' ? key : `${key}:${locale}`;
+}
+
 /** 조회 키 정규화 — 중복 제거·정렬해 같은 요청이 같은 캐시 칸을 쓰게 한다. 생략·빈 배열이면 전체(null). */
 export function normalizeContentKeys(keys?: string[]): string[] | null {
   if (!keys || keys.length === 0) return null;

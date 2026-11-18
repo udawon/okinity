@@ -9,7 +9,10 @@
 
 export type TextMap = Record<string, string>;
 
-/** 콘텐츠 종류별 번역 대상 경로 — `목록[]` 은 모든 항목. 그 외 칸은 한국어 값을 그대로 쓴다. */
+/**
+ * 콘텐츠 종류별 번역 대상 경로 — `목록[]` 은 모든 항목, `객체{}` 는 모든 키(예: 활동 id → 카드 문구).
+ * 그 외 칸은 한국어 값을 그대로 쓴다.
+ */
 export const SYNC_PATHS = {
   tour: [
     'summary',
@@ -41,7 +44,11 @@ export const SYNC_PATHS = {
     'instructorBody'
   ],
   tourNotices: ['refund.title', 'refund.body', 'safety.title', 'safety.body'],
-  gallery: ['items[].caption']
+  gallery: ['items[].caption'],
+  // 홈 — 배경 미디어·숨김 여부는 언어 공통(한국어 저장본 그대로)
+  homeHero: ['eyebrow', 'title', 'subtitle', 'badge1', 'badge2', 'badge3', 'ctaReserve', 'ctaExplore'],
+  homeTourCopy: ['sectionTitle', 'sectionIntro', 'cards{}.title', 'cards{}.tagline', 'cards{}.desc'],
+  homeAssurances: ['sectionTitle', 'items[].title', 'items[].desc']
 } as const;
 export type SyncKind = keyof typeof SYNC_PATHS;
 
@@ -65,6 +72,11 @@ export function textEntries(doc: unknown, patterns: readonly string[]): TextMap 
       const list = node[seg.slice(0, -2)];
       if (!Array.isArray(list)) return;
       list.forEach((item, i) => walk(item, rest, `${prefix}${seg.slice(0, -2)}.${i}${rest.length ? '.' : ''}`));
+    } else if (seg.endsWith('{}')) {
+      const name = seg.slice(0, -2);
+      const record = node[name];
+      if (!isRecord(record)) return;
+      for (const k of Object.keys(record)) walk(record[k], rest, `${prefix}${name}.${k}${rest.length ? '.' : ''}`);
     } else {
       walk(node[seg], rest, `${prefix}${seg}${rest.length ? '.' : ''}`);
     }

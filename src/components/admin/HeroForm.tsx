@@ -58,7 +58,7 @@ export default function HeroForm({
   defaults: HeroDefaults;
   disabled?: boolean;
 }) {
-  const { status, show } = useSaveStatus();
+  const { status, show, showSaved } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   async function action(formData: FormData) {
@@ -81,7 +81,7 @@ export default function HeroForm({
       hideBadges: formData.get('showBadges') !== 'on'
     }));
     setSaving(false);
-    if (res.ok) show('저장되었습니다.');
+    if (res.ok) showSaved('저장되었습니다.', res.sync);
     else show(res.error ?? '저장 실패', 'err');
   }
 

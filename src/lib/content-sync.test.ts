@@ -47,6 +47,56 @@ describe('textEntries — 번역 대상 글 뽑기', () => {
     expect(textEntries(null, SYNC_PATHS.tour)).toEqual({});
     expect(textEntries({ summary: 3, steps: 'x' }, SYNC_PATHS.tour)).toEqual({});
   });
+
+  it('이름{} 는 객체의 모든 키 — 홈 투어 카드(활동 id → 문구)', () => {
+    const copy = {
+      sectionTitle: '오키나와의 바다',
+      sectionIntro: '',
+      cards: {
+        padi: { title: 'PADI 교육', tagline: '오늘부터 나도 다이버', desc: '10년 이상 경력 강사' },
+        yacht: { title: '프라이빗 크루징', tagline: '', desc: '전세 요트' }
+      }
+    };
+    expect(textEntries(copy, SYNC_PATHS.homeTourCopy)).toEqual({
+      sectionTitle: '오키나와의 바다',
+      sectionIntro: '',
+      'cards.padi.title': 'PADI 교육',
+      'cards.padi.tagline': '오늘부터 나도 다이버',
+      'cards.padi.desc': '10년 이상 경력 강사',
+      'cards.yacht.title': '프라이빗 크루징',
+      'cards.yacht.tagline': '',
+      'cards.yacht.desc': '전세 요트'
+    });
+    expect(textEntries({ cards: ['x'] }, SYNC_PATHS.homeTourCopy)).toEqual({});
+  });
+
+  it('홈 첫 화면 — 글만, 배경 미디어·숨김 여부는 번역 대상 아님', () => {
+    const hero = {
+      eyebrow: 'OKINAWA · OCEAN LIFE',
+      title: '바다가 시작되는 곳',
+      subtitle: '안전제일 소수한정 투어',
+      badge1: '   ',
+      ctaReserve: '투어 예약하기',
+      mediaUrl: 'https://cdn/x.mp4',
+      hideBadges: true
+    };
+    expect(textEntries(hero, SYNC_PATHS.homeHero)).toEqual({
+      eyebrow: 'OKINAWA · OCEAN LIFE',
+      title: '바다가 시작되는 곳',
+      subtitle: '안전제일 소수한정 투어',
+      badge1: '   ',
+      ctaReserve: '투어 예약하기'
+    });
+  });
+
+  it('홈 신뢰 영역 — 섹션 제목과 카드 제목·설명', () => {
+    const doc = { sectionTitle: '', items: [{ title: '소수정예', desc: '프라이빗 가능' }] };
+    expect(textEntries(doc, SYNC_PATHS.homeAssurances)).toEqual({
+      sectionTitle: '',
+      'items.0.title': '소수정예',
+      'items.0.desc': '프라이빗 가능'
+    });
+  });
 });
 
 describe('planSync — 무엇을 재사용하고 무엇을 번역할지', () => {
@@ -92,6 +142,13 @@ describe('buildLocalDoc — 번역본 조립', () => {
       options: [ko.options[0], { ...ko.options[1], name: 'Solo tour' }]
     });
     expect(ko.summary).toBe('푸른동굴 스노클링'); // 원본 불변
+  });
+
+  it('객체 키 경로(cards.padi.desc)도 그 자리만 바꾼다', () => {
+    const copy = { sectionTitle: '바다', cards: { padi: { title: 'PADI 교육', desc: '강사' }, yacht: { title: '요트', desc: '' } } };
+    const doc = buildLocalDoc(copy, { 'cards.padi.desc': 'Instructor', sectionTitle: 'Sea' });
+    expect(doc).toEqual({ sectionTitle: 'Sea', cards: { padi: { title: 'PADI 교육', desc: 'Instructor' }, yacht: { title: '요트', desc: '' } } });
+    expect(copy.cards.padi.desc).toBe('강사');
   });
 });
 
