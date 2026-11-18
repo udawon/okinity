@@ -19,6 +19,48 @@ export const GEO_QUESTIONS = [
 ] as const;
 
 export const GEO_PLATFORMS = ['ChatGPT', '구글 AI 개요', '네이버 AI 브리핑', 'Claude'] as const;
+export type GeoPlatform = (typeof GEO_PLATFORMS)[number];
+
+/**
+ * 플랫폼별 묻는 방법 — 어드민 기록 화면에서 고른 플랫폼 위에 띄운다(components/admin/GeoCheckForm·GeoManual).
+ * 원칙: 지난 대화 기억·개인화가 답에 섞이지 않게(임시 채팅·시크릿 창), 질문마다 새로.
+ */
+export const GEO_PLATFORM_GUIDE: Record<GeoPlatform, { where: string; steps: string[] }> = {
+  ChatGPT: {
+    where: 'chatgpt.com 또는 ChatGPT 앱 (로그인)',
+    steps: [
+      '새 채팅 화면 오른쪽 위의 "임시 채팅"을 켭니다 — 지난 대화 기억이 답에 섞이지 않게',
+      '질문을 붙여넣고 보냅니다',
+      '답 아래 "출처"를 눌러 okinity.com 이 있는지 봅니다. 출처가 하나도 없으면 입력창의 + → "웹 검색"을 켜고 다시 물어봅니다',
+      '다음 질문은 새 임시 채팅에서 합니다'
+    ]
+  },
+  '구글 AI 개요': {
+    where: '크롬 시크릿 창의 google.com (로그인 안 한 상태)',
+    steps: [
+      '시크릿 창을 엽니다 (윈도우 Ctrl+Shift+N · 맥 ⌘+Shift+N) — 검색 기록에 따른 개인화를 빼려고',
+      'google.com 검색창에 질문을 붙여넣고 검색합니다',
+      '맨 위 "AI 개요" 상자를 "더보기"로 펼쳐 내용과 옆의 링크를 봅니다',
+      '"AI 모드" 탭은 누르지 않습니다(AI 개요만 기록). AI 개요가 안 나오면 체크 없이 메모에 "AI 개요 없음"'
+    ]
+  },
+  '네이버 AI 브리핑': {
+    where: 'naver.com 또는 네이버 앱',
+    steps: [
+      '네이버 검색창에 질문을 붙여넣고 검색합니다',
+      '맨 위 "AI 브리핑" 내용과 아래 출처를 봅니다',
+      'AI 브리핑이 안 나오면 체크 없이 메모에 "AI 브리핑 없음"'
+    ]
+  },
+  Claude: {
+    where: 'claude.ai 또는 Claude 앱 (로그인)',
+    steps: [
+      '새 대화를 엽니다 — 질문마다 새 대화',
+      '입력창의 도구 메뉴에서 "웹 검색"이 켜져 있는지 확인합니다',
+      '질문을 붙여넣고 보낸 뒤, 답 속 출처 링크에 okinity.com 이 있는지 봅니다'
+    ]
+  }
+};
 
 const blank = (v: unknown) => (v === null || v === undefined ? '' : v);
 const text = (max: number) => z.preprocess(blank, z.string().trim().max(max));

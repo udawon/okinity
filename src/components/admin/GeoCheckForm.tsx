@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { saveGeoChecks } from '@/app/admin/geo-actions';
-import { GEO_PLATFORMS, GEO_QUESTIONS, type GeoCheck } from '@/lib/geo-checks';
+import { GEO_PLATFORM_GUIDE, GEO_PLATFORMS, GEO_QUESTIONS, type GeoCheck, type GeoPlatform } from '@/lib/geo-checks';
 import { safeAction } from '@/lib/safe-action';
 import { useSaveStatus, SaveStatusBadge } from './save-status';
 
@@ -65,7 +65,8 @@ function rowsFor(checks: GeoCheck[], checkedOn: string, platform: string): { row
  */
 export default function GeoCheckForm({ checks, today, disabled }: { checks: GeoCheck[]; today: string; disabled?: boolean }) {
   const [checkedOn, setCheckedOn] = useState(today);
-  const [platform, setPlatform] = useState<string>(GEO_PLATFORMS[0]);
+  const [platform, setPlatform] = useState<GeoPlatform>(GEO_PLATFORMS[0]);
+  const guide = GEO_PLATFORM_GUIDE[platform];
   const initial = useMemo(() => rowsFor(checks, checkedOn, platform), [checks, checkedOn, platform]);
   // 날짜·플랫폼별로 입력 중인 내용을 따로 보관 — 저장 전에 다른 플랫폼을 눌러도 사라지지 않게
   const [drafts, setDrafts] = useState<Record<string, { rows: Row[]; extra: Row }>>({});
@@ -183,6 +184,19 @@ export default function GeoCheckForm({ checks, today, disabled }: { checks: GeoC
             ))}
           </div>
         </div>
+      </div>
+      {/* 고른 플랫폼에서 묻는 방법 — 매뉴얼과 같은 내용(lib/geo-checks GEO_PLATFORM_GUIDE) */}
+      <div className="mt-3 rounded-card border border-sky-200 bg-sky-50/60 p-3 text-[13px] text-ink">
+        <p className="font-semibold">
+          {platform}에서 묻는 법 <span className="font-normal text-muted">· {guide.where}</span>
+        </p>
+        <ol className="mt-1 list-decimal space-y-0.5 pl-5">
+          {guide.steps.map((s) => (
+            <li key={s} className="leading-relaxed">
+              {s}
+            </li>
+          ))}
+        </ol>
       </div>
       <p className="mt-2 text-xs text-muted">
         {initial.existing > 0
