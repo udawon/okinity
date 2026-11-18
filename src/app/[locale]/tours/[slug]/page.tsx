@@ -18,6 +18,7 @@ import {
   parseFishingClasses,
   isTourPublished,
   splitLines,
+  startingPrice,
   tourHasClasses,
   tourImages,
   TOUR_NAME_NAV_KEY
@@ -28,6 +29,7 @@ import { parseTourTimes } from '@/lib/tour-times';
 import { getJpyKrwRate } from '@/lib/exchange-rate';
 import { cdnMedia } from '@/lib/media';
 import { localeAlternates } from '@/lib/seo';
+import { firstYenAmount, jsonLdHtml, tourOffer, touristTripJsonLd } from '@/lib/structured-data';
 import { site } from '@/config/site.config';
 import TourGallery from '@/components/tour/TourGallery';
 import TourSectionNav from '@/components/tour/TourSectionNav';
@@ -196,8 +198,30 @@ export default async function TourDetailPage({
     rules.length > 0 && { id: 'rules', label: t('rulesTitle') }
   ].filter(Boolean) as { id: string; label: string }[];
 
+  // 구조화 데이터(공개 투어만) — 이름·요약·사진·가격. 시작 가격은 예약 카드와 같은 규칙(1인·배 요금 숫자 →
+  // 없으면 가격 문장의 첫 금액), 문장은 화면 그대로. 요트·낚시는 숫자 없이 "상담 요망"(2026-11-18 원님 결정).
+  const tourJsonLd = showDetail
+    ? touristTripJsonLd({
+        locale,
+        slug,
+        name: tourName,
+        description: detail.summary,
+        images,
+        offer: tourOffer({
+          locale,
+          url: `${site.url}/${locale}/tours/${slug}`,
+          amount: startingPrice(base) ?? firstYenAmount(base.price),
+          text: detail.price,
+          consult: entry.categoryId === 'fishing' || entry.categoryId === 'yacht'
+        })
+      })
+    : null;
+
   return (
     <article className="break-keep pb-32 pt-6 sm:pt-10 lg:pb-24">
+      {tourJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(tourJsonLd) }} />
+      )}
       <TourBookingProvider options={options}>
         <Container>
           <nav aria-label={t('crumbLabel')} className="flex items-center gap-2 text-sm text-white/60">
