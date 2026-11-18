@@ -1,5 +1,6 @@
 import { site } from '@/config/site.config';
-import type { NewInquiry } from './inquiries/types';
+import type { InquirySource, NewInquiry } from './inquiries/types';
+import { sourceSummary } from './traffic-source';
 
 /**
  * 예약 문의 전달 — 알림 메일 구성과, 저장·메일 결과에 따른 고객 응답 결정.
@@ -26,8 +27,13 @@ function esc(v: string): string {
 }
 
 /** 문의 데이터로 알림 이메일(제목·텍스트·HTML)을 구성한다. 저장 실패면 제목·본문에 경고를 붙인다. */
-export function buildInquiryEmail(data: NewInquiry, { stored }: { stored: boolean }): Notif {
+export function buildInquiryEmail(
+  data: NewInquiry,
+  { stored, source }: { stored: boolean; source?: InquirySource }
+): Notif {
   const adminUrl = `${site.url}/admin`;
+  // 유입(어디서 왔는지 — ChatGPT·네이버 등). 없으면 줄을 넣지 않는다.
+  const via = source ? sourceSummary(source) : '';
   const rows: [string, string][] = [
     ['상품', data.product ?? '-'],
     ['희망일', data.date ?? '-'],
@@ -36,7 +42,8 @@ export function buildInquiryEmail(data: NewInquiry, { stored }: { stored: boolea
     ['성함', data.name],
     ['이메일', data.email || '-'],
     ['연락처', data.contact],
-    ['메시지', data.message ?? '-']
+    ['메시지', data.message ?? '-'],
+    ...(via ? ([['유입', via]] as [string, string][]) : [])
   ];
 
   const subject =

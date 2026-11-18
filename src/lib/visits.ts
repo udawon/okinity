@@ -1,6 +1,8 @@
 import 'server-only';
 import { getSupabaseAdmin } from './supabase/server';
 import { addDays } from './admin-dashboard';
+import { isMissingSchemaError } from './db-errors';
+import { fetchAllPages } from './db-paging';
 
 /**
  * 방문자 카운터 저장소 — Supabase `site_visits` 테이블(docs/supabase-site-visits.sql).
@@ -8,11 +10,41 @@ import { addDays } from './admin-dashboard';
  */
 const TABLE = 'site_visits';
 
-/** 하루 1명 기록(같은 날 같은 방문자는 무시). 실패해도 사이트 동작에는 영향 없음. */
-export async function recordVisit(day: string, visitor: string): Promise<void> {
+/**
+ * 하루 1명 기록(같은 날 같은 방문자는 무시 — 그날 첫 방문의 유입처가 남는다). 실패해도 사이트 동작에는 영향 없음.
+ * source 칸이 아직 없으면(docs/supabase-geo-tracking.sql 실행 전) 유입처 없이 다시 기록한다.
+ */
+export async function recordVisit(day: string, visitor: string, source?: string): Promise<void> {
   const sb = getSupabaseAdmin();
   if (!sb) return;
-  await sb.from(TABLE).upsert({ day, visitor }, { onConflict: 'day,visitor', ignoreDuplicates: true });
+  const opts = { onConflict: 'day,visitor', ignoreDuplicates: true } as const;
+  const { error } = await sb.from(TABLE).upsert({ day, visitor, ...(source ? { source } : {}) }, opts);
+  if (error && source && isMissingSchemaError(error)) await sb.from(TABLE).upsert({ day, visitor }, opts);
+}
+
+export type SourceStats = {
+  /** source 칸이 있는지(없으면 SQL 실행 필요) */
+  ready: boolean;
+  /** 유입처별 방문자 수(많은 순). 유입처 기록 전 방문은 '(기록 전)' */
+  rows: { source: string; count: number }[];
+  total: number;
+};
+
+/** 기간(포함) 유입처별 방문자 수. */
+export async function getSourceStats(from: string, to: string): Promise<SourceStats> {
+  const sb = getSupabaseAdmin();
+  if (!sb) return { ready: false, rows: [], total: 0 };
+  const { data, error } = await fetchAllPages<{ source: string | null }>((a, b) =>
+    sb.from(TABLE).select('source').gte('day', from).lte('day', to).order('day').order('visitor').range(a, b)
+  );
+  if (error) return { ready: false, rows: [], total: 0 };
+  const counts = new Map<string, number>();
+  for (const r of data) {
+    const k = r.source ?? '(기록 전)';
+    counts.set(k, (counts.get(k) ?? 0) + 1);
+  }
+  const rows = [...counts].map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count);
+  return { ready: true, rows, total: rows.reduce((n, r) => n + r.count, 0) };
 }
 
 export type VisitStats = {

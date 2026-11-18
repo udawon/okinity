@@ -8,6 +8,7 @@ import MemoCell from './MemoCell';
 import ConfirmedDateCell from './ConfirmedDateCell';
 import { splitMedical, type Inquiry, type InquiryStatus } from '@/lib/inquiries/types';
 import { emptySettlement, type SettlementMap } from '@/lib/inquiry-settlement';
+import { sourceSummary } from '@/lib/traffic-source';
 
 /** 접수 시각(오키나와 JST) → 날짜 YYYY.MM.DD + 시간 HH:MM(24h) 두 줄. */
 function fmtReceived(iso: string): { date: string; time: string } {
@@ -165,7 +166,12 @@ export default function InquiryTable({
                   <td className="whitespace-nowrap px-4 py-3 text-ink">
                     <ContactLink contact={q.contact} />
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-ink">{q.product ?? '-'}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-ink">
+                    {q.product ?? '-'}
+                    {sourceSummary(q) && (
+                      <span className="mt-0.5 block text-xs font-medium text-sky-700">유입: {sourceSummary(q)}</span>
+                    )}
+                  </td>
                   <td className="whitespace-nowrap px-4 py-3 text-ink">{q.date ?? '-'}</td>
                   <td className="whitespace-nowrap px-4 py-3">
                     <ConfirmedDateCell id={q.id} settlement={settlements[q.id] ?? emptySettlement()} />

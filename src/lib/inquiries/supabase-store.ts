@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
-import type { Inquiry, InquiryStatus, InquiryStore, NewInquiry } from './types';
+import { insertWithSchemaFallback } from '@/lib/db-errors';
+import type { Inquiry, InquirySource, InquiryStatus, InquiryStore, NewInquiry } from './types';
 
 /**
  * Supabase(Postgres) 기반 예약 문의 저장소 — 콘텐츠와 동일한 DB로 통합.
@@ -25,6 +26,8 @@ type Row = {
   status: string;
   note: string | null;
   scheduled_time: string | null;
+  source_first?: string | null;
+  source_last?: string | null;
 };
 
 function toInquiry(r: Row): Inquiry {
@@ -41,7 +44,9 @@ function toInquiry(r: Row): Inquiry {
     message: r.message ?? undefined,
     status: r.status as InquiryStatus,
     note: r.note ?? undefined,
-    scheduledTime: r.scheduled_time ?? undefined
+    scheduledTime: r.scheduled_time ?? undefined,
+    sourceFirst: r.source_first ?? undefined,
+    sourceLast: r.source_last ?? undefined
   };
 }
 
@@ -52,24 +57,28 @@ function client() {
 }
 
 export const supabaseStore: InquiryStore = {
-  async create(input: NewInquiry): Promise<Inquiry> {
-    const { data, error } = await client()
-      .from(TABLE)
-      .insert({
-        id: randomUUID(),
-        product: input.product ?? null,
-        date: input.date ?? null,
-        time: input.time ?? null,
-        people: input.people ?? null,
-        name: input.name,
-        email: input.email || null,
-        contact: input.contact,
-        message: input.message ?? null,
-        status: 'tentative'
-      })
-      .select('*')
-      .single();
-    if (error || !data) throw new Error(`예약 저장 실패: ${error?.message ?? 'no data'}`);
+  async create(input: NewInquiry, source?: InquirySource): Promise<Inquiry> {
+    const row: Record<string, unknown> = {
+      id: randomUUID(),
+      product: input.product ?? null,
+      date: input.date ?? null,
+      time: input.time ?? null,
+      people: input.people ?? null,
+      name: input.name,
+      email: input.email || null,
+      contact: input.contact,
+      message: input.message ?? null,
+      status: 'tentative',
+      ...(source?.sourceFirst ? { source_first: source.sourceFirst } : {}),
+      ...(source?.sourceLast ? { source_last: source.sourceLast } : {})
+    };
+    // 유입처 칸이 아직 없으면(docs/supabase-geo-tracking.sql 실행 전) 유입처 없이 다시 저장 — 문의 유실 방지
+    const { data, error } = await insertWithSchemaFallback(
+      (r) => client().from(TABLE).insert(r).select('*').single(),
+      row,
+      ['source_first', 'source_last']
+    );
+    if (error || !data) throw new Error(`예약 저장 실패: ${(error as { message?: string } | null)?.message ?? 'no data'}`);
     return toInquiry(data as Row);
   },
 

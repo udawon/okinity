@@ -28,6 +28,10 @@ const GROUPS: { title: string; items: Item[] }[] = [
       { href: '/admin/notice', label: '공지사항', icon: 'mega' },
       { href: '/admin/about', label: '소개', icon: 'info' }
     ]
+  },
+  {
+    title: '분석',
+    items: [{ href: '/admin/geo', label: 'AI 노출', sub: '측정', icon: 'chart' }]
   }
 ];
 
@@ -42,7 +46,8 @@ const ICONS = {
   shield: <path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z" />,
   camera: <path d="M4 8h3l2-3h6l2 3h3v11H4zM12 9.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" />,
   mega: <path d="M3 10v4h4l6 4V6L7 10zM17 9a4 4 0 0 1 0 6" />,
-  info: <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v5M12 8v.01" />
+  info: <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v5M12 8v.01" />,
+  chart: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
 };
 
 function isActive(pathname: string, href: string): boolean {
