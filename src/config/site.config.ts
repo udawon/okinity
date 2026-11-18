@@ -21,8 +21,16 @@ export const site = {
   // 푸터 주소·연락처 (일본 본사)
   address: {
     postal: '〒902-0075',
-    line: '192-3, Kokuba, Naha-Si, Okinawa-Ken, JAPAN',
-    representative: '代表　比嘉海斗'
+    line: '192-3, Kokuba, Naha-Si, Okinawa-Ken, JAPAN'
+  },
+  // 대표 — 허범영과 比嘉海斗(일본 이름)는 같은 사람. 두 이름을 함께 적어 검색·AI 가 대표를 두 사람으로
+  // 오해하지 않게 한다(2026-11-18 원님 결정). 하단 표기는 언어별, names 는 구조화 데이터용 전체 이름.
+  representative: {
+    ko: '허범영 (比嘉海斗)',
+    en: 'Beomyoung Heo (Higa Kaito)',
+    ja: '比嘉海斗（ホ・ボミョン）',
+    names: { ko: '허범영', en: 'Beomyoung Heo', ja: '比嘉海斗' },
+    aliases: ['허범영', '比嘉海斗', 'Beomyoung Heo', 'Higa Kaito', 'ホ・ボミョン', '포뇨강사', 'Instructor Ponyo']
   },
   phone: '+81-90-1947-5156'
 } as const;

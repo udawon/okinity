@@ -3,8 +3,8 @@
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { ADMIN_COOKIE, verifySession } from '@/lib/admin-auth';
-import { setSiteContent, createSignedUpload, CONTENT_KEYS, type Json } from '@/lib/site-content';
-import { syncTranslations } from '@/lib/content-sync-server';
+import { setSiteContent, createSignedUpload, type Json } from '@/lib/site-content';
+import { syncItemFor, syncTranslations } from '@/lib/content-sync-server';
 import type { SyncOutcome } from '@/lib/content-sync';
 
 /** 서버액션 2차 방어 — 미들웨어 외에 세션 재검증. */
@@ -17,12 +17,16 @@ async function requireAdmin(): Promise<void> {
 
 export type SaveState = { ok?: boolean; error?: string; sync?: SyncOutcome };
 
-/** 영역 콘텐츠 저장 후 메인 전체 무효화. 갤러리는 사진 설명을 EN/JA 로 자동 번역(한국어 기준). */
+/**
+ * 영역 콘텐츠 저장 후 메인 전체 무효화. 번역 대상(갤러리 사진 설명·홈 첫 화면·투어 카드·신뢰 영역)은
+ * 저장 뒤 EN/JA 를 한국어 기준으로 자동 번역한다(lib/content-sync-server 의 목록).
+ */
 export async function saveContent(key: string, value: Json): Promise<SaveState> {
   await requireAdmin();
   try {
     await setSiteContent(key, value);
-    const sync = key === CONTENT_KEYS.gallery ? await syncTranslations({ kind: 'gallery', key }) : undefined;
+    const item = syncItemFor(key);
+    const sync = item ? await syncTranslations(item) : undefined;
     revalidatePath('/', 'layout');
     return { ok: true, sync };
   } catch (e) {

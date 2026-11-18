@@ -15,6 +15,7 @@ import {
   parseHomeTestimonials,
   parseHomeAssurances,
   parseHomeTourCopy,
+  homeTextDoc,
   nonEmpty
 } from '@/lib/home-content';
 import OceanHome, { type HomeContent } from '@/components/OceanHome';
@@ -49,6 +50,7 @@ export default async function HomePage({
   setRequestLocale(locale);
 
   const tSchedule = await getTranslations('schedule');
+  const tFooter = await getTranslations('footer');
   const overrides = await getSiteContentMap();
 
   // 블로그("오늘의 오키니티") — 공개글 최신순. 한국어 콘텐츠 전용이라 EN/JA 홈에서는 섹션 숨김.
@@ -82,23 +84,24 @@ export default async function HomePage({
   const tourOptions = reserveOptionsFor(tourDocsIn(overrides, locale));
 
   // 어드민 편집 가능한 미디어(배경영상·투어 카드·갤러리). 비우면 기본값 사용.
-  const heroOv = overrides[CONTENT_KEYS.hero] as
-    | {
-        mediaUrl?: string;
-        mediaType?: string;
-        eyebrow?: string;
-        title?: string;
-        subtitle?: string;
-        badge1?: string;
-        badge2?: string;
-        badge3?: string;
-        ctaReserve?: string;
-        ctaExplore?: string;
-        hideEyebrow?: boolean;
-        hideSubtitle?: boolean;
-        hideBadges?: boolean;
-      }
-    | undefined;
+  // 배경 미디어·숨김 여부는 언어 공통(한국어 저장본), 문구는 이 언어 저장본(EN/JA 는 자동 번역본).
+  type HeroDoc = {
+    mediaUrl?: string;
+    mediaType?: string;
+    eyebrow?: string;
+    title?: string;
+    subtitle?: string;
+    badge1?: string;
+    badge2?: string;
+    badge3?: string;
+    ctaReserve?: string;
+    ctaExplore?: string;
+    hideEyebrow?: boolean;
+    hideSubtitle?: boolean;
+    hideBadges?: boolean;
+  };
+  const heroOv = overrides[CONTENT_KEYS.hero] as HeroDoc | undefined;
+  const heroText = homeTextDoc(overrides, CONTENT_KEYS.hero, locale) as HeroDoc | undefined;
   const galleryItems = overrides[CONTENT_KEYS.gallery]?.items;
   const galleryImages = Array.isArray(galleryItems)
     ? (galleryItems as { image?: string }[]).map((g) => cdnMedia(g.image)).filter(Boolean)
@@ -111,16 +114,16 @@ export default async function HomePage({
         )
       : undefined;
 
-  // 어드민 hero 텍스트 오버라이드는 한국어로 입력된 운영자 콘텐츠라 기본 로케일(ko)에서만 적용.
-  // en/ja는 i18n 번역 기본값(ocean 네임스페이스)을 쓴다(어드민 다국어 입력은 후속 과제).
+  // 홈 문구(Hero·투어 카드·신뢰 영역)는 운영자가 한국어로 입력하고, 저장하면 EN/JA 번역본이 자동으로
+  // 만들어진다(lib/content-sync). EN/JA 는 번역본이 있을 때만 적용하고, 없으면 i18n 기본 문구(ocean 네임스페이스).
   // 배경 영상/이미지(media.hero)는 텍스트가 아니므로 전 로케일 공통 적용.
   const isDefaultLocale = locale === routing.defaultLocale;
   const media = {
     hero: heroOv?.mediaUrl?.trim()
       ? { url: cdnMedia(heroOv.mediaUrl), type: mediaKind(heroOv.mediaUrl, heroOv.mediaType) } // 종류는 파일 확장자 우선
       : undefined,
-    heroText: isDefaultLocale
-      ? { eyebrow: heroOv?.eyebrow, title: heroOv?.title, subtitle: heroOv?.subtitle }
+    heroText: heroText
+      ? { eyebrow: heroText.eyebrow, title: heroText.title, subtitle: heroText.subtitle }
       : undefined,
     // 표시/숨김은 구조적 결정이라 전 로케일 공통 적용(배경 미디어와 동일).
     heroHide: {
@@ -132,28 +135,29 @@ export default async function HomePage({
     tours: tourImages
   };
 
-  // 섹션 텍스트 어드민 오버라이드(후기·신뢰·투어카피·Hero 배지/CTA) — 운영자 한국어 입력이라
-  // 기본 로케일(ko)에만 적용. en/ja는 i18n 번역 사용(다국어 회귀 방지).
-  const content: HomeContent | undefined = isDefaultLocale
-    ? {
-        heroExtra: {
-          badges: [heroOv?.badge1, heroOv?.badge2, heroOv?.badge3]
-            .map(nonEmpty)
-            .filter((b): b is string => !!b),
-          ctaReserve: nonEmpty(heroOv?.ctaReserve),
-          ctaExplore: nonEmpty(heroOv?.ctaExplore)
-        },
-        tours: parseHomeTourCopy(overrides[HOME_CONTENT_KEYS.tourCopy]),
-        assurances: parseHomeAssurances(overrides[HOME_CONTENT_KEYS.assurances]),
-        testimonials: parseHomeTestimonials(overrides[HOME_CONTENT_KEYS.testimonials])
-      }
-    : undefined;
+  // 섹션 텍스트 오버라이드(Hero 배지/CTA·투어카피·신뢰) — 이 언어 저장본(EN/JA 는 자동 번역본, 없으면 i18n).
+  // 후기는 손님이 쓴 글이라 번역하지 않고 한국어 홈에만 적용.
+  const content: HomeContent = {
+    heroExtra: {
+      badges: [heroText?.badge1, heroText?.badge2, heroText?.badge3]
+        .map(nonEmpty)
+        .filter((b): b is string => !!b),
+      ctaReserve: nonEmpty(heroText?.ctaReserve),
+      ctaExplore: nonEmpty(heroText?.ctaExplore)
+    },
+    tours: parseHomeTourCopy(homeTextDoc(overrides, HOME_CONTENT_KEYS.tourCopy, locale)),
+    assurances: parseHomeAssurances(homeTextDoc(overrides, HOME_CONTENT_KEYS.assurances, locale)),
+    testimonials: isDefaultLocale ? parseHomeTestimonials(overrides[HOME_CONTENT_KEYS.testimonials]) : undefined
+  };
 
   // 구조화 데이터(JSON-LD) — 구글이 "OKINITY = 오키나와 다이빙샵(주소·연락처)"를
   // 명확히 인식하도록. 브랜드/지역 검색 노출에 유리.
-  const jsonLd = {
-    '@context': 'https://schema.org',
+  const businessId = `${site.url}/#business`;
+  const rep = site.representative;
+  const repName = rep.names[locale as keyof typeof rep.names] ?? rep.names.ko;
+  const business = {
     '@type': 'LocalBusiness',
+    '@id': businessId,
     name: site.name,
     // 한글·일문 표기 병기 — "오키니티" 검색어와 브랜드를 연결하는 신호
     alternateName: ['오키니티', 'オキニティ', 'Okinity'],
@@ -175,6 +179,16 @@ export default async function HomePage({
     areaServed: 'Okinawa, Japan',
     sameAs: [site.contact.kakaoChannel, site.contact.line].filter(Boolean)
   };
+  // 대표 — 한국·일본 이름이 같은 사람임을 연결. 사이트(하단·소개)에 실제로 보이는 이름만 담는다.
+  const representative = {
+    '@type': 'Person',
+    '@id': `${site.url}/#representative`,
+    name: repName,
+    alternateName: rep.aliases.filter((n) => n !== repName),
+    jobTitle: tFooter('representative'),
+    worksFor: { '@id': businessId }
+  };
+  const jsonLd = { '@context': 'https://schema.org', '@graph': [business, representative] };
 
   // 구글맵 후기 — 랜딩 후기 카드 수(3)에 맞춰 별점 높은 순으로. 키 미설정/실패 시 null(기존 후기 표시).
   const googleReviews = await getGoogleReviews(locale, 3);

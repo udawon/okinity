@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { site } from '@/config/site.config';
 import Container from './Container';
 
@@ -79,8 +79,15 @@ function ContactRow({
   );
 }
 
+/** 하단 대표 표기 — 언어별(한국·일본 이름 병기). 알 수 없는 언어는 한국어 표기. */
+function representativeIn(locale: string): string {
+  const r = site.representative;
+  return locale === 'en' ? r.en : locale === 'ja' ? r.ja : r.ko;
+}
+
 export default async function Footer() {
   const t = await getTranslations('footer');
+  const locale = await getLocale();
   const telHref = `tel:${site.phone.replace(/[^+\d]/g, '')}`;
 
   return (
@@ -103,7 +110,7 @@ export default async function Footer() {
               {site.phone}
             </a>
             <br />
-            {site.address.representative}
+            {t('representative')} {representativeIn(locale)}
           </address>
           <p className="mt-5 text-xs text-white/40">
             {t('rights', { year: new Date().getFullYear() })}

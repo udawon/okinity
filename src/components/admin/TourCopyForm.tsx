@@ -33,7 +33,7 @@ export default function TourCopyForm({
   const [title, setTitle] = useState(defaultTitle ?? '');
   const [intro, setIntro] = useState(defaultIntro ?? '');
   const [cards, setCards] = useState<Record<string, TourCardCopy>>(defaults);
-  const { status, show } = useSaveStatus();
+  const { status, show, showSaved } = useSaveStatus();
   const [saving, setSaving] = useState(false);
 
   const patch = (id: string, p: Partial<TourCardCopy>) =>
@@ -52,7 +52,7 @@ export default function TourCopyForm({
       cards: cleaned
     }));
     setSaving(false);
-    if (res.ok) show('저장되었습니다.');
+    if (res.ok) showSaved('저장되었습니다.', res.sync);
     else show(res.error ?? '저장 실패', 'err');
   }
 

@@ -653,7 +653,7 @@ export default function TourEditor({
           id="tour-included"
           value={included}
           onChange={(e) => setIncluded(e.target.value)}
-          placeholder={'장비 일체\n한국어 가이드\n수중 사진 원본\n숙소 픽업'}
+          placeholder={'장비 일체\n한국어 가이드\n수중 사진 원본'}
           rows={4}
           disabled={disabled}
           className={`${inputCls} resize-y !rounded-card`}
