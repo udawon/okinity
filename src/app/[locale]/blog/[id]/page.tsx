@@ -4,10 +4,12 @@ import { notFound, redirect } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import {
+  blogDescription,
+  blogSeoTitle,
   coverOf,
   displayTitle,
-  excerptOf,
   groupBlocks,
+  koDateLabel,
   parseBlogItems,
   postTourSlug,
   publishedSorted,
@@ -15,7 +17,9 @@ import {
 } from '@/lib/blog';
 import { getTourCatalogEntry, resolveTourDetail, tourImages } from '@/lib/tour';
 import { cdnMedia } from '@/lib/media';
-import { localeAlternates } from '@/lib/seo';
+import { koOnlyAlternates } from '@/lib/seo';
+import { blogPostingJsonLd } from '@/lib/structured-data';
+import { site } from '@/config/site.config';
 import { isAdminPreview } from '@/lib/admin-preview';
 import Container from '@/components/Container';
 import DraftNotice from '@/components/DraftNotice';
@@ -52,14 +56,17 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; id: string }>;
 }): Promise<Metadata> {
-  const { locale, id } = await params;
+  const { id } = await params;
   const { post } = await loadPosts(id);
+  const tourSlug = post ? postTourSlug(post) : null;
   return {
-    title: post ? displayTitle(post.title) || '블로그' : '블로그',
-    description: post ? excerptOf(post) : undefined,
+    // 검색 제목에만 날짜 — 같은 제목("푸른동굴 투어")의 글이 많아 구분용(화면 제목은 그대로)
+    title: post ? blogSeoTitle(post) : '블로그',
+    description: post ? blogDescription(post, (tourSlug && getTourCatalogEntry(tourSlug)?.name) || null) : undefined,
     // 초안은 어드민에게만 보이지만, 색인 대상이 아님을 명시해 둔다.
     ...(post && !post.published ? { robots: { index: false, follow: false } } : {}),
-    alternates: localeAlternates(locale, `/blog/${id}`)
+    // 블로그는 한국어 전용 — EN/JA 대체 주소를 선언하지 않는다(사이트맵과 일치)
+    alternates: koOnlyAlternates(`/blog/${id}`)
   };
 }
 
@@ -121,8 +128,23 @@ export default async function BlogPostPage({
     .filter((p) => !tourSlug || postTourSlug(p) === tourSlug)
     .slice(0, 3);
 
+  // 구조화 데이터 — 작성일·작성자(대표와 같은 사람)·이 날의 투어. 화면에 보이는 정보만.
+  const jsonLd = blogPostingJsonLd({
+    id: post.id,
+    headline: title,
+    date: post.date,
+    description: blogDescription(post, tourEntry?.name ?? null),
+    images: groups.flatMap((g) => (g.kind === 'photos' ? g.photos.map((p) => cdnMedia(p.url)) : [])).slice(0, 5),
+    tour: tourEntry ? { slug: tourEntry.slug, name: tourEntry.name } : null
+  });
+  // 사진 설명이 없을 때의 대체 문구 — 같은 제목의 글이 많아 날짜까지(예: 푸른동굴 투어 2026년 11월 5일 사진 1)
+  const photoAltBase = [title, koDateLabel(post.date)].filter(Boolean).join(' ');
+
   return (
     <article className="break-keep py-12 sm:py-16">
+      {post.published && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      )}
       <Container size="text">
         {!post.published && <DraftNotice editHref={`/admin/blog/${post.id}`} />}
 
@@ -141,6 +163,13 @@ export default async function BlogPostPage({
               </Link>
             )}
             {post.date && <span>{formatDate(post.date, locale)}</span>}
+            {/* 작성자 — 소개 페이지의 "허범영 A.K.A 포뇨강사"로 연결(구조화 데이터의 author 와 같은 사람) */}
+            <span className="text-white/50">
+              ·{' '}
+              <Link href="/about" className="transition-colors hover:text-white">
+                {site.representative.byline}
+              </Link>
+            </span>
             {(photoCount > 0 || videoCount > 0) && (
               <span className="text-white/50">
                 · {[photoCount > 0 && `사진 ${photoCount}장`, videoCount > 0 && `영상 ${videoCount}개`].filter(Boolean).join(' · ')}
@@ -150,7 +179,7 @@ export default async function BlogPostPage({
           <h1 className="user-text mt-3 text-balance font-serif text-3xl leading-tight text-white sm:text-4xl">{title}</h1>
         </header>
 
-        <BlogBody groups={groups} title={title} />
+        <BlogBody groups={groups} title={photoAltBase} />
 
         {tourEntry && tourDetail && (
           <section className="mt-12 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#0e3858]/90 to-[#061522]/90 backdrop-blur-md sm:flex">

@@ -21,3 +21,12 @@ export function localeAlternates(locale: string, path: string): Metadata['altern
     }
   };
 }
+
+/**
+ * 한국어 전용 페이지(블로그·공지) — EN/JA 주소는 홈으로 넘어가므로 대체 언어를 선언하지 않는다
+ * (사이트맵과 같은 신호. 없는 번역본을 hreflang 으로 알리면 검색엔진이 오류로 본다).
+ */
+export function koOnlyAlternates(path: string): Metadata['alternates'] {
+  const ko = `${site.url}/ko${path}`;
+  return { canonical: ko, languages: { ko, 'x-default': ko } };
+}

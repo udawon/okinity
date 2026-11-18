@@ -101,6 +101,48 @@ export function excerptOf(post: BlogPost, max = 80): string {
   return s.length > max ? s.slice(0, max) + '…' : s;
 }
 
+/** 'YYYY-MM-DD' → '2026년 11월 5일'(문자열 그대로 읽어 시간대 영향 없음). 형식이 아니면 그대로. */
+export function koDateLabel(date: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date.trim());
+  return m ? `${m[1]}년 ${Number(m[2])}월 ${Number(m[3])}일` : date;
+}
+
+/**
+ * 검색 결과·브라우저 탭 제목 — 같은 제목("푸른동굴 투어")의 글이 많아 날짜로 구분한다.
+ * 화면 제목(h1)은 그대로 두고 여기에만 붙인다(2026-11-18 원님 결정).
+ */
+export function blogSeoTitle(post: BlogPost): string {
+  const label = koDateLabel(post.date);
+  return `${displayTitle(post.title) || '블로그'}${label ? ` (${label})` : ''}`;
+}
+
+/**
+ * 검색 요약문 — 본문이 있으면 본문 요약, 없으면 날짜·이 날의 투어·사진/영상 수로 만든 문장.
+ * 본문이 없는 글에 내용을 지어내지 않는다(현장 사실은 작성자만 안다).
+ */
+export function blogDescription(post: BlogPost, tourName: string | null, max = 150): string {
+  const excerpt = excerptOf(post, max);
+  if (excerpt) return excerpt;
+  const photos = post.blocks.filter((b) => b.type === 'image' && b.url).length;
+  const videos = post.blocks.filter((b) => b.type === 'video' && b.url).length;
+  const counts = [photos && `사진 ${photos}장`, videos && `영상 ${videos}개`].filter(Boolean).join(' · ');
+  const head = [koDateLabel(post.date), '오키니티', tourName, '현장 기록.'].filter(Boolean).join(' ');
+  return counts ? `${head} ${counts}.` : head;
+}
+
+/**
+ * 어드민 본문 칸 안내(빈 칸에만 흐리게 보임) — 2~3분 안에 현장 사실을 적도록 질문으로.
+ * AI·검색이 인용하는 건 이런 현장 정보다(다른 사이트에 없음).
+ */
+export const BLOG_WRITING_GUIDE = [
+  '오늘 어디서 진행했나요? (장소가 바뀌었다면 이유도)',
+  '바다는 어땠나요? (파도·수온·시야)',
+  '무엇을 만났나요? (거북이·니모 등)',
+  '다음 손님에게 한마디 팁은?',
+  '',
+  '예) 파도가 높아 마에다 플랫에서 진행. 수온 25도, 시야 15m, 거북이 2마리!'
+].join('\n');
+
 /** 블로그 투어 연결에서 '연결 안 함'을 뜻하는 값. */
 export const BLOG_TOUR_NONE = 'none';
 

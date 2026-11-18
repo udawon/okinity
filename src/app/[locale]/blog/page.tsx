@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Locale } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseBlogItems, publishedSorted } from '@/lib/blog';
-import { localeAlternates } from '@/lib/seo';
+import { koOnlyAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
 import BlogCard from '@/components/BlogCard';
 
@@ -20,7 +20,7 @@ export async function generateMetadata({
   return {
     title: t('sectionTitle'),
     description: t('sectionIntro'),
-    alternates: localeAlternates(locale, '/blog')
+    alternates: koOnlyAlternates('/blog') // 한국어 전용 — EN/JA 대체 주소 선언 안 함
   };
 }
 

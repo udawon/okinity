@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseNoticeItems, publishedNotices, excerptOf, mediaLabel } from '@/lib/notice';
-import { localeAlternates } from '@/lib/seo';
+import { koOnlyAlternates } from '@/lib/seo';
 import Container from '@/components/Container';
 
 export const dynamic = 'force-dynamic';
@@ -29,7 +29,7 @@ export async function generateMetadata({
   return {
     title: t('title'),
     description: t('intro'),
-    alternates: localeAlternates(locale, '/notice')
+    alternates: koOnlyAlternates('/notice') // 한국어 전용 — EN/JA 대체 주소 선언 안 함
   };
 }
 

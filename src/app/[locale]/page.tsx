@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { site } from '@/config/site.config';
 import { localeAlternates } from '@/lib/seo';
+import { BUSINESS_ID, representativePerson } from '@/lib/structured-data';
 import { getSchedule, type ScheduleItem } from '@/lib/content';
 import { normalizeScheduleItems } from '@/lib/schedule-range';
 import { getGoogleReviews } from '@/lib/google-reviews';
@@ -152,12 +153,9 @@ export default async function HomePage({
 
   // 구조화 데이터(JSON-LD) — 구글이 "OKINITY = 오키나와 다이빙샵(주소·연락처)"를
   // 명확히 인식하도록. 브랜드/지역 검색 노출에 유리.
-  const businessId = `${site.url}/#business`;
-  const rep = site.representative;
-  const repName = rep.names[locale as keyof typeof rep.names] ?? rep.names.ko;
   const business = {
     '@type': 'LocalBusiness',
-    '@id': businessId,
+    '@id': BUSINESS_ID,
     name: site.name,
     // 한글·일문 표기 병기 — "오키니티" 검색어와 브랜드를 연결하는 신호
     alternateName: ['오키니티', 'オキニティ', 'Okinity'],
@@ -179,15 +177,8 @@ export default async function HomePage({
     areaServed: 'Okinawa, Japan',
     sameAs: [site.contact.kakaoChannel, site.contact.line].filter(Boolean)
   };
-  // 대표 — 한국·일본 이름이 같은 사람임을 연결. 사이트(하단·소개)에 실제로 보이는 이름만 담는다.
-  const representative = {
-    '@type': 'Person',
-    '@id': `${site.url}/#representative`,
-    name: repName,
-    alternateName: rep.aliases.filter((n) => n !== repName),
-    jobTitle: tFooter('representative'),
-    worksFor: { '@id': businessId }
-  };
+  // 대표 — 한국·일본 이름이 같은 사람임을 연결(블로그 작성자와 같은 @id).
+  const representative = representativePerson(locale, tFooter('representative'));
   const jsonLd = { '@context': 'https://schema.org', '@graph': [business, representative] };
 
   // 구글맵 후기 — 랜딩 후기 카드 수(3)에 맞춰 별점 높은 순으로. 키 미설정/실패 시 null(기존 후기 표시).

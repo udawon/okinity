@@ -30,6 +30,8 @@ export const site = {
     en: 'Beomyoung Heo (Higa Kaito)',
     ja: '比嘉海斗（ホ・ボミョン）',
     names: { ko: '허범영', en: 'Beomyoung Heo', ja: '比嘉海斗' },
+    // 블로그 글 작성자 표시(손님에게 익숙한 이름, 소개 페이지의 "A.K.A 포뇨강사")
+    byline: '포뇨강사',
     aliases: ['허범영', '比嘉海斗', 'Beomyoung Heo', 'Higa Kaito', 'ホ・ボミョン', '포뇨강사', 'Instructor Ponyo']
   },
   phone: '+81-90-1947-5156'

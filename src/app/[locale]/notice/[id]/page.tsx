@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { getSiteContent, CONTENT_KEYS } from '@/lib/site-content';
 import { parseNoticeItems, excerptOf } from '@/lib/notice';
-import { localeAlternates } from '@/lib/seo';
+import { koOnlyAlternates } from '@/lib/seo';
 import { isAdminPreview } from '@/lib/admin-preview';
 import Container from '@/components/Container';
 import MediaFigure from '@/components/MediaFigure';
@@ -47,7 +47,7 @@ export async function generateMetadata({
     description: post ? excerptOf(post) : undefined,
     // 초안은 어드민에게만 보이지만, 색인 대상이 아님을 명시해 둔다.
     ...(post && !post.published ? { robots: { index: false, follow: false } } : {}),
-    alternates: localeAlternates(locale, `/notice/${id}`)
+    alternates: koOnlyAlternates(`/notice/${id}`) // 한국어 전용 — EN/JA 대체 주소 선언 안 함
   };
 }
 
