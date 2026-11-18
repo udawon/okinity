@@ -25,26 +25,34 @@ export async function recordVisit(day: string, visitor: string, source?: string)
 export type SourceStats = {
   /** source 칸이 있는지(없으면 SQL 실행 필요) */
   ready: boolean;
-  /** 유입처별 방문자 수(많은 순). 유입처 기록 전 방문은 '(기록 전)' */
+  /** 유입처별 방문자 수(많은 순) — 유입이 기록된 방문만 */
   rows: { source: string; count: number }[];
+  /** 유입이 기록된 방문자 수 — 비율의 분모 */
   total: number;
+  /** 유입 기록 기능 배포 전 방문자 수(유입처 없음) — 비율에서 제외 */
+  untracked: number;
 };
 
 /** 기간(포함) 유입처별 방문자 수. */
 export async function getSourceStats(from: string, to: string): Promise<SourceStats> {
+  const none: SourceStats = { ready: false, rows: [], total: 0, untracked: 0 };
   const sb = getSupabaseAdmin();
-  if (!sb) return { ready: false, rows: [], total: 0 };
+  if (!sb) return none;
   const { data, error } = await fetchAllPages<{ source: string | null }>((a, b) =>
     sb.from(TABLE).select('source').gte('day', from).lte('day', to).order('day').order('visitor').range(a, b)
   );
-  if (error) return { ready: false, rows: [], total: 0 };
+  if (error) return none;
   const counts = new Map<string, number>();
+  let untracked = 0;
   for (const r of data) {
-    const k = r.source ?? '(기록 전)';
-    counts.set(k, (counts.get(k) ?? 0) + 1);
+    if (!r.source) {
+      untracked++;
+      continue;
+    }
+    counts.set(r.source, (counts.get(r.source) ?? 0) + 1);
   }
   const rows = [...counts].map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count);
-  return { ready: true, rows, total: rows.reduce((n, r) => n + r.count, 0) };
+  return { ready: true, rows, total: rows.reduce((n, r) => n + r.count, 0), untracked };
 }
 
 export type VisitStats = {

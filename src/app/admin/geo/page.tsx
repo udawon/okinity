@@ -60,7 +60,7 @@ export default async function AdminGeoPage() {
   const notReady = enabled && (!sources.ready || !crawlers.ready || !geo.ready);
 
   const stats = [
-    { label: 'AI에서 온 방문자 · 30일', value: sources.ready ? String(aiVisits) : '—', sub: sources.ready ? `전체 ${sources.total}명 중 ${pct(aiVisits, sources.total)}` : 'SQL 실행 필요' },
+    { label: 'AI에서 온 방문자 · 30일', value: sources.ready ? String(aiVisits) : '—', sub: sources.ready ? `유입 기록된 ${sources.total}명 중 ${pct(aiVisits, sources.total)}` : 'SQL 실행 필요' },
     { label: 'AI가 거친 예약 문의 · 90일', value: String(inq.ai.length), sub: `유입 기록된 문의 ${inq.tracked}건 중` },
     { label: 'AI 크롤러 방문 · 30일', value: crawlers.ready ? String(aiBots.reduce((n, b) => n + b.hits, 0)) : '—', sub: crawlers.ready ? `${aiBots.length}종` : 'SQL 실행 필요' },
     {
@@ -127,6 +127,11 @@ export default async function AdminGeoPage() {
             </ul>
           ) : (
             <p className="mt-3 text-sm text-muted">아직 기록이 없습니다.</p>
+          )}
+          {sources.untracked > 0 && (
+            <p className="mt-3 text-xs text-muted">
+              유입 기록 전(기능 배포 이전) 방문 {sources.untracked}명은 비율 계산에서 뺐습니다.
+            </p>
           )}
         </section>
 
