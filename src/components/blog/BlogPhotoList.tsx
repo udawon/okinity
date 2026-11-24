@@ -6,7 +6,7 @@ import type { BlogPhoto } from '@/lib/blog';
 
 /**
  * 블로그 연속 사진 — 한 장씩 위에서 아래로 나열(가장 단순한 방식). 누르면 크게 보기(onOpen).
- * - 가로 사진은 본문 폭 가득, 세로 사진은 화면 높이의 80%까지만 커지고 가운데 정렬(잘림 없음).
+ * - 가로 사진은 페이지 폭 가득(화면 높이 80%를 넘으면 그만큼 줄여 가운데), 세로 사진은 화면 높이의 80%까지만 커지고 가운데 정렬(잘림 없음).
  * - 설명은 각 사진 바로 아래.
  */
 export default function BlogPhotoList({
@@ -74,7 +74,7 @@ function BlogPhotoItem({
           className={
             loaded
               ? 'block h-auto max-h-[80svh] w-auto max-w-full rounded-card'
-              : 'block aspect-[4/3] w-full rounded-card bg-white/[0.04]'
+              : 'block aspect-[4/3] max-h-[80svh] w-full rounded-card bg-white/[0.04]'
           }
         />
       </button>

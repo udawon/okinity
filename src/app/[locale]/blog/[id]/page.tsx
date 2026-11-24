@@ -145,7 +145,8 @@ export default async function BlogPostPage({
       {post.published && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
       )}
-      <Container size="text">
+      {/* 폭: 제목·글·사진 모두 메뉴바와 같은 전체 폭(왼쪽 끝 = 로고). */}
+      <Container>
         {!post.published && <DraftNotice editHref={`/admin/blog/${post.id}`} />}
 
         <Link href="/blog" className="text-sm text-white/60 transition-colors hover:text-white">
