@@ -48,9 +48,11 @@ export default async function AboutPage({
   });
 
   return (
-    <section className="py-14 sm:py-20">
+    // 폭: 메뉴바와 같은 전체 폭(로고~예약 버튼)에 왼쪽 끝을 맞춘다. 글 문단도 같은 폭을 그대로 쓴다(한 줄에 들어가는 문장을 억지로 꺾지 않음).
+    // break-keep: 한국어를 어절 단위로 줄바꿈(카드 제목이 "진/행하는"처럼 끊기던 문제). 일본어는 globals.css 에서 기본 줄바꿈으로 되돌림.
+    <section className="break-keep py-14 sm:py-20">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
-      <Container size="text" className="[text-shadow:0_2px_14px_rgba(0,0,0,0.45)]">
+      <Container className="[text-shadow:0_2px_14px_rgba(0,0,0,0.45)]">
         {/* 상단 소개 */}
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200/80">
           {about.eyebrow}
@@ -66,7 +68,7 @@ export default async function AboutPage({
           })}
         </h1>
         {about.intro && (
-          <p className="user-text mt-5 max-w-2xl text-lg leading-relaxed text-white/80">{about.intro}</p>
+          <p className="user-text mt-5 text-lg leading-relaxed text-white/80">{about.intro}</p>
         )}
 
         {about.heroImage && (
@@ -75,7 +77,7 @@ export default async function AboutPage({
             <img
               src={cdnMedia(about.heroImage)}
               alt={about.instructorName || '소개 이미지'}
-              className="aspect-[16/9] w-full object-cover"
+              className="aspect-[16/9] w-full object-cover lg:aspect-[2/1]"
             />
           </div>
         )}
